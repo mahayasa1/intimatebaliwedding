@@ -7,7 +7,7 @@
         width: 100%;
         z-index: 1000;
         transition: background-color 0.3s ease, box-shadow 0.3s ease;
-        padding: 1rem 0;
+        padding-top: 10px;
         background: rgba(0, 0, 0, 0.3);
         min-height: 80px;
         display: flex;
@@ -24,13 +24,14 @@
         width: 100%;
         margin: 0 auto;
         padding: 0 2rem;
-        display: flex;
-        justify-content: space-between;
+        display: grid;
+        grid-template-columns: 200px 1fr 200px;
         align-items: center;
         height: 100%;
+        gap: 2rem;
     }
 
-    /* Logo */
+    /* Logo - Left */
     .navbar-logo {
         font-family: 'Playfair Display', serif;
         font-size: 1.5rem;
@@ -39,17 +40,19 @@
         text-decoration: none;
         transition: color 0.3s;
         z-index: 1001;
+        justify-self: start;
     }
 
     nav#navbar.scrolled .navbar-logo {
         color: #333;
     }
 
-    /* Desktop Menu */
+    /* Desktop Menu - Center */
     .navbar-menu {
         display: flex;
         align-items: center;
-        gap: 2rem;
+        justify-content: center;
+        gap: 2.5rem;
     }
 
     .navbar-menu a {
@@ -86,11 +89,17 @@
         width: 100%;
     }
 
+    /* CTA Button Container - Right */
+    .navbar-cta-container {
+        justify-self: end;
+    }
+
     /* CTA Button in Navbar */
     .navbar-cta {
-        background: #D4AF37;
+        background: transparent;
         color: white !important;
-        padding: 0.6rem 1.5rem;
+        padding: 0.7rem 1.8rem;
+        border: 2.5px solid white;
         border-radius: 4px;
         font-weight: 600;
         text-transform: uppercase;
@@ -98,16 +107,32 @@
         transition: all 0.3s;
         text-decoration: none;
         font-size: 0.85rem;
+        display: inline-block;
+        white-space: nowrap;
     }
 
     .navbar-cta:hover {
-        background: #B8941F;
+        background: white;
+        color: #333 !important;
         transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+        box-shadow: 0 4px 12px rgba(255, 255, 255, 0.3);
     }
 
     .navbar-cta::after {
         display: none;
+    }
+
+    /* Scrolled state CTA */
+    nav#navbar.scrolled .navbar-cta {
+        border-color: #333;
+        color: #333 !important;
+    }
+
+    nav#navbar.scrolled .navbar-cta:hover {
+        background: #333;
+        color: white !important;
+        border-color: #333;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     }
 
     /* Mobile Menu Button */
@@ -120,6 +145,7 @@
         cursor: pointer;
         padding: 0.5rem;
         z-index: 1001;
+        justify-self: end;
     }
 
     .mobile-menu-btn span {
@@ -209,9 +235,10 @@
 
     .mobile-menu-cta {
         margin: 1rem 1.5rem;
-        background: #D4AF37;
-        color: white;
+        background: transparent;
+        color: #333;
         padding: 1rem;
+        border: 2.5px solid #333;
         border-radius: 4px;
         font-weight: 600;
         text-transform: uppercase;
@@ -223,7 +250,8 @@
     }
 
     .mobile-menu-cta:hover {
-        background: #B8941F;
+        background: #333;
+        color: white;
     }
 
     /* Mobile Menu Overlay */
@@ -246,6 +274,60 @@
     }
 
     /* Responsive */
+    @media (max-width: 1200px) {
+        .navbar-container {
+            gap: 1rem;
+            grid-template-columns: 180px 1fr 180px;
+        }
+
+        .navbar-menu {
+            gap: 1.8rem;
+        }
+
+        .navbar-menu a {
+            font-size: 0.85rem;
+        }
+
+        .navbar-cta {
+            padding: 0.6rem 1.4rem;
+            font-size: 0.8rem;
+        }
+    }
+
+    @media (max-width: 1024px) {
+        .navbar-container {
+            grid-template-columns: 160px 1fr 160px;
+        }
+
+        .navbar-menu {
+            gap: 1.5rem;
+        }
+
+        .navbar-menu a {
+            font-size: 0.8rem;
+        }
+    }
+
+    @media (max-width: 900px) {
+        .navbar-container {
+            grid-template-columns: 150px 1fr 150px;
+        }
+
+        .navbar-menu {
+            gap: 1.2rem;
+        }
+
+        .navbar-menu a {
+            font-size: 0.75rem;
+            letter-spacing: 0.5px;
+        }
+
+        .navbar-cta {
+            padding: 0.5rem 1.2rem;
+            font-size: 0.75rem;
+        }
+    }
+
     @media (max-width: 768px) {
         nav#navbar {
             min-height: 70px;
@@ -253,9 +335,14 @@
 
         .navbar-container {
             padding: 0 1rem;
+            grid-template-columns: 1fr auto;
         }
 
         .navbar-menu {
+            display: none;
+        }
+
+        .navbar-cta-container {
             display: none;
         }
 
@@ -274,20 +361,24 @@
 <!-- Navigation -->
 <nav id="navbar">
     <div class="navbar-container">
-        <!-- Logo -->
+        <!-- Logo - Left -->
         <a href="{{ url('/') }}" class="navbar-logo">
-            INTIMATE BALI
+            <img src="{{ asset('assets/logo_IBW_1.png') }}" alt="Intimate Bali Wedding Logo" style="margin-left: 2rem; height:65px;">
         </a>
 
-        <!-- Desktop Menu -->
+        <!-- Desktop Menu - Center -->
         <div class="navbar-menu">
-            <a href="#home">Home</a>
-            <a href="#about">About</a>
-            <a href="#packages">Packages</a>
-            <a href="#gallery">Gallery</a>
-            <a href="#testimonials">Testimonials</a>
-            <a href="#contact">Contact</a>
-            <a href="#contact" class="navbar-cta">Inquire Now</a>
+            <a href="{{ route('home') }}">Home</a>
+            <a href="{{ route('about') }}">About</a>
+            <a href="{{ route('services.public') }}">Services</a>
+            <a href="{{ route('packages.public') }}">Packages</a>
+            <a href="{{ route('gallery.public') }}">Gallery</a>
+            <a href="{{ route('blog.public') }}">Blog</a>
+        </div>
+
+        <!-- CTA Button - Right -->
+        <div class="navbar-cta-container">
+            <a href="{{ route('contact') }}" class="navbar-cta">Inquire Now</a>
         </div>
 
         <!-- Mobile Menu Button -->
@@ -308,13 +399,13 @@
         </button>
     </div>
     <div class="mobile-menu-links">
-        <a href="#home">Home</a>
-        <a href="#about">About</a>
-        <a href="#packages">Packages</a>
-        <a href="#gallery">Gallery</a>
-        <a href="#testimonials">Testimonials</a>
-        <a href="#contact">Contact</a>
+        <a href="{{ route('home') }}">Home</a>
+        <a href="{{ route('about') }}">About</a>
+        <a href="{{ route('services.public') }}">Services</a>
+        <a href="{{ route('packages.public') }}">Packages</a>
+        <a href="{{ route('gallery.public') }}">Gallery</a>
+        <a href="{{ route('blog.public') }}">Blog</a>
     </div>
-    <a href="#contact" class="mobile-menu-cta">Inquire Now</a>
+    <a href="{{ route('contact') }}" class="mobile-menu-cta">Inquire Now</a>
 </div>
 <div class="mobile-menu-overlay" id="mobile-menu-overlay"></div>

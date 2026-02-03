@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('services', function (Blueprint $table) {
-            $table->uuid();
+            $table->uuid('id')->primary();
             $table->string('name');
             $table->foreignUuid('package_id')->constrained('packages')->onDelete('cascade');
             $table->string('foto')->nullable();

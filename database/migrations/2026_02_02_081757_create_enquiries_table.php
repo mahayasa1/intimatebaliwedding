@@ -12,8 +12,17 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('enquiries', function (Blueprint $table) {
-            $table->id();
+            $table->uuid('id')->primary();
+            $table->string('name');
+            $table->string('email');
+            $table->string('phone')->nullable();
+            $table->string('wedding_date')->nullable();
+            $table->string('wedding_type')->nullable();
+            $table->integer('guest_count')->nullable();
+            $table->text('message');
+            $table->enum('status', ['new', 'contacted', 'in_progress', 'completed', 'cancelled'])->default('new');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

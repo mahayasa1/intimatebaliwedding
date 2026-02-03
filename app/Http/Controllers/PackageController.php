@@ -12,7 +12,8 @@ class PackageController extends Controller
      */
     public function index()
     {
-        //
+        $packages = Package::withCount('services')->latest()->paginate(12);
+        return view('packages.index', compact('packages'));
     }
 
     /**
@@ -20,7 +21,7 @@ class PackageController extends Controller
      */
     public function create()
     {
-        //
+        return view('packages.create');
     }
 
     /**
@@ -28,7 +29,15 @@ class PackageController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+        ]);
+
+        Package::create($validated);
+
+        return redirect()->route('packages.index')
+            ->with('success', 'Package created successfully.');
     }
 
     /**
@@ -36,7 +45,8 @@ class PackageController extends Controller
      */
     public function show(Package $package)
     {
-        //
+        $package->load('services');
+        return view('packages.show', compact('package'));
     }
 
     /**
@@ -44,7 +54,7 @@ class PackageController extends Controller
      */
     public function edit(Package $package)
     {
-        //
+        return view('packages.edit', compact('package'));
     }
 
     /**
@@ -52,7 +62,15 @@ class PackageController extends Controller
      */
     public function update(Request $request, Package $package)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+        ]);
+
+        $package->update($validated);
+
+        return redirect()->route('packages.index')
+            ->with('success', 'Package updated successfully.');
     }
 
     /**
@@ -60,6 +78,15 @@ class PackageController extends Controller
      */
     public function destroy(Package $package)
     {
-        //
+        // Check if package has services
+        if ($package->services()->count() > 0) {
+            return redirect()->route('packages.index')
+                ->with('error', 'Cannot delete package with existing services.');
+        }
+
+        $package->delete();
+
+        return redirect()->route('packages.index')
+            ->with('success', 'Package deleted successfully.');
     }
-}
+}   

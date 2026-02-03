@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Service;
+use App\Models\Package;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class ServiceController extends Controller
 {
@@ -12,7 +14,8 @@ class ServiceController extends Controller
      */
     public function index()
     {
-        //
+        $services = Service::with('package')->latest()->paginate(12);
+        return view('services.index', compact('services'));
     }
 
     /**
@@ -20,7 +23,8 @@ class ServiceController extends Controller
      */
     public function create()
     {
-        //
+        $packages = Package::all();
+        return view('services.create', compact('packages'));
     }
 
     /**
@@ -28,7 +32,21 @@ class ServiceController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'package_id' => 'required|exists:packages,id',
+            'foto' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'description' => 'nullable|string',
+        ]);
+
+        if ($request->hasFile('foto')) {
+            $validated['foto'] = $request->file('foto')->store('services', 'public');
+        }
+
+        Service::create($validated);
+
+        return redirect()->route('services.index')
+            ->with('success', 'Service created successfully.');
     }
 
     /**
@@ -36,7 +54,8 @@ class ServiceController extends Controller
      */
     public function show(Service $service)
     {
-        //
+        $service->load('package');
+        return view('services.show', compact('service'));
     }
 
     /**
@@ -44,7 +63,8 @@ class ServiceController extends Controller
      */
     public function edit(Service $service)
     {
-        //
+        $packages = Package::all();
+        return view('services.edit', compact('service', 'packages'));
     }
 
     /**
@@ -52,7 +72,25 @@ class ServiceController extends Controller
      */
     public function update(Request $request, Service $service)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'package_id' => 'required|exists:packages,id',
+            'foto' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'description' => 'nullable|string',
+        ]);
+
+        if ($request->hasFile('foto')) {
+            // Delete old image
+            if ($service->foto) {
+                Storage::disk('public')->delete($service->foto);
+            }
+            $validated['foto'] = $request->file('foto')->store('services', 'public');
+        }
+
+        $service->update($validated);
+
+        return redirect()->route('services.index')
+            ->with('success', 'Service updated successfully.');
     }
 
     /**
@@ -60,6 +98,13 @@ class ServiceController extends Controller
      */
     public function destroy(Service $service)
     {
-        //
+        if ($service->foto) {
+            Storage::disk('public')->delete($service->foto);
+        }
+
+        $service->delete();
+
+        return redirect()->route('services.index')
+            ->with('success', 'Service deleted successfully.');
     }
 }

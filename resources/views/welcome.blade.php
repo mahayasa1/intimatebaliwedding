@@ -234,7 +234,6 @@
     <div class="hero-overlay">
         <h1 class="hero-title">WEDDING VENUE</h1>
         <p class="hero-subtitle">Creating Timeless Memories Amidst Nature's Splendor</p>
-        {{-- <a href="#contact" class="btn-primary hero-cta">Free Consultation (Now)</a> --}}
     </div>
 </section>
 
@@ -243,12 +242,13 @@
     <div class="container">
         <h2 class="section-title">INTIMATE BALI WEDDING</h2>
         <p class="section-subtitle">
-            Intimate Bali Wedding is a specialized wedding service company dedicated to weddings affairs, meticulously, and resourcefully wedding. We 
+            Intimate Bali Wedding is a specialized wedding service company dedicated to wedding affairs, meticulously, and resourcefully wedding. We 
             GUARANTEE THAT YOU ARE IN GOOD HANDS FROM BEGINNING TO END. PROFESSIONAL AND FLEXIBLE. We have worked on various 
             projects around the world. Let us handle it!
         </p>
         <div style="text-align: center;">
-            <a href="#packages" class="btn-primary">Our Services</a>
+            <a href="{{ route('about') }}" class="btn-primary">Learn More</a>
+            <a href="{{ route('services.public') }}" class="btn-primary" style="margin-left: 1rem;">Our Services</a>
         </div>
     </div>
 </section>
@@ -263,40 +263,70 @@
 
         <div class="package-grid">
             <!-- Beach Wedding -->
-            <div class="package-card">
+            <a href="{{ route('packages.public') }}" class="package-card" style="text-decoration: none;">
                 <img src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=800&q=80" alt="Beach Wedding">
                 <div class="package-overlay">
                     <h3 class="package-title">Beach Wedding</h3>
                     <p>Celebrate your love with the ocean as your backdrop</p>
                 </div>
-            </div>
+            </a>
 
             <!-- Garden Wedding -->
-            <div class="package-card">
+            <a href="{{ route('packages.public') }}" class="package-card" style="text-decoration: none;">
                 <img src="https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=800&q=80" alt="Garden Wedding">
                 <div class="package-overlay">
                     <h3 class="package-title">Garden Wedding</h3>
                     <p>Exchange vows surrounded by lush tropical gardens</p>
                 </div>
-            </div>
+            </a>
 
             <!-- Chapel Wedding -->
-            <div class="package-card">
+            <a href="{{ route('packages.public') }}" class="package-card" style="text-decoration: none;">
                 <img src="https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=800&q=80" alt="Chapel Wedding">
                 <div class="package-overlay">
                     <h3 class="package-title">Chapel Wedding</h3>
                     <p>Traditional elegance in our beautiful chapel</p>
                 </div>
-            </div>
+            </a>
 
             <!-- Villa Wedding -->
-            <div class="package-card">
+            <a href="{{ route('packages.public') }}" class="package-card" style="text-decoration: none;">
                 <img src="https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=800&q=80" alt="Villa Wedding">
                 <div class="package-overlay">
                     <h3 class="package-title">Villa Wedding</h3>
                     <p>Intimate celebration in a private luxury villa</p>
                 </div>
-            </div>
+            </a>
+        </div>
+
+        <div style="text-align: center; margin-top: 3rem;">
+            <a href="{{ route('packages.public') }}" class="btn-primary">View All Packages</a>
+        </div>
+    </div>
+</section>
+
+<!-- Gallery Preview -->
+<section id="gallery" class="section">
+    <div class="container">
+        <h2 class="section-title">GALLERY</h2>
+        <p class="section-subtitle">
+            Beautiful moments captured in paradise
+        </p>
+        <div style="text-align: center; margin-top: 2rem;">
+            <a href="{{ route('gallery.public') }}" class="btn-primary">View Full Gallery</a>
+        </div>
+    </div>
+</section>
+
+<!-- Blog Preview -->
+<section class="section" style="background: #f8f8f8;">
+    <div class="container">
+        <h2 class="section-title">LATEST FROM OUR BLOG</h2>
+        <p class="section-subtitle">
+            Wedding tips, inspiration, and stories
+        </p>
+        <div style="text-align: center; margin-top: 2rem;">
+            <a href="{{ route('blog.public') }}" class="btn-primary">Read Our Blog</a>
         </div>
     </div>
 </section>
@@ -325,9 +355,20 @@
                     step of the way, ensuring everything ran smoothly. Our guests are still raving about how beautiful and well-organized 
                     everything was. We couldn't have asked for a better experience. Thank you for making our dream wedding a reality!
                 </p>
-                <a href="#testimonials" class="btn-primary" style="font-size: 0.85rem; padding: 0.6rem 1.5rem;">Read More</a>
+                <a href="{{ route('gallery.public') }}" class="btn-primary" style="font-size: 0.85rem; padding: 0.6rem 1.5rem;">View More Testimonials</a>
             </div>
         </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="section">
+    <div class="container" style="text-align: center;">
+        <h2 class="section-title">Ready to Start Planning?</h2>
+        <p class="section-subtitle">
+            Contact us today for a free consultation and let's create your dream wedding together
+        </p>
+        <a href="{{ route('contact') }}" class="btn-primary">Contact Us Now</a>
     </div>
 </section>
 @endsection
