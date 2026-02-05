@@ -19,6 +19,15 @@ class ServiceController extends Controller
     }
 
     /**
+     * Display a listing for admin.
+     */
+    public function adminIndex()
+    {
+        $services = Service::with('package')->latest()->paginate(20);
+        return view('admin.services.index', compact('services'));
+    }
+
+    /**
      * Show the form for creating a new resource.
      */
     public function create()

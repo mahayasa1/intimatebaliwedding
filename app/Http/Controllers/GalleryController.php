@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Storage;
 class GalleryController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Display a listing of the resource (Frontend).
      */
     public function index()
     {
@@ -19,11 +19,20 @@ class GalleryController extends Controller
     }
 
     /**
+     * Display a listing for admin.
+     */
+    public function adminIndex()
+    {
+        $galleries = Gallery::orderBy('order')->latest()->paginate(20);
+        return view('admin.galleries.index', compact('galleries'));
+    }
+
+    /**
      * Show the form for creating a new resource.
      */
     public function create()
     {
-        return view('gallery.create');
+        return view('admin.galleries.create');
     }
 
     /**
@@ -45,30 +54,30 @@ class GalleryController extends Controller
 
         Gallery::create($validated);
 
-        return redirect()->route('gallery.index')
+        return redirect()->route('admin.galleries.index')
             ->with('success', 'Gallery item created successfully.');
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Gallery $galleries)
+    public function show(Gallery $gallery)
     {
-        return view('gallery.show', compact('gallery'));
+        return view('admin.galleries.show', compact('gallery'));
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Gallery $galleries)
+    public function edit(Gallery $gallery)
     {
-        return view('gallery.edit', compact('gallery'));
+        return view('admin.galleries.edit', compact('gallery'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Gallery $galleries)
+    public function update(Request $request, Gallery $gallery)
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
@@ -80,30 +89,30 @@ class GalleryController extends Controller
 
         if ($request->hasFile('image')) {
             // Delete old image
-            if ($galleries->image) {
-                Storage::disk('public')->delete($galleries->image);
+            if ($gallery->image) {
+                Storage::disk('public')->delete($gallery->image);
             }
             $validated['image'] = $request->file('image')->store('gallery', 'public');
         }
 
-        $galleries->update($validated);
+        $gallery->update($validated);
 
-        return redirect()->route('gallery.index')
+        return redirect()->route('admin.galleries.index')
             ->with('success', 'Gallery item updated successfully.');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Gallery $galleries)
+    public function destroy(Gallery $gallery)
     {
-        if ($galleries->image) {
-            Storage::disk('public')->delete($galleries->image);
+        if ($gallery->image) {
+            Storage::disk('public')->delete($gallery->image);
         }
 
-        $galleries->delete();
+        $gallery->delete();
 
-        return redirect()->route('gallery.index')
+        return redirect()->route('admin.galleries.index')
             ->with('success', 'Gallery item deleted successfully.');
     }
 }

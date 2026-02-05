@@ -1,20 +1,124 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\BlogController;
+use App\Http\Controllers\EnquiryController;
+use App\Http\Controllers\GalleryController;
+use App\Http\Controllers\PackageController;
+use App\Http\Controllers\ServiceController;
 use Illuminate\Support\Facades\Route;
+
+/*
+|--------------------------------------------------------------------------
+| FRONTEND ROUTES (Public Website)
+|--------------------------------------------------------------------------
+*/
 
 Route::get('/', function () {
     return view('welcome');
+})->name('home');
+
+Route::get('/about', function () {
+    return view('about');
+})->name('about');
+
+Route::get('/services', [ServiceController::class, 'index'])->name('services.public');
+Route::get('/packages', [PackageController::class, 'index'])->name('packages.public');
+Route::get('/gallery', [GalleryController::class, 'index'])->name('gallery.public');
+Route::get('/blog', [BlogController::class, 'index'])->name('blog.public');
+Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
+Route::get('/contact', function () {
+    return view('contact');
+})->name('contact');
+
+// Enquiry Submission
+Route::post('/enquiry', [EnquiryController::class, 'store'])->name('enquiry.store');
+
+/*
+|--------------------------------------------------------------------------
+| ADMIN ROUTES (Admin Panel)
+|--------------------------------------------------------------------------
+| Access: http://yoursite.com/admin/login
+*/
+
+Route::prefix('admin')->name('admin.')->group(function () {
+    
+    /*
+    |--------------------------------------------------------------------------
+    | Guest Routes (Not Authenticated)
+    |--------------------------------------------------------------------------
+    */
+    Route::middleware('guest')->group(function () {
+        Route::get('/', [AuthController::class, 'showLoginForm'])->name('login');
+        Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login.page');
+        Route::post('/login', [AuthController::class, 'login'])->name('login.post');
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | Protected Routes (Admin Only)
+    |--------------------------------------------------------------------------
+    */
+    Route::middleware(['auth', 'admin'])->group(function () {
+        
+        // Dashboard
+        Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+        
+        // Logout
+        Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+        
+        // Services Management
+        Route::prefix('services')->name('services.')->group(function () {
+            Route::get('/', [ServiceController::class, 'adminIndex'])->name('index');
+            Route::get('/create', [ServiceController::class, 'create'])->name('create');
+            Route::post('/', [ServiceController::class, 'store'])->name('store');
+            Route::get('/{service}', [ServiceController::class, 'show'])->name('show');
+            Route::get('/{service}/edit', [ServiceController::class, 'edit'])->name('edit');
+            Route::put('/{service}', [ServiceController::class, 'update'])->name('update');
+            Route::delete('/{service}', [ServiceController::class, 'destroy'])->name('destroy');
+        });
+        
+        // Packages Management
+        Route::prefix('packages')->name('packages.')->group(function () {
+            Route::get('/', [PackageController::class, 'adminIndex'])->name('index');
+            Route::get('/create', [PackageController::class, 'create'])->name('create');
+            Route::post('/', [PackageController::class, 'store'])->name('store');
+            Route::get('/{package}', [PackageController::class, 'show'])->name('show');
+            Route::get('/{package}/edit', [PackageController::class, 'edit'])->name('edit');
+            Route::put('/{package}', [PackageController::class, 'update'])->name('update');
+            Route::delete('/{package}', [PackageController::class, 'destroy'])->name('destroy');
+        });
+        
+        // Galleries Management
+        Route::prefix('galleries')->name('galleries.')->group(function () {
+            Route::get('/', [GalleryController::class, 'adminIndex'])->name('index');
+            Route::get('/create', [GalleryController::class, 'create'])->name('create');
+            Route::post('/', [GalleryController::class, 'store'])->name('store');
+            Route::get('/{gallery}', [GalleryController::class, 'show'])->name('show');
+            Route::get('/{gallery}/edit', [GalleryController::class, 'edit'])->name('edit');
+            Route::put('/{gallery}', [GalleryController::class, 'update'])->name('update');
+            Route::delete('/{gallery}', [GalleryController::class, 'destroy'])->name('destroy');
+        });
+        
+        // Blogs Management
+        Route::prefix('blogs')->name('blogs.')->group(function () {
+            Route::get('/', [BlogController::class, 'adminIndex'])->name('index');
+            Route::get('/create', [BlogController::class, 'create'])->name('create');
+            Route::post('/', [BlogController::class, 'store'])->name('store');
+            Route::get('/{blog}', [BlogController::class, 'adminShow'])->name('show');
+            Route::get('/{blog}/edit', [BlogController::class, 'edit'])->name('edit');
+            Route::put('/{blog}', [BlogController::class, 'update'])->name('update');
+            Route::delete('/{blog}', [BlogController::class, 'destroy'])->name('destroy');
+        });
+        
+        // Enquiries Management
+        Route::prefix('enquiries')->name('enquiries.')->group(function () {
+            Route::get('/', [EnquiryController::class, 'adminIndex'])->name('index');
+            Route::get('/{enquiry}', [EnquiryController::class, 'adminShow'])->name('show');
+            Route::get('/{enquiry}/edit', [EnquiryController::class, 'adminEdit'])->name('edit');
+            Route::put('/{enquiry}', [EnquiryController::class, 'adminUpdate'])->name('update');
+            Route::delete('/{enquiry}', [EnquiryController::class, 'adminDestroy'])->name('destroy');
+        });
+    });
 });
-
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
-
-Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-});
-
-require __DIR__.'/auth.php';

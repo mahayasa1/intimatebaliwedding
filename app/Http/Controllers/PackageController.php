@@ -17,6 +17,15 @@ class PackageController extends Controller
     }
 
     /**
+     * Display a listing for admin.
+     */
+    public function adminIndex()
+    {
+        $packages = Package::withCount('services')->latest()->paginate(20);
+        return view('admin.packages.index', compact('packages'));
+    }
+
+    /**
      * Show the form for creating a new resource.
      */
     public function create()
@@ -89,4 +98,4 @@ class PackageController extends Controller
         return redirect()->route('packages.index')
             ->with('success', 'Package deleted successfully.');
     }
-}   
+}

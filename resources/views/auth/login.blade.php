@@ -1,47 +1,300 @@
-<x-guest-layout>
-    <!-- Session Status -->
-    <x-auth-session-status class="mb-4" :status="session('status')" />
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>Admin Login - Intimate Bali Wedding</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    <form method="POST" action="{{ route('login') }}">
-        @csrf
+        body {
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
 
-        <!-- Email Address -->
-        <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
+        /* Background Image with Overlay */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://images.unsplash.com/photo-1519741497674-611481863552?w=1920&q=80');
+            background-size: cover;
+            background-position: center;
+            filter: brightness(0.6);
+            z-index: -1;
+        }
+
+        /* Decorative Wave Line */
+        .wave-decoration {
+            position: absolute;
+            top: 50px;
+            left: 100px;
+            width: 200px;
+            height: 100px;
+            opacity: 0.3;
+        }
+
+        .wave-decoration svg {
+            width: 100%;
+            height: 100%;
+            stroke: white;
+            fill: none;
+            stroke-width: 2;
+        }
+
+        /* Login Container */
+        .login-container {
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 0;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 420px;
+            width: 90%;
+            padding: 3rem 2.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Logo Area */
+        .login-logo {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .logo-box {
+            display: inline-block;
+            padding: 1rem 2.5rem;
+            border: 3px solid #8B7355;
+            border-radius: 50px;
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #8B7355;
+            letter-spacing: 2px;
+        }
+
+        /* Form Styles */
+        .login-form {
+            margin-top: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 1rem;
+            border: none;
+            background: #E8E8E8;
+            border-radius: 0;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+            color: #333;
+        }
+
+        .form-group input::placeholder {
+            color: #999;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            background: #DDD;
+        }
+
+        .form-group input.error {
+            border: 2px solid #e74c3c;
+        }
+
+        /* Error Messages */
+        .alert {
+            padding: 1rem;
+            border-radius: 0;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .error-message {
+            color: #e74c3c;
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+        }
+
+        /* Login Button */
+        .btn-login {
+            width: 100%;
+            padding: 1rem;
+            background: #8B7355;
+            color: white;
+            border: none;
+            border-radius: 0;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 2rem;
+        }
+
+        .btn-login:hover {
+            background: #6F5B44;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(139, 115, 85, 0.3);
+        }
+
+        .btn-login:active {
+            transform: translateY(0);
+        }
+
+        /* Back Link */
+        .back-to-site {
+            text-align: center;
+            margin-top: 1.5rem;
+        }
+
+        .back-to-site a {
+            color: #8B7355;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: color 0.3s;
+        }
+
+        .back-to-site a:hover {
+            color: #6F5B44;
+            text-decoration: underline;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .wave-decoration {
+                display: none;
+            }
+
+            .login-container {
+                padding: 2rem 1.5rem;
+                width: 95%;
+            }
+
+            .logo-box {
+                font-size: 1.2rem;
+                padding: 0.8rem 2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 2rem 1.5rem;
+            }
+
+            .logo-box {
+                font-size: 1rem;
+                padding: 0.7rem 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Decorative Wave Line -->
+    <div class="wave-decoration">
+        <svg viewBox="0 0 200 100" preserveAspectRatio="none">
+            <path d="M0,50 Q50,20 100,50 T200,50" stroke-linecap="round"/>
+        </svg>
+    </div>
+
+    <!-- Login Container -->
+    <div class="login-container">
+        <!-- Logo -->
+        <div class="login-logo">
+            <div class="logo-box">Logo</div>
         </div>
 
-        <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
-
-            <x-text-input id="password" class="block mt-1 w-full"
-                            type="password"
-                            name="password"
-                            required autocomplete="current-password" />
-
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
+        <!-- Alerts -->
+        @if(session('success'))
+        <div class="alert alert-success">
+            {{ session('success') }}
         </div>
+        @endif
 
-        <!-- Remember Me -->
-        <div class="block mt-4">
-            <label for="remember_me" class="inline-flex items-center">
-                <input id="remember_me" type="checkbox" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500" name="remember">
-                <span class="ms-2 text-sm text-gray-600">{{ __('Remember me') }}</span>
-            </label>
+        @if(session('error'))
+        <div class="alert alert-error">
+            {{ session('error') }}
         </div>
+        @endif
 
-        <div class="flex items-center justify-end mt-4">
-            @if (Route::has('password.request'))
-                <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('password.request') }}">
-                    {{ __('Forgot your password?') }}
-                </a>
-            @endif
+        <!-- Login Form -->
+        <form method="POST" action="{{ route('admin.login.post') }}" class="login-form">
+            @csrf
 
-            <x-primary-button class="ms-3">
-                {{ __('Log in') }}
-            </x-primary-button>
+            <div class="form-group">
+                <input 
+                    type="text" 
+                    id="email" 
+                    name="email" 
+                    value="{{ old('email') }}" 
+                    required 
+                    autofocus
+                    placeholder="Email"
+                    class="@error('email') error @enderror"
+                >
+                @error('email')
+                <div class="error-message">{{ $message }}</div>
+                @enderror
+            </div>
+
+            <div class="form-group">
+                <input 
+                    type="password" 
+                    id="password" 
+                    name="password" 
+                    required
+                    placeholder="Password"
+                    class="@error('password') error @enderror"
+                >
+                @error('password')
+                <div class="error-message">{{ $message }}</div>
+                @enderror
+            </div>
+
+            <button type="submit" class="btn-login">
+                Login
+            </button>
+        </form>
+
+        <!-- Back to Site Link -->
+        <div class="back-to-site">
+            <a href="{{ route('home') }}">← Back to Main Website</a>
         </div>
-    </form>
-</x-guest-layout>
+    </div>
+</body>
+</html>

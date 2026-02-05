@@ -19,6 +19,15 @@ class BlogController extends Controller
     }
 
     /**
+     * Display a listing for admin.
+     */
+    public function adminIndex()
+    {
+        $blogs = Blog::latest()->paginate(20);
+        return view('admin.blogs.index', compact('blogs'));
+    }
+
+    /**
      * Show the form for creating a new resource.
      */
     public function create()
@@ -49,7 +58,7 @@ class BlogController extends Controller
 
         Blog::create($validated);
 
-        return redirect()->route('blogs.index')
+        return redirect()->route('admin.blogs.index')
             ->with('success', 'Blog post created successfully.');
     }
 
@@ -60,6 +69,14 @@ class BlogController extends Controller
     {
         $blog = Blog::where('slug', $slug)->firstOrFail();
         return view('blogs.show', compact('blog'));
+    }
+
+    /**
+     * Display the specified resource for admin.
+     */
+    public function adminShow(Blog $blog)
+    {
+        return view('admin.blogs.show', compact('blog'));
     }
 
     /**
@@ -97,7 +114,7 @@ class BlogController extends Controller
 
         $blog->update($validated);
 
-        return redirect()->route('blogs.index')
+        return redirect()->route('admin.blogs.index')
             ->with('success', 'Blog post updated successfully.');
     }
 
@@ -112,7 +129,7 @@ class BlogController extends Controller
 
         $blog->delete();
 
-        return redirect()->route('blogs.index')
+        return redirect()->route('admin.blogs.index')
             ->with('success', 'Blog post deleted successfully.');
     }
 }
