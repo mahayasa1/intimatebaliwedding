@@ -6,7 +6,6 @@ use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 
 class UserSeeder extends Seeder
 {
@@ -17,7 +16,6 @@ class UserSeeder extends Seeder
     {
         // Create Admin User
         User::create([
-            'id' => Str::uuid(),
             'name' => 'Administrator',
             'username' => 'admin',
             'email' => 'admin@intimatebaliwedding.com',
@@ -29,7 +27,6 @@ class UserSeeder extends Seeder
 
         // Create another Admin User
         User::create([
-            'id' => Str::uuid(),
             'name' => 'Super Admin',
             'username' => 'superadmin',
             'email' => 'superadmin@intimatebaliwedding.com',
@@ -41,7 +38,6 @@ class UserSeeder extends Seeder
 
         // Create Regular User
         User::create([
-            'id' => Str::uuid(),
             'name' => 'John Doe',
             'username' => 'johndoe',
             'email' => 'john@example.com',
@@ -53,7 +49,6 @@ class UserSeeder extends Seeder
 
         // Create more sample users
         User::create([
-            'id' => Str::uuid(),
             'name' => 'Jane Smith',
             'username' => 'janesmith',
             'email' => 'jane@example.com',

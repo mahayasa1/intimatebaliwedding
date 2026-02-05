@@ -1,52 +1,151 @@
-@extends('admin.layouts.app')
+@extends('layouts.admin')
 
 @section('title', 'Enquiries')
 @section('page-title', 'Customer Enquiries')
 
 @push('styles')
 <style>
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Work+Sans:wght@400;500;600&display=swap');
+
     .page-header {
+        margin-bottom: 3rem;
+    }
+
+    .page-header h1 {
+        font-family: 'Playfair Display', serif;
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #1a1a1a;
+        margin-bottom: 0.5rem;
+        letter-spacing: -0.5px;
+    }
+
+    .page-header p {
+        font-family: 'Work Sans', sans-serif;
+        color: #666;
+        font-size: 1rem;
+    }
+
+    /* Statistics Cards */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2.5rem;
+    }
+
+    .stat-card {
+        background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+        padding: 1.75rem;
+        border-radius: 16px;
+        border: 1px solid #e8e8e8;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, #8B7355, #6B5644);
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 24px rgba(139, 115, 85, 0.15);
+        border-color: #8B7355;
+    }
+
+    .stat-card:hover::before {
+        transform: scaleX(1);
+    }
+
+    .stat-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
         display: flex;
-        justify-content: space-between;
         align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+        background: linear-gradient(135deg, #8B7355 0%, #6B5644 100%);
+        color: white;
+    }
+
+    .stat-label {
+        font-family: 'Work Sans', sans-serif;
+        font-size: 0.85rem;
+        color: #999;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-value {
+        font-family: 'Playfair Display', serif;
+        font-size: 2.25rem;
+        font-weight: 700;
+        color: #1a1a1a;
+        line-height: 1;
+    }
+
+    /* Filter Tabs */
+    .filter-section {
         margin-bottom: 2rem;
     }
 
     .filter-tabs {
         display: flex;
-        gap: 0.5rem;
-        margin-bottom: 1.5rem;
+        gap: 0.75rem;
         flex-wrap: wrap;
+        padding: 0.5rem;
+        background: #f8f9fa;
+        border-radius: 12px;
+        border: 1px solid #e8e8e8;
     }
 
     .filter-tab {
-        padding: 0.5rem 1rem;
-        border: 2px solid #e0e0e0;
-        background: white;
-        border-radius: 6px;
+        font-family: 'Work Sans', sans-serif;
+        padding: 0.65rem 1.25rem;
+        border: none;
+        background: transparent;
+        border-radius: 8px;
         cursor: pointer;
-        transition: all 0.3s;
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         font-weight: 500;
         text-decoration: none;
         color: #666;
+        font-size: 0.9rem;
+        position: relative;
     }
 
     .filter-tab:hover {
-        border-color: #3498db;
-        color: #3498db;
+        color: #8B7355;
+        background: rgba(139, 115, 85, 0.08);
     }
 
     .filter-tab.active {
-        background: #3498db;
-        border-color: #3498db;
+        background: linear-gradient(135deg, #8B7355 0%, #6B5644 100%);
         color: white;
+        box-shadow: 0 4px 12px rgba(139, 115, 85, 0.25);
+        transform: translateY(-2px);
     }
 
-    .card {
+    /* Table Card */
+    .table-card {
         background: white;
-        padding: 1.5rem;
-        border-radius: 12px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+        border: 1px solid #e8e8e8;
+        overflow: hidden;
     }
 
     .table-responsive {
@@ -55,64 +154,174 @@
 
     table {
         width: 100%;
-        border-collapse: collapse;
+        border-collapse: separate;
+        border-spacing: 0;
+        font-family: 'Work Sans', sans-serif;
+    }
+
+    table thead {
+        background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
     }
 
     table th {
         text-align: left;
-        padding: 1rem 0.75rem;
-        background: #f8f9fa;
+        padding: 1.25rem 1.5rem;
         font-weight: 600;
-        font-size: 0.875rem;
+        font-size: 0.85rem;
         color: #666;
-        border-bottom: 2px solid #eee;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-bottom: 2px solid #e8e8e8;
         white-space: nowrap;
+    }
+
+    table tbody tr {
+        transition: all 0.3s ease;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    table tbody tr:hover {
+        background: linear-gradient(135deg, #fafbfc 0%, #f8f9fa 100%);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
     }
 
     table td {
-        padding: 1rem 0.75rem;
-        border-bottom: 1px solid #f0f0f0;
+        padding: 1.25rem 1.5rem;
         vertical-align: top;
+        color: #333;
     }
 
-    table tr:hover {
-        background: #f8f9fa;
-    }
-
+    /* Status Badges */
     .badge {
-        display: inline-block;
-        padding: 0.35rem 0.75rem;
-        border-radius: 12px;
-        font-size: 0.75rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
         font-weight: 600;
         white-space: nowrap;
+        font-family: 'Work Sans', sans-serif;
+        letter-spacing: 0.3px;
+    }
+
+    .badge::before {
+        content: '';
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.5; transform: scale(1.2); }
     }
 
     .badge-new {
-        background: #fff3cd;
-        color: #856404;
+        background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+        color: #f57f17;
+        border: 1px solid #ffd54f;
+    }
+
+    .badge-new::before {
+        background: #f57f17;
     }
 
     .badge-contacted {
-        background: #d1ecf1;
-        color: #0c5460;
+        background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+        color: #0d47a1;
+        border: 1px solid #90caf9;
+    }
+
+    .badge-contacted::before {
+        background: #0d47a1;
     }
 
     .badge-in_progress {
-        background: #cce5ff;
-        color: #004085;
+        background: linear-gradient(135deg, #e8eaf6 0%, #c5cae9 100%);
+        color: #311b92;
+        border: 1px solid #9fa8da;
+    }
+
+    .badge-in_progress::before {
+        background: #311b92;
     }
 
     .badge-completed {
-        background: #d4edda;
-        color: #155724;
+        background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+        color: #1b5e20;
+        border: 1px solid #81c784;
+    }
+
+    .badge-completed::before {
+        background: #1b5e20;
     }
 
     .badge-cancelled {
-        background: #f8d7da;
-        color: #721c24;
+        background: linear-gradient(135deg, #fce4ec 0%, #f8bbd0 100%);
+        color: #880e4f;
+        border: 1px solid #f48fb1;
     }
 
+    .badge-cancelled::before {
+        background: #880e4f;
+    }
+
+    /* Contact Info */
+    .contact-info {
+        font-size: 0.9rem;
+    }
+
+    .contact-name {
+        font-weight: 600;
+        color: #1a1a1a;
+        margin-bottom: 0.25rem;
+        font-family: 'Work Sans', sans-serif;
+    }
+
+    .contact-detail {
+        color: #666;
+        margin-bottom: 0.15rem;
+    }
+
+    /* Date Display */
+    .date-display {
+        font-weight: 600;
+        color: #1a1a1a;
+        margin-bottom: 0.25rem;
+        font-family: 'Work Sans', sans-serif;
+    }
+
+    .time-display {
+        font-size: 0.85rem;
+        color: #999;
+    }
+
+    /* Wedding Details */
+    .wedding-details {
+        font-size: 0.9rem;
+    }
+
+    .wedding-detail-item {
+        margin-bottom: 0.35rem;
+        color: #666;
+    }
+
+    .wedding-detail-label {
+        font-weight: 600;
+        color: #333;
+    }
+
+    /* Message Preview */
+    .message-preview {
+        max-width: 350px;
+        font-size: 0.9rem;
+        color: #666;
+        line-height: 1.6;
+    }
+
+    /* Action Buttons */
     .action-buttons {
         display: flex;
         gap: 0.5rem;
@@ -120,106 +329,110 @@
     }
 
     .btn {
+        font-family: 'Work Sans', sans-serif;
         padding: 0.5rem 1rem;
-        border-radius: 6px;
+        border-radius: 8px;
         text-decoration: none;
         font-weight: 500;
         font-size: 0.875rem;
-        transition: all 0.3s;
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         border: none;
         cursor: pointer;
-        display: inline-block;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
     }
 
     .btn-primary {
-        background: #3498db;
+        background: linear-gradient(135deg, #8B7355 0%, #6B5644 100%);
         color: white;
+        box-shadow: 0 2px 8px rgba(139, 115, 85, 0.2);
     }
 
     .btn-primary:hover {
-        background: #2980b9;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(139, 115, 85, 0.3);
     }
 
     .btn-success {
-        background: #27ae60;
+        background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
         color: white;
+        box-shadow: 0 2px 8px rgba(46, 204, 113, 0.2);
     }
 
     .btn-success:hover {
-        background: #229954;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(46, 204, 113, 0.3);
     }
 
     .btn-danger {
-        background: #e74c3c;
+        background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
         color: white;
+        box-shadow: 0 2px 8px rgba(231, 76, 60, 0.2);
     }
 
     .btn-danger:hover {
-        background: #c0392b;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
     }
 
     .btn-sm {
-        padding: 0.375rem 0.75rem;
+        padding: 0.4rem 0.85rem;
         font-size: 0.8rem;
     }
 
+    /* Empty State */
     .empty-state {
         text-align: center;
-        padding: 4rem 2rem;
-        color: #999;
+        padding: 5rem 2rem;
     }
 
     .empty-state-icon {
-        font-size: 4rem;
-        margin-bottom: 1rem;
-        opacity: 0.5;
-    }
-
-    .stats-mini {
-        display: flex;
-        gap: 1rem;
+        font-size: 5rem;
         margin-bottom: 1.5rem;
-        flex-wrap: wrap;
+        opacity: 0.3;
+        filter: grayscale(1);
     }
 
-    .stat-mini {
-        background: white;
-        padding: 1rem 1.5rem;
-        border-radius: 8px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
+    .empty-state h3 {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.75rem;
+        color: #1a1a1a;
+        margin-bottom: 0.75rem;
     }
 
-    .stat-mini-icon {
-        font-size: 1.5rem;
-    }
-
-    .stat-mini-label {
-        font-size: 0.85rem;
+    .empty-state p {
+        font-family: 'Work Sans', sans-serif;
         color: #999;
+        font-size: 1rem;
     }
 
-    .stat-mini-value {
-        font-size: 1.5rem;
-        font-weight: 700;
-        color: #2c3e50;
+    /* Pagination */
+    .pagination {
+        display: flex;
+        justify-content: center;
+        gap: 0.5rem;
+        margin-top: 2rem;
+        padding: 1.5rem;
     }
 
-    .contact-info {
-        font-size: 0.9rem;
-    }
-
-    .contact-info div {
-        margin-bottom: 0.25rem;
-    }
-
+    /* Responsive */
     @media (max-width: 768px) {
-        .page-header {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 1rem;
+        .page-header h1 {
+            font-size: 2rem;
+        }
+
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .filter-tabs {
+            padding: 0.25rem;
+        }
+
+        .filter-tab {
+            font-size: 0.85rem;
+            padding: 0.5rem 0.85rem;
         }
 
         table {
@@ -228,7 +441,7 @@
 
         table th,
         table td {
-            padding: 0.75rem 0.5rem;
+            padding: 1rem 0.75rem;
         }
 
         .action-buttons {
@@ -237,6 +450,7 @@
 
         .btn {
             width: 100%;
+            justify-content: center;
         }
     }
 </style>
@@ -244,68 +458,60 @@
 
 @section('content')
 <div class="page-header">
-    <div>
-        <h1 style="font-size: 1.75rem; font-weight: 600; margin-bottom: 0.5rem;">Customer Enquiries</h1>
-        <p style="color: #666;">Manage customer wedding enquiries and inquiries</p>
-    </div>
+    <h1>Customer Enquiries</h1>
+    <p>Manage customer wedding enquiries and inquiries</p>
 </div>
 
 <!-- Statistics -->
-<div class="stats-mini">
-    <div class="stat-mini">
-        <div class="stat-mini-icon">📋</div>
-        <div>
-            <div class="stat-mini-label">Total Enquiries</div>
-            <div class="stat-mini-value">{{ $enquiries->total() }}</div>
-        </div>
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon">📋</div>
+        <div class="stat-label">Total Enquiries</div>
+        <div class="stat-value">{{ $enquiries->total() }}</div>
     </div>
-    <div class="stat-mini">
-        <div class="stat-mini-icon">🆕</div>
-        <div>
-            <div class="stat-mini-label">New</div>
-            <div class="stat-mini-value">{{ $enquiries->where('status', 'new')->count() }}</div>
-        </div>
+    <div class="stat-card">
+        <div class="stat-icon">🆕</div>
+        <div class="stat-label">New</div>
+        <div class="stat-value">{{ $enquiries->where('status', 'new')->count() }}</div>
     </div>
-    <div class="stat-mini">
-        <div class="stat-mini-icon">📞</div>
-        <div>
-            <div class="stat-mini-label">In Progress</div>
-            <div class="stat-mini-value">{{ $enquiries->where('status', 'in_progress')->count() }}</div>
-        </div>
+    <div class="stat-card">
+        <div class="stat-icon">📞</div>
+        <div class="stat-label">In Progress</div>
+        <div class="stat-value">{{ $enquiries->where('status', 'in_progress')->count() }}</div>
     </div>
-    <div class="stat-mini">
-        <div class="stat-mini-icon">✅</div>
-        <div>
-            <div class="stat-mini-label">Completed</div>
-            <div class="stat-mini-value">{{ $enquiries->where('status', 'completed')->count() }}</div>
-        </div>
+    <div class="stat-card">
+        <div class="stat-icon">✅</div>
+        <div class="stat-label">Completed</div>
+        <div class="stat-value">{{ $enquiries->where('status', 'completed')->count() }}</div>
     </div>
 </div>
 
 <!-- Filter Tabs -->
-<div class="filter-tabs">
-    <a href="{{ route('admin.enquiries.index') }}" class="filter-tab {{ !request('status') ? 'active' : '' }}">
-        All ({{ $enquiries->total() }})
-    </a>
-    <a href="{{ route('admin.enquiries.index', ['status' => 'new']) }}" class="filter-tab {{ request('status') == 'new' ? 'active' : '' }}">
-        New
-    </a>
-    <a href="{{ route('admin.enquiries.index', ['status' => 'contacted']) }}" class="filter-tab {{ request('status') == 'contacted' ? 'active' : '' }}">
-        Contacted
-    </a>
-    <a href="{{ route('admin.enquiries.index', ['status' => 'in_progress']) }}" class="filter-tab {{ request('status') == 'in_progress' ? 'active' : '' }}">
-        In Progress
-    </a>
-    <a href="{{ route('admin.enquiries.index', ['status' => 'completed']) }}" class="filter-tab {{ request('status') == 'completed' ? 'active' : '' }}">
-        Completed
-    </a>
-    <a href="{{ route('admin.enquiries.index', ['status' => 'cancelled']) }}" class="filter-tab {{ request('status') == 'cancelled' ? 'active' : '' }}">
-        Cancelled
-    </a>
+<div class="filter-section">
+    <div class="filter-tabs">
+        <a href="{{ route('admin.enquiries.index') }}" class="filter-tab {{ !request('status') ? 'active' : '' }}">
+            All ({{ $enquiries->total() }})
+        </a>
+        <a href="{{ route('admin.enquiries.index', ['status' => 'new']) }}" class="filter-tab {{ request('status') == 'new' ? 'active' : '' }}">
+            New
+        </a>
+        <a href="{{ route('admin.enquiries.index', ['status' => 'contacted']) }}" class="filter-tab {{ request('status') == 'contacted' ? 'active' : '' }}">
+            Contacted
+        </a>
+        <a href="{{ route('admin.enquiries.index', ['status' => 'in_progress']) }}" class="filter-tab {{ request('status') == 'in_progress' ? 'active' : '' }}">
+            In Progress
+        </a>
+        <a href="{{ route('admin.enquiries.index', ['status' => 'completed']) }}" class="filter-tab {{ request('status') == 'completed' ? 'active' : '' }}">
+            Completed
+        </a>
+        <a href="{{ route('admin.enquiries.index', ['status' => 'cancelled']) }}" class="filter-tab {{ request('status') == 'cancelled' ? 'active' : '' }}">
+            Cancelled
+        </a>
+    </div>
 </div>
 
 <!-- Enquiries Table -->
-<div class="card">
+<div class="table-card">
     @if($enquiries->count() > 0)
     <div class="table-responsive">
         <table>
@@ -323,28 +529,34 @@
                 @foreach($enquiries as $enquiry)
                 <tr>
                     <td>
-                        <div style="font-weight: 600;">{{ $enquiry->created_at->format('M d, Y') }}</div>
-                        <div style="font-size: 0.85rem; color: #999;">{{ $enquiry->created_at->format('h:i A') }}</div>
+                        <div class="date-display">{{ $enquiry->created_at->format('M d, Y') }}</div>
+                        <div class="time-display">{{ $enquiry->created_at->format('h:i A') }}</div>
                     </td>
                     <td>
                         <div class="contact-info">
-                            <div style="font-weight: 600; color: #2c3e50;">{{ $enquiry->name }}</div>
-                            <div style="color: #666;">{{ $enquiry->email }}</div>
+                            <div class="contact-name">{{ $enquiry->name }}</div>
+                            <div class="contact-detail">{{ $enquiry->email }}</div>
                             @if($enquiry->phone)
-                            <div style="color: #666;">{{ $enquiry->phone }}</div>
+                            <div class="contact-detail">{{ $enquiry->phone }}</div>
                             @endif
                         </div>
                     </td>
                     <td>
-                        <div style="font-size: 0.9rem;">
+                        <div class="wedding-details">
                             @if($enquiry->wedding_date)
-                            <div><strong>Date:</strong> {{ $enquiry->wedding_date }}</div>
+                            <div class="wedding-detail-item">
+                                <span class="wedding-detail-label">Date:</span> {{ $enquiry->wedding_date }}
+                            </div>
                             @endif
                             @if($enquiry->wedding_type)
-                            <div><strong>Type:</strong> {{ $enquiry->wedding_type }}</div>
+                            <div class="wedding-detail-item">
+                                <span class="wedding-detail-label">Type:</span> {{ $enquiry->wedding_type }}
+                            </div>
                             @endif
                             @if($enquiry->guest_count)
-                            <div><strong>Guests:</strong> {{ $enquiry->guest_count }}</div>
+                            <div class="wedding-detail-item">
+                                <span class="wedding-detail-label">Guests:</span> {{ $enquiry->guest_count }}
+                            </div>
                             @endif
                             @if(!$enquiry->wedding_date && !$enquiry->wedding_type && !$enquiry->guest_count)
                             <span style="color: #999;">Not specified</span>
@@ -357,22 +569,22 @@
                         </span>
                     </td>
                     <td>
-                        <div style="max-width: 300px; font-size: 0.9rem; color: #666;">
+                        <div class="message-preview">
                             {{ Str::limit($enquiry->message, 80) }}
                         </div>
                     </td>
                     <td>
                         <div class="action-buttons">
                             <a href="{{ route('admin.enquiries.show', $enquiry) }}" class="btn btn-primary btn-sm">
-                                View
+                                👁️ View
                             </a>
                             <a href="{{ route('admin.enquiries.edit', $enquiry) }}" class="btn btn-success btn-sm">
-                                Edit
+                                ✏️ Edit
                             </a>
                             <form action="{{ route('admin.enquiries.destroy', $enquiry) }}" method="POST" style="margin: 0;" onsubmit="return confirm('Are you sure you want to delete this enquiry?');">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                <button type="submit" class="btn btn-danger btn-sm">🗑️ Delete</button>
                             </form>
                         </div>
                     </td>
@@ -384,15 +596,15 @@
 
     <!-- Pagination -->
     @if($enquiries->hasPages())
-    <div style="margin-top: 1.5rem;">
+    <div class="pagination">
         {{ $enquiries->links() }}
     </div>
     @endif
     @else
     <div class="empty-state">
         <div class="empty-state-icon">📭</div>
-        <h3 style="margin-bottom: 0.5rem;">No Enquiries Found</h3>
-        <p>There are no customer enquiries yet.</p>
+        <h3>No Enquiries Found</h3>
+        <p>There are no customer enquiries matching your filter.</p>
     </div>
     @endif
 </div>
