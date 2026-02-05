@@ -67,7 +67,7 @@
 
         /* Sidebar Logo */
         .sidebar-logo {
-            padding: 1.75rem 0;
+            padding: 1rem 0;
             text-align: center;
             border-bottom: 1px solid rgba(255,255,255,0.1);
             display: flex;
@@ -87,9 +87,6 @@
 
         .logo-box {
             display: none;
-            padding: 0.65rem 2.25rem;
-            border: 2px solid white;
-            border-radius: 30px;
             font-size: 0.95rem;
             font-weight: 600;
             letter-spacing: 1.5px;
@@ -683,8 +680,8 @@
     <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-logo">
-            <div class="logo-icon">🏠</div>
-            <div class="logo-box">LOGO</div>
+            <div class="logo-icon"><img src="{{ asset('assets/Logo_IBW_1.png') }}" alt="" height="70px"></div>
+            <div class="logo-box"><img src="{{ asset('assets/Logo_IBW_1.png') }}" alt="" height="100px"></div>
         </div>
 
         <nav class="sidebar-menu">

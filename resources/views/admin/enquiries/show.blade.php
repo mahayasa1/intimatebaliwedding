@@ -1,4 +1,4 @@
-@extends('admin.layouts.app')
+@extends('layouts.admin')
 
 @section('title', 'View Enquiry')
 @section('page-title', 'Enquiry Details')
