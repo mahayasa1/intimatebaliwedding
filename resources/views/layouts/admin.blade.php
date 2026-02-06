@@ -10,6 +10,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
     
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
     <style>
         * {
             margin: 0;
@@ -672,7 +675,9 @@
 </head>
 <body>
     <!-- Mobile Toggle -->
-    <button class="mobile-toggle" id="mobile-toggle">☰</button>
+    <button class="mobile-toggle" id="mobile-toggle">
+        <i class="fas fa-bars"></i>
+    </button>
 
     <!-- Sidebar Overlay (Mobile) -->
     <div class="sidebar-overlay" id="sidebar-overlay"></div>
@@ -688,35 +693,47 @@
             <a href="{{ route('admin.dashboard') }}" 
                class="{{ request()->routeIs('admin.dashboard') ? 'active' : '' }}"
                data-tooltip="Dashboard">
-                <span class="icon">🏠</span>
+                <span class="icon"><i class="fas fa-home"></i></span>
                 <span class="menu-text">Dashboard</span>
             </a>
             <a href="{{ route('admin.packages.index') }}" 
                class="{{ request()->routeIs('admin.packages.*') ? 'active' : '' }}"
                data-tooltip="Packages">
-                <span class="icon">📦</span>
+                <span class="icon"><i class="fas fa-box"></i></span>
                 <span class="menu-text">Packages</span>
             </a>
             <a href="{{ route('admin.services.index') }}" 
                class="{{ request()->routeIs('admin.services.*') ? 'active' : '' }}"
                data-tooltip="Services">
-                <span class="icon">⚙️</span>
+                <span class="icon"><i class="fas fa-cog"></i></span>
                 <span class="menu-text">Services</span>
             </a>
             <a href="{{ route('admin.galleries.index') }}" 
                class="{{ request()->routeIs('admin.galleries.*') ? 'active' : '' }}"
                data-tooltip="Gallery">
-                <span class="icon">🖼️</span>
+                <span class="icon"><i class="fas fa-images"></i></span>
                 <span class="menu-text">Gallery</span>
             </a>
+            <a href="{{ route('admin.blogs.index') }}" 
+               class="{{ request()->routeIs('admin.blogs.*') ? 'active' : '' }}"
+               data-tooltip="Blog">
+                <span class="icon"><i class="fas fa-blog"></i></span>
+                <span class="menu-text">Blog</span>
+            </a>
             <a href="{{ route('admin.enquiries.index') }}" 
-               class="{{ request()->routeIs('admin.enquiries.*') ? 'active' : '' }}"
-               data-tooltip="Enquiries">
-                <span class="icon">✉️</span>
-                <span class="menu-text">Enquiries</span>
-                @if(isset($stats) && $stats['new_enquiries'] > 0)
-                <span class="badge">{{ $stats['new_enquiries'] }}</span>
-                @endif
+            class="{{ request()->routeIs('admin.enquiries.*') ? 'active' : '' }}"
+            data-tooltip="Enquiries">
+            <span class="icon"><i class="fas fa-envelope"></i></span>
+            <span class="menu-text">Enquiries</span>
+            @if(isset($stats) && $stats['new_enquiries'] > 0)
+            <span class="badge">{{ $stats['new_enquiries'] }}</span>
+            @endif
+            </a>
+            <a href="{{ route('admin.users.index') }}" 
+               class="{{ request()->routeIs('admin.users.*') ? 'active' : '' }}"
+               data-tooltip="Users">
+                <span class="icon"><i class="fas fa-user"></i></span>
+                <span class="menu-text">Users</span>
             </a>
         </nav>
 
@@ -733,7 +750,7 @@
             <form method="POST" action="{{ route('admin.logout') }}" style="margin: 0;">
                 @csrf
                 <button type="submit" class="logout-btn-sidebar">
-                    <span class="logout-icon">🚪</span>
+                    <span class="logout-icon"><i class="fas fa-sign-out-alt"></i></span>
                     <span class="logout-text">Logout</span>
                 </button>
             </form>
@@ -746,14 +763,14 @@
         <div class="top-bar">
             <div class="top-bar-left">
                 <button class="sidebar-toggle-btn" id="sidebar-toggle-btn" title="Toggle Sidebar">
-                    <span id="toggle-icon">☰</span>
+                    <span id="toggle-icon"><i class="fas fa-bars"></i></span>
                 </button>
                 <h2>@yield('page-title', 'Dashboard')</h2>
             </div>
 
             <div class="top-bar-right">
                 <div class="notification-icon">
-                    🔔
+                    <i class="fas fa-bell"></i>
                     @if(isset($stats) && $stats['new_enquiries'] > 0)
                     <span class="notification-badge">{{ $stats['new_enquiries'] }}</span>
                     @endif
@@ -771,14 +788,14 @@
         <div class="content">
             @if(session('success'))
             <div class="alert alert-success">
-                <span style="font-size: 1.25rem;">✓</span>
+                <span style="font-size: 1.25rem;"><i class="fas fa-check-circle"></i></span>
                 <span>{{ session('success') }}</span>
             </div>
             @endif
 
             @if(session('error'))
             <div class="alert alert-error">
-                <span style="font-size: 1.25rem;">✗</span>
+                <span style="font-size: 1.25rem;"><i class="fas fa-times-circle"></i></span>
                 <span>{{ session('error') }}</span>
             </div>
             @endif
@@ -801,7 +818,7 @@
         if (sidebarState === 'true') {
             sidebar.classList.add('expanded');
             mainContent.classList.add('expanded');
-            if (toggleIcon) toggleIcon.textContent = '✕';
+            if (toggleIcon) toggleIcon.innerHTML = '<i class="fas fa-times"></i>';
         }
 
         // Desktop: Toggle sidebar with button
@@ -811,7 +828,7 @@
             
             // Update icon
             if (toggleIcon) {
-                toggleIcon.textContent = isExpanded ? '✕' : '☰';
+                toggleIcon.innerHTML = isExpanded ? '<i class="fas fa-times"></i>' : '<i class="fas fa-bars"></i>';
             }
             
             // Save state
@@ -872,7 +889,7 @@
                     if (savedState) {
                         sidebar.classList.add('expanded');
                         mainContent.classList.add('expanded');
-                        if (toggleIcon) toggleIcon.textContent = '✕';
+                        if (toggleIcon) toggleIcon.innerHTML = '<i class="fas fa-times"></i>';
                     }
                 } else {
                     // On mobile, reset to collapsed

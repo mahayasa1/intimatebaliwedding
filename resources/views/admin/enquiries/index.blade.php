@@ -465,22 +465,22 @@
 <!-- Statistics -->
 <div class="stats-grid">
     <div class="stat-card">
-        <div class="stat-icon">📋</div>
+        <div class="stat-icon"><i class="fas fa-list"></i></div>
         <div class="stat-label">Total Enquiries</div>
         <div class="stat-value">{{ $enquiries->total() }}</div>
     </div>
     <div class="stat-card">
-        <div class="stat-icon">🆕</div>
+        <div class="stat-icon"><i class="fas fa-star"></i></div>
         <div class="stat-label">New</div>
         <div class="stat-value">{{ $enquiries->where('status', 'new')->count() }}</div>
     </div>
     <div class="stat-card">
-        <div class="stat-icon">📞</div>
+        <div class="stat-icon"><i class="fas fa-phone"></i></div>
         <div class="stat-label">In Progress</div>
         <div class="stat-value">{{ $enquiries->where('status', 'in_progress')->count() }}</div>
     </div>
     <div class="stat-card">
-        <div class="stat-icon">✅</div>
+        <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
         <div class="stat-label">Completed</div>
         <div class="stat-value">{{ $enquiries->where('status', 'completed')->count() }}</div>
     </div>
@@ -576,15 +576,17 @@
                     <td>
                         <div class="action-buttons">
                             <a href="{{ route('admin.enquiries.show', $enquiry) }}" class="btn btn-primary btn-sm">
-                                👁️ View
+                                <i class="fas fa-eye"></i> View
                             </a>
                             <a href="{{ route('admin.enquiries.edit', $enquiry) }}" class="btn btn-success btn-sm">
-                                ✏️ Edit
+                                <i class="fas fa-edit"></i> Edit
                             </a>
                             <form action="{{ route('admin.enquiries.destroy', $enquiry) }}" method="POST" style="margin: 0;" onsubmit="return confirm('Are you sure you want to delete this enquiry?');">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn btn-danger btn-sm">🗑️ Delete</button>
+                                <button type="submit" class="btn btn-danger btn-sm">
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
                             </form>
                         </div>
                     </td>
@@ -602,7 +604,7 @@
     @endif
     @else
     <div class="empty-state">
-        <div class="empty-state-icon">📭</div>
+        <div class="empty-state-icon"><i class="fas fa-inbox"></i></div>
         <h3>No Enquiries Found</h3>
         <p>There are no customer enquiries matching your filter.</p>
     </div>

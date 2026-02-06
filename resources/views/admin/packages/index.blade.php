@@ -169,12 +169,15 @@
     }
 
     .search-box::before {
-        content: '🔍';
+        content: '\f002';
+        font-family: 'Font Awesome 6 Free';
+        font-weight: 900;
         position: absolute;
         left: 1rem;
         top: 50%;
         transform: translateY(-50%);
         font-size: 1rem;
+        color: #999;
     }
 
     .table-responsive {
@@ -404,7 +407,7 @@
 <div class="page-header">
     <h1>Wedding Packages</h1>
     <a href="{{ route('admin.packages.create') }}" class="btn-add">
-        ➕ Add New Package
+        <i class="fas fa-plus"></i> Add New Package
     </a>
 </div>
 
@@ -413,7 +416,7 @@
     <div class="stat-card">
         <div class="stat-header">
             <div class="stat-title">Total Packages</div>
-            <div class="stat-icon">📦</div>
+            <div class="stat-icon"><i class="fas fa-box"></i></div>
         </div>
         <div class="stat-value">{{ $packages->total() }}</div>
     </div>
@@ -421,7 +424,7 @@
     <div class="stat-card">
         <div class="stat-header">
             <div class="stat-title">Active Services</div>
-            <div class="stat-icon">⚙️</div>
+            <div class="stat-icon"><i class="fas fa-cog"></i></div>
         </div>
         <div class="stat-value">{{ $packages->sum('services_count') }}</div>
     </div>
@@ -429,7 +432,7 @@
     <div class="stat-card">
         <div class="stat-header">
             <div class="stat-title">This Month</div>
-            <div class="stat-icon">📅</div>
+            <div class="stat-icon"><i class="fas fa-calendar-alt"></i></div>
         </div>
         <div class="stat-value">{{ $packages->where('created_at', '>=', now()->startOfMonth())->count() }}</div>
     </div>
@@ -468,7 +471,7 @@
                     </td>
                     <td>
                         <span class="services-count">
-                            ⚙️ {{ $package->services_count }} Service{{ $package->services_count != 1 ? 's' : '' }}
+                            <i class="fas fa-cog"></i> {{ $package->services_count }} Service{{ $package->services_count != 1 ? 's' : '' }}
                         </span>
                     </td>
                     <td>
@@ -479,15 +482,17 @@
                     <td>
                         <div class="action-buttons">
                             <a href="{{ route('admin.packages.show', $package) }}" class="btn btn-primary btn-sm">
-                                👁️ View
+                                <i class="fas fa-eye"></i> View
                             </a>
                             <a href="{{ route('admin.packages.edit', $package) }}" class="btn btn-success btn-sm">
-                                ✏️ Edit
+                                <i class="fas fa-edit"></i> Edit
                             </a>
                             <form action="{{ route('admin.packages.destroy', $package) }}" method="POST" style="margin: 0;" onsubmit="return confirm('Are you sure you want to delete this package?');">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn btn-danger btn-sm">🗑️ Delete</button>
+                                <button type="submit" class="btn btn-danger btn-sm">
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
                             </form>
                         </div>
                     </td>
@@ -505,11 +510,11 @@
     @endif
     @else
     <div class="empty-state">
-        <div class="empty-state-icon">📦</div>
+        <div class="empty-state-icon"><i class="fas fa-box"></i></div>
         <h3>No Packages Yet</h3>
         <p>Start by creating your first wedding package</p>
         <a href="{{ route('admin.packages.create') }}" class="btn-add">
-            ➕ Create First Package
+            <i class="fas fa-plus"></i> Create First Package
         </a>
     </div>
     @endif

@@ -32,7 +32,7 @@ class BlogController extends Controller
      */
     public function create()
     {
-        return view('blogs.create');
+        return view('admin.blogs.create');
     }
 
     /**
@@ -84,7 +84,7 @@ class BlogController extends Controller
      */
     public function edit(Blog $blog)
     {
-        return view('blogs.edit', compact('blog'));
+        return view('admin.blogs.edit', compact('blog'));
     }
 
     /**

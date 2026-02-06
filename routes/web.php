@@ -7,6 +7,7 @@ use App\Http\Controllers\EnquiryController;
 use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\PackageController;
 use App\Http\Controllers\ServiceController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -120,5 +121,37 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::put('/{enquiry}', [EnquiryController::class, 'adminUpdate'])->name('update');
             Route::delete('/{enquiry}', [EnquiryController::class, 'adminDestroy'])->name('destroy');
         });
+        
+        // Users Management
+        Route::prefix('users')->name('users.')->group(function () {
+            // Main CRUD Routes
+            Route::get('/', [UserController::class, 'index'])->name('index');
+            Route::get('/create', [UserController::class, 'create'])->name('create');
+            Route::post('/', [UserController::class, 'store'])->name('store');
+            Route::get('/{user}', [UserController::class, 'show'])->name('show');
+            Route::get('/{user}/edit', [UserController::class, 'edit'])->name('edit');
+            Route::put('/{user}', [UserController::class, 'update'])->name('update');
+            Route::delete('/{user}', [UserController::class, 'destroy'])->name('destroy');
+            
+            // Additional User Actions
+            Route::post('/bulk-delete', [UserController::class, 'bulkDelete'])->name('bulk-delete');
+            Route::post('/{user}/change-role', [UserController::class, 'changeRole'])->name('change-role');
+            Route::post('/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('toggle-status');
+            
+            // AJAX & Utility Routes
+            Route::get('/search/query', [UserController::class, 'search'])->name('search');
+            Route::get('/export/csv', [UserController::class, 'export'])->name('export');
+            Route::get('/statistics/data', [UserController::class, 'statistics'])->name('statistics');
+        });
     });
+});
+
+/*
+|--------------------------------------------------------------------------
+| User Profile Routes (Accessible by all authenticated users)
+|--------------------------------------------------------------------------
+*/
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [UserController::class, 'profile'])->name('profile');
+    Route::put('/profile', [UserController::class, 'updateProfile'])->name('profile.update');
 });

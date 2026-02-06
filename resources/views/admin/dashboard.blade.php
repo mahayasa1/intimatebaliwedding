@@ -439,7 +439,7 @@
     <div class="stat-card">
         <div class="stat-header">
             <div class="stat-title">Active Packages</div>
-            <div class="stat-icon">📦</div>
+            <div class="stat-icon"><i class="fas fa-box"></i></div>
         </div>
         <div class="stat-value">{{ $stats['packages'] ?? 10 }}</div>
     </div>
@@ -447,7 +447,7 @@
     <div class="stat-card">
         <div class="stat-header">
             <div class="stat-title">Total Enquiries</div>
-            <div class="stat-icon">✉️</div>
+            <div class="stat-icon"><i class="fas fa-envelope"></i></div>
         </div>
         <div class="stat-value">{{ $stats['enquiries'] ?? 25 }}</div>
     </div>
@@ -455,7 +455,7 @@
     <div class="stat-card">
         <div class="stat-header">
             <div class="stat-title">New (Today)</div>
-            <div class="stat-icon">🔔</div>
+            <div class="stat-icon"><i class="fas fa-bell"></i></div>
         </div>
         <div class="stat-value">{{ $stats['new_enquiries'] ?? 2 }}</div>
     </div>
@@ -463,7 +463,7 @@
     <div class="stat-card">
         <div class="stat-header">
             <div class="stat-title">Blog Articles</div>
-            <div class="stat-icon">📝</div>
+            <div class="stat-icon"><i class="fas fa-pencil-alt"></i></div>
         </div>
         <div class="stat-value">{{ $stats['blogs'] ?? 13 }}</div>
     </div>
@@ -493,7 +493,7 @@
 <div class="table-card">
     <div class="table-header">
         <h3 class="table-title">
-            📋 Recent Enquiries
+            <i class="fas fa-list"></i> Recent Enquiries
         </h3>
     </div>
 
@@ -669,4 +669,4 @@
         });
     }
 </script>
-@endpush    
+@endpush

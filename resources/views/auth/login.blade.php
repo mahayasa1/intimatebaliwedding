@@ -78,18 +78,6 @@
             margin-bottom: 3rem;
         }
 
-        .logo-box {
-            display: inline-block;
-            padding: 1rem 2.5rem;
-            border: 3px solid #8B7355;
-            border-radius: 50px;
-            font-family: 'Playfair Display', serif;
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: #8B7355;
-            letter-spacing: 2px;
-        }
-
         /* Form Styles */
         .login-form {
             margin-top: 2rem;
@@ -236,7 +224,7 @@
     <div class="login-container">
         <!-- Logo -->
         <div class="login-logo">
-            <div class="logo-box">Logo</div>
+            <img src="{{ asset('assets/logo_IBW.png') }}" alt="Intimate Bali Wedding Logo" style=" height:100px;">
         </div>
 
         <!-- Alerts -->

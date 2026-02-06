@@ -30,7 +30,7 @@ class PackageController extends Controller
      */
     public function create()
     {
-        return view('packages.create');
+        return view('admin.packages.create');
     }
 
     /**
@@ -45,7 +45,7 @@ class PackageController extends Controller
 
         Package::create($validated);
 
-        return redirect()->route('packages.index')
+        return redirect()->route('admin.packages.index')
             ->with('success', 'Package created successfully.');
     }
 
@@ -55,7 +55,7 @@ class PackageController extends Controller
     public function show(Package $package)
     {
         $package->load('services');
-        return view('packages.show', compact('package'));
+        return view('admin.packages.show', compact('package'));
     }
 
     /**
@@ -63,7 +63,7 @@ class PackageController extends Controller
      */
     public function edit(Package $package)
     {
-        return view('packages.edit', compact('package'));
+        return view('admin.packages.edit', compact('package'));
     }
 
     /**
@@ -78,7 +78,7 @@ class PackageController extends Controller
 
         $package->update($validated);
 
-        return redirect()->route('packages.index')
+        return redirect()->route('admin.packages.index')
             ->with('success', 'Package updated successfully.');
     }
 
@@ -89,13 +89,13 @@ class PackageController extends Controller
     {
         // Check if package has services
         if ($package->services()->count() > 0) {
-            return redirect()->route('packages.index')
+            return redirect()->route('admin.packages.index')
                 ->with('error', 'Cannot delete package with existing services.');
         }
 
         $package->delete();
 
-        return redirect()->route('packages.index')
+        return redirect()->route('admin.packages.index')
             ->with('success', 'Package deleted successfully.');
     }
 }

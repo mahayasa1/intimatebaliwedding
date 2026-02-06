@@ -33,7 +33,7 @@ class ServiceController extends Controller
     public function create()
     {
         $packages = Package::all();
-        return view('services.create', compact('packages'));
+        return view('admin.services.create', compact('packages'));
     }
 
     /**
@@ -54,7 +54,7 @@ class ServiceController extends Controller
 
         Service::create($validated);
 
-        return redirect()->route('services.index')
+        return redirect()->route('admin.services.index')
             ->with('success', 'Service created successfully.');
     }
 
@@ -64,7 +64,7 @@ class ServiceController extends Controller
     public function show(Service $service)
     {
         $service->load('package');
-        return view('services.show', compact('service'));
+        return view('admin.services.show', compact('service'));
     }
 
     /**
@@ -73,7 +73,7 @@ class ServiceController extends Controller
     public function edit(Service $service)
     {
         $packages = Package::all();
-        return view('services.edit', compact('service', 'packages'));
+        return view('admin.services.edit', compact('service', 'packages'));
     }
 
     /**
@@ -98,7 +98,7 @@ class ServiceController extends Controller
 
         $service->update($validated);
 
-        return redirect()->route('services.index')
+        return redirect()->route('admin.services.index')
             ->with('success', 'Service updated successfully.');
     }
 
@@ -113,7 +113,7 @@ class ServiceController extends Controller
 
         $service->delete();
 
-        return redirect()->route('services.index')
+        return redirect()->route('admin.services.index')
             ->with('success', 'Service deleted successfully.');
     }
 }

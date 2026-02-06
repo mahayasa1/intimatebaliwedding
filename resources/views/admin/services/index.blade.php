@@ -428,7 +428,7 @@
 <div class="page-header">
     <h1>Wedding Services</h1>
     <a href="{{ route('admin.services.create') }}" class="btn-add">
-        ➕ Add New Service
+        <i class="fas fa-plus"></i> Add New Service
     </a>
 </div>
 
@@ -437,7 +437,7 @@
     <div class="stat-card">
         <div class="stat-header">
             <div class="stat-title">Total Services</div>
-            <div class="stat-icon">⚙️</div>
+            <div class="stat-icon"><i class="fas fa-cog"></i></div>
         </div>
         <div class="stat-value">{{ $services->total() }}</div>
     </div>
@@ -445,7 +445,7 @@
     <div class="stat-card">
         <div class="stat-header">
             <div class="stat-title">With Images</div>
-            <div class="stat-icon">🖼️</div>
+            <div class="stat-icon"><i class="fas fa-images"></i></div>
         </div>
         <div class="stat-value">{{ $services->where('foto', '!=', null)->count() }}</div>
     </div>
@@ -453,7 +453,7 @@
     <div class="stat-card">
         <div class="stat-header">
             <div class="stat-title">This Month</div>
-            <div class="stat-icon">📅</div>
+            <div class="stat-icon"><i class="fas fa-calendar-alt"></i></div>
         </div>
         <div class="stat-value">{{ $services->where('created_at', '>=', now()->startOfMonth())->count() }}</div>
     </div>
@@ -489,7 +489,7 @@
             @endif
             @if($service->foto)
             <div class="service-image-overlay">
-                <span class="image-badge">📸 Image</span>
+                <span class="image-badge"><i class="fas fa-camera"></i> Image</span>
             </div>
             @endif
         </div>
@@ -511,15 +511,17 @@
                 </div>
                 <div class="service-actions">
                     <a href="{{ route('admin.services.show', $service) }}" class="btn btn-primary btn-sm btn-icon" title="View">
-                        👁️
+                        <i class="fas fa-eye"></i>
                     </a>
                     <a href="{{ route('admin.services.edit', $service) }}" class="btn btn-success btn-sm btn-icon" title="Edit">
-                        ✏️
+                        <i class="fas fa-edit"></i>
                     </a>
                     <form action="{{ route('admin.services.destroy', $service) }}" method="POST" style="margin: 0;" onsubmit="return confirm('Are you sure you want to delete this service?');">
                         @csrf
                         @method('DELETE')
-                        <button type="submit" class="btn btn-danger btn-sm btn-icon" title="Delete">🗑️</button>
+                        <button type="submit" class="btn btn-danger btn-sm btn-icon" title="Delete">
+                            <i class="fas fa-trash"></i>
+                        </button>
                     </form>
                 </div>
             </div>
@@ -536,11 +538,11 @@
 @endif
 @else
 <div class="empty-state">
-    <div class="empty-state-icon">⚙️</div>
+    <div class="empty-state-icon"><i class="fas fa-cog"></i></div>
     <h3>No Services Yet</h3>
     <p>Start by creating your first wedding service</p>
     <a href="{{ route('admin.services.create') }}" class="btn-add">
-        ➕ Create First Service
+        <i class="fas fa-plus"></i> Create First Service
     </a>
 </div>
 @endif

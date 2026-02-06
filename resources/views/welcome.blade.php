@@ -7,7 +7,7 @@
     /* Hero Section */
     .hero-section {
         position: relative;
-        height: 120vh;
+        height: 100vh;
         overflow: hidden;
         margin-top: -80px;
     }
@@ -219,15 +219,15 @@
 <section id="home" class="hero-section">
     <!-- Slide 1 -->
     <div class="hero-slide active">
-        <img src="https://images.unsplash.com/photo-1519741497674-611481863552?w=1920&q=80" alt="Wedding Venue">
+        <img src="{{ asset('assets/intimate/web/Background/home_1.jpg') }}" alt="Wedding Venue">
     </div>
     <!-- Slide 2 -->
     <div class="hero-slide">
-        <img src="https://images.unsplash.com/photo-1606800052052-a08af7148866?w=1920&q=80" alt="Wedding Venue">
+        <img src="{{ asset('assets/intimate/web/Background/home_2.jpg') }}" alt="Wedding Venue">
     </div>
     <!-- Slide 3 -->
     <div class="hero-slide">
-        <img src="https://images.unsplash.com/photo-1522413452208-996ff3f3e740?w=1920&q=80" alt="Wedding Venue">
+        <img src="{{ asset('assets/intimate/web/Background/home_3.jpg') }}" alt="Wedding Venue">
     </div>
 
     <!-- Hero Overlay -->
@@ -379,7 +379,7 @@
     document.addEventListener('DOMContentLoaded', function() {
         const slides = document.querySelectorAll('.hero-slide');
         let currentSlide = 0;
-        const slideInterval = 5000; // 5 seconds
+        const slideInterval = 3000; 
 
         function nextSlide() {
             slides[currentSlide].classList.remove('active');
