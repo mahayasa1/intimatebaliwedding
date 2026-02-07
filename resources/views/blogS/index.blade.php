@@ -236,14 +236,14 @@
             <img src="{{ asset('storage/' . $blog->image) }}" alt="{{ $blog->title }}" class="blog-image">
             <div class="blog-content">
                 <h3 class="blog-title">
-                    <a href="{{ route('blog.show', $blog->slug) }}">{{ $blog->title }}</a>
+                    <a href="{{ route('blogs.show', $blog->slug) }}">{{ $blog->title }}</a>
                 </h3>
                 <p class="blog-excerpt">
                     {{ $blog->excerpt ?? Str::limit(strip_tags($blog->content), 150) }}
                 </p>
                 <div class="blog-meta">
                     <span class="blog-author">By {{ $blog->author ?? 'Admin' }}</span>
-                    <a href="{{ route('blog.show', $blog->slug) }}" class="blog-read-more">
+                    <a href="{{ route('blogs.show', $blog->slug) }}" class="blog-read-more">
                         Read More →
                     </a>
                 </div>

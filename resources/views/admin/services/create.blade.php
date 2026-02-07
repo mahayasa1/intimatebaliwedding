@@ -333,12 +333,10 @@
             </h3>
 
             <div class="form-group">
-                <label for="foto" class="form-label">Upload Image</label>
                 <div class="image-upload-wrapper">
                     <label for="foto" class="image-upload-area" id="upload-area">
-                        <div class="upload-icon">📸</div>
                         <div class="upload-text">Click to upload or drag and drop</div>
-                        <div class="upload-hint">JPG, PNG, WEBP (Max 2MB)</div>
+                        <div class="upload-hint">JPG, PNG, WEBP (Max 20MB)</div>
                     </label>
                     <input 
                         type="file" 

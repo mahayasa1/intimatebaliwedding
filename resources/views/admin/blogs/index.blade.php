@@ -332,7 +332,7 @@
     <form action="{{ route('admin.blogs.index') }}" method="GET">
         <div class="filter-grid">
             <div class="search-box">
-                <span class="search-icon">🔍</span>
+                <span class="search-icon"></span>
                 <input 
                     type="text" 
                     name="search" 
@@ -359,17 +359,17 @@
         <img src="{{ asset('storage/' . $blog->image) }}" alt="{{ $blog->title }}" class="blog-image">
         @else
         <div class="blog-image" style="background: linear-gradient(135deg, #8B7355 0%, #6B5644 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 3rem;">
-            📝
+            <i class="fas fa-image"></i>
         </div>
         @endif
         
         <div class="blog-content">
             <div class="blog-meta">
                 <span class="meta-badge {{ $blog->is_published ? 'published' : 'draft' }}">
-                    {{ $blog->is_published ? '✓ Published' : '📄 Draft' }}
+                    {{ $blog->is_published ? '✓ Published' : 'Draft' }}
                 </span>
                 <span class="meta-badge">
-                    📅 {{ $blog->published_at ? $blog->published_at->format('M d, Y') : 'Not set' }}
+                    <i class="fas fa-calendar-alt"></i> {{ $blog->published_at ? $blog->published_at->format('M d, Y') : 'Not set' }}
                 </span>
             </div>
             
@@ -391,13 +391,16 @@
                 </div>
                 <div class="blog-actions">
                     <a href="{{ route('admin.blogs.show', $blog) }}" class="btn-icon btn-view" title="View">
+                        <i class="fas fa-eye"></i>
                     </a>
                     <a href="{{ route('admin.blogs.edit', $blog) }}" class="btn-icon btn-edit" title="Edit">
+                        <i class="fas fa-edit"></i>
                     </a>
                     <form action="{{ route('admin.blogs.destroy', $blog) }}" method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this blog post?');">
                         @csrf
                         @method('DELETE')
                         <button type="submit" class="btn-icon btn-delete" title="Delete">
+                            <i class="fas fa-trash-alt"></i>
                         </button>
                     </form>
                 </div>
@@ -413,7 +416,7 @@
 </div>
 @else
 <div class="empty-state">
-    <div class="empty-icon">📝</div>
+    <div class="empty-icon"><i class="fas fa-newspaper"></i></div>
     <h3 class="empty-title">No Blog Posts Found</h3>
     <p class="empty-text">
         @if(request('search'))
@@ -423,7 +426,7 @@
         @endif
     </p>
     <a href="{{ route('admin.blogs.create') }}" class="btn-add">
-        ➕ Create First Blog Post
+        + Create First Blog Post
     </a>
 </div>
 @endif

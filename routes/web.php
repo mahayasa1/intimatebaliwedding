@@ -26,9 +26,12 @@ Route::get('/about', function () {
 
 Route::get('/services', [ServiceController::class, 'index'])->name('services.public');
 Route::get('/packages', [PackageController::class, 'index'])->name('packages.public');
+
+// Gallery with Google Maps Reviews Integration
 Route::get('/gallery', [GalleryController::class, 'index'])->name('gallery.public');
-Route::get('/blog', [BlogController::class, 'index'])->name('blog.public');
-Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
+
+Route::get('/blog', [BlogController::class, 'index'])->name('blogs.public');
+Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blogs.show');
 Route::get('/contact', function () {
     return view('contact');
 })->name('contact');
@@ -100,6 +103,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::get('/{gallery}/edit', [GalleryController::class, 'edit'])->name('edit');
             Route::put('/{gallery}', [GalleryController::class, 'update'])->name('update');
             Route::delete('/{gallery}', [GalleryController::class, 'destroy'])->name('destroy');
+            
+            // Google Maps Reviews - Refresh Cache (Admin Only)
+            Route::post('/refresh-reviews', [GalleryController::class, 'refreshReviews'])->name('galleries.refresh-reviews');
         });
         
         // Blogs Management
@@ -155,3 +161,5 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [UserController::class, 'profile'])->name('profile');
     Route::put('/profile', [UserController::class, 'updateProfile'])->name('profile.update');
 });
+
+require __DIR__.'/auth.php';

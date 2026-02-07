@@ -229,7 +229,6 @@
     <!-- Package Information -->
     <div class="detail-card">
         <h3 class="card-title">
-            <span class="card-title-icon">📦</span>
             Package Information
         </h3>
         <div class="info-grid">
@@ -265,7 +264,6 @@
     <!-- Services in Package -->
     <div class="detail-card">
         <h3 class="card-title">
-            <span class="card-title-icon">⚙️</span>
             Services in this Package
         </h3>
         
@@ -273,14 +271,14 @@
         <ul class="services-list">
             @foreach($package->services as $service)
             <li class="service-item">
-                <div class="service-icon">⚙️</div>
+                <i class="fas fa-check-circle"></i>
                 <div class="service-name">{{ $service->name }}</div>
             </li>
             @endforeach
         </ul>
         @else
         <div class="empty-state">
-            <div class="empty-state-icon">📭</div>
+            <div class="empty-state-icon"><i class="fas fa-inbox"></i></div>
             <p>No services assigned to this package yet.</p>
         </div>
         @endif
@@ -293,12 +291,12 @@
                 ← Back to List
             </a>
             <a href="{{ route('admin.packages.edit', $package) }}" class="btn btn-primary">
-                ✏️ Edit Package
+                <i class="fas fa-edit"></i> Edit Package
             </a>
             <form action="{{ route('admin.packages.destroy', $package) }}" method="POST" style="margin: 0;" onsubmit="return confirm('Are you sure you want to delete this package? This action cannot be undone.');">
                 @csrf
                 @method('DELETE')
-                <button type="submit" class="btn btn-danger">🗑️ Delete</button>
+                <button type="submit" class="btn btn-danger"><i class="fas fa-trash-alt"></i> Delete</button>
             </form>
         </div>
     </div>

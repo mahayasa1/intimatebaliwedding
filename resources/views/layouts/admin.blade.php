@@ -491,7 +491,7 @@
         /* Content */
         .content {
             padding: 2rem;
-            max-width: 1600px;
+            max-width: 100%;
             margin: 0 auto;
         }
 
@@ -744,7 +744,6 @@
                 </div>
                 <div class="user-details-sidebar">
                     <div class="user-name-sidebar">{{ auth()->user()->name }}</div>
-                    <div class="user-role-sidebar">{{ auth()->user()->email }}</div>
                 </div>
             </div>
             <form method="POST" action="{{ route('admin.logout') }}" style="margin: 0;">
@@ -776,11 +775,11 @@
                     @endif
                 </div>
 
-                <div class="upcoming-wedding">
+                {{-- <div class="upcoming-wedding">
                     <div class="upcoming-wedding-title">Upcoming Wedding</div>
                     <div class="upcoming-wedding-couple">Nyoman & Dayu</div>
                     <div class="upcoming-wedding-date">22 December 2022</div>
-                </div>
+                </div> --}}
             </div>
         </div>
 

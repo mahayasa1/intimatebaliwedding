@@ -326,7 +326,7 @@
             Wedding tips, inspiration, and stories
         </p>
         <div style="text-align: center; margin-top: 2rem;">
-            <a href="{{ route('blog.public') }}" class="btn-primary">Read Our Blog</a>
+            <a href="{{ route('blogs.public') }}" class="btn-primary">Read Our Blog</a>
         </div>
     </div>
 </section>

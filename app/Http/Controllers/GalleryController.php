@@ -3,19 +3,75 @@
 namespace App\Http\Controllers;
 
 use App\Models\Gallery;
+use App\Services\GoogleMapsService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class GalleryController extends Controller
 {
+    protected $googleMapsService;
+
+    public function __construct(GoogleMapsService $googleMapsService)
+    {
+        $this->googleMapsService = $googleMapsService;
+    }
+
     /**
      * Display a listing of the resource (Frontend).
      */
     public function index()
     {
-        $galleries = Gallery::orderBy('order')->latest()->paginate(12);
+        // Ambil semua galleries dan sort berdasarkan orientasi gambar
+        $allGalleries = Gallery::orderBy('order')->latest()->get();
+        
+        // Pisahkan berdasarkan orientasi (horizontal terlebih dahulu, lalu vertikal)
+        $sortedGalleries = $allGalleries->sortByDesc(function ($gallery) {
+            if (!$gallery->image) return 0;
+            
+            $imagePath = storage_path('app/public/' . $gallery->image);
+            
+            if (file_exists($imagePath)) {
+                list($width, $height) = getimagesize($imagePath);
+                
+                // Hitung rasio aspek
+                $aspectRatio = $width / $height;
+                
+                // Return nilai tinggi untuk horizontal (landscape), rendah untuk vertical (portrait)
+                return $aspectRatio;
+            }
+            
+            return 0;
+        });
+        
+        // Paginate hasil sorted
+        $page = request()->get('page', 1);
+        $perPage = 12;
+        $galleries = new \Illuminate\Pagination\LengthAwarePaginator(
+            $sortedGalleries->forPage($page, $perPage),
+            $sortedGalleries->count(),
+            $perPage,
+            $page,
+            ['path' => request()->url(), 'query' => request()->query()]
+        );
+        
         $categories = Gallery::distinct()->pluck('category')->filter();
-        return view('gallery.index', compact('galleries', 'categories'));
+        
+        // Fetch testimonials langsung dari Google Maps API
+        $googleReviews = $this->googleMapsService->getReviews(6);
+        $businessStats = $this->googleMapsService->getBusinessStats();
+        
+        return view('gallery.index', compact('galleries', 'categories', 'googleReviews', 'businessStats'));
+    }
+
+    /**
+     * Refresh Google Maps reviews cache
+     */
+    public function refreshReviews()
+    {
+        $this->googleMapsService->clearCache();
+        
+        return redirect()->route('gallery.index')
+            ->with('success', 'Google Maps reviews refreshed successfully!');
     }
 
     /**

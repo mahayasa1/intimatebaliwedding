@@ -14,10 +14,13 @@ class BlogController extends Controller
      */
     public function index()
     {
-        $blogs = Blog::latest('published_at')->paginate(12);
+        $blogs = Blog::where('is_published', true)
+                    ->whereNotNull('published_at')
+                    ->orderBy('published_at', 'desc')
+                    ->paginate(12);
+
         return view('blogs.index', compact('blogs'));
     }
-
     /**
      * Display a listing for admin.
      */
@@ -42,7 +45,7 @@ class BlogController extends Controller
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
-            'image' => 'required|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'image' => 'required|image|mimes:jpeg,png,jpg,webp|max:20480',
             'excerpt' => 'nullable|string',
             'content' => 'required|string',
             'author' => 'nullable|string|max:255',
@@ -67,7 +70,12 @@ class BlogController extends Controller
      */
     public function show($slug)
     {
-        $blog = Blog::where('slug', $slug)->firstOrFail();
+        // Only show if blog is published
+        $blog = Blog::where('slug', $slug)
+                    ->where('is_published', true)
+                    ->whereNotNull('published_at')
+                    ->firstOrFail();
+
         return view('blogs.show', compact('blog'));
     }
 
@@ -94,7 +102,7 @@ class BlogController extends Controller
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:20480',
             'excerpt' => 'nullable|string',
             'content' => 'required|string',
             'author' => 'nullable|string|max:255',

@@ -373,7 +373,7 @@
             <a href="{{ route('services.public') }}">Services</a>
             <a href="{{ route('packages.public') }}">Packages</a>
             <a href="{{ route('gallery.public') }}">Gallery</a>
-            <a href="{{ route('blog.public') }}">Blog</a>
+            <a href="{{ route('blogs.public') }}">Blog</a>
         </div>
 
         <!-- CTA Button - Right -->
@@ -404,7 +404,7 @@
         <a href="{{ route('services.public') }}">Services</a>
         <a href="{{ route('packages.public') }}">Packages</a>
         <a href="{{ route('gallery.public') }}">Gallery</a>
-        <a href="{{ route('blog.public') }}">Blog</a>
+        <a href="{{ route('blogs.public') }}">Blog</a>
     </div>
     <a href="{{ route('contact') }}" class="mobile-menu-cta">Inquire Now</a>
 </div>

@@ -277,7 +277,7 @@
     <!-- Blog Information -->
     <div class="detail-card">
         <h3 class="card-title">
-            <span class="card-title-icon">ℹ️</span>
+            <i class="fas fa-info-circle"></i>
             Post Information
         </h3>
         <div class="info-grid">
@@ -335,15 +335,15 @@
                 ← Back to List
             </a>
             <a href="{{ route('blogs.show', $blog->slug) }}" class="btn btn-info" target="_blank">
-                🌐 View on Website
+                <i class="fas fa-external-link-alt"></i> View on Website
             </a>
             <a href="{{ route('admin.blogs.edit', $blog) }}" class="btn btn-primary">
-                ✏️ Edit Post
+                <i class="fas fa-edit"></i> Edit Post
             </a>
             <form action="{{ route('admin.blogs.destroy', $blog) }}" method="POST" style="margin: 0;" onsubmit="return confirm('Are you sure you want to delete this blog post? This action cannot be undone.');">
                 @csrf
                 @method('DELETE')
-                <button type="submit" class="btn btn-danger">🗑️ Delete</button>
+                <button type="submit" class="btn btn-danger"><i class="fas fa-trash-alt"></i> Delete</button>
             </form>
         </div>
     </div>

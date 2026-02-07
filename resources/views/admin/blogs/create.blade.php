@@ -296,7 +296,6 @@
         <!-- Blog Information -->
         <div class="form-card">
             <h3 class="section-title">
-                <span class="section-icon">📝</span>
                 Blog Post Information
             </h3>
             
@@ -396,8 +395,7 @@
         <!-- Featured Image -->
         <div class="form-card">
             <h3 class="section-title">
-                <span class="section-icon">🖼️</span>
-                Featured Image
+                <i class="fas fa-image"></i> Featured Image
             </h3>
 
             <div class="form-group">
@@ -406,9 +404,9 @@
                 </label>
                 <div class="image-upload-wrapper">
                     <label for="image" class="image-upload-area" id="upload-area">
-                        <div class="upload-icon">📸</div>
+                        <div class="upload-icon"><i class="fas fa-cloud-upload-alt"></i></div>
                         <div class="upload-text">Click to upload or drag and drop</div>
-                        <div class="upload-hint">JPG, PNG, WEBP (Max 2MB)</div>
+                        <div class="upload-hint">JPG, PNG, WEBP (Max 20MB)</div>
                     </label>
                     <input 
                         type="file" 
@@ -437,7 +435,7 @@
                     ← Cancel
                 </a>
                 <button type="submit" class="btn btn-primary">
-                    💾 Create Blog Post
+                    Create Blog Post
                 </button>
             </div>
         </div>
