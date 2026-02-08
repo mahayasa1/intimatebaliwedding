@@ -13,6 +13,7 @@ class Package extends Model
     protected $fillable = [
         'name',
         'description',
+        'image',
     ];
 
     public function services()

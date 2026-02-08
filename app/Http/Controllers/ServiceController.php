@@ -44,7 +44,7 @@ class ServiceController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'package_id' => 'required|exists:packages,id',
-            'foto' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'foto' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:20480',
             'description' => 'nullable|string',
         ]);
 
@@ -84,7 +84,7 @@ class ServiceController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'package_id' => 'required|exists:packages,id',
-            'foto' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'foto' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:20480',
             'description' => 'nullable|string',
         ]);
 

@@ -188,10 +188,11 @@
 
     /* Footer Bottom */
     .footer-bottom {
-        padding: 2rem 0;
+        padding: 1rem 0;
         text-align: center;
         color: #999;
         font-size: 0.9rem;
+        margin-top: -2rem;
     }
 
     .footer-bottom-content {
@@ -350,20 +351,20 @@
             </div>
 
             <!-- Newsletter -->
-            <div class="footer-section">
+            {{-- <div class="footer-section">
                 <h3>Newsletter</h3>
                 <p>Subscribe to receive our latest news and special offers.</p>
                 <form class="newsletter-form" onsubmit="return false;">
                     <input type="email" class="newsletter-input" placeholder="Your email address" required>
                     <button type="submit" class="newsletter-btn">Subscribe</button>
                 </form>
-            </div>
+            </div> --}}
         </div>
 
         <!-- Footer Bottom -->
         <div class="footer-bottom">
             <div class="footer-bottom-content">
-                <p>&copy; {{ date('Y') }} Intimate Bali Wedding. All rights reserved.</p>
+                <p>&copy; {{ date('Y') }} SKYNUSA TECH. All rights reserved.</p>
                 <div class="footer-bottom-links">
                     <a href="#privacy">Privacy Policy</a>
                     <a href="#terms">Terms of Service</a>

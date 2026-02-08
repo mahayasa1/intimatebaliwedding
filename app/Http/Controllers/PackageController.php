@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Package;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class PackageController extends Controller
 {
@@ -41,7 +42,12 @@ class PackageController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
+            'image' => 'required|image|mimes:jpeg,png,jpg,webp|max:20480',
         ]);
+
+        if ($request->hasFile('image')) {
+            $validated['image'] = $request->file('image')->store('packages', 'public');
+        }
 
         Package::create($validated);
 
@@ -74,7 +80,16 @@ class PackageController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:20480',
         ]);
+
+        if ($request->hasFile('image')) {
+            // Delete old image
+            if ($package->image) {
+                Storage::disk('public')->delete($package->image);
+            }
+            $validated['image'] = $request->file('image')->store('packages', 'public');
+        }
 
         $package->update($validated);
 
@@ -91,6 +106,11 @@ class PackageController extends Controller
         if ($package->services()->count() > 0) {
             return redirect()->route('admin.packages.index')
                 ->with('error', 'Cannot delete package with existing services.');
+        }
+
+        // Delete image if exists
+        if ($package->image) {
+            Storage::disk('public')->delete($package->image);
         }
 
         $package->delete();

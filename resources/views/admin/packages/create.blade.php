@@ -34,18 +34,6 @@
         border-bottom: 2px solid #f0f0f0;
     }
 
-    .section-icon {
-        width: 40px;
-        height: 40px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: linear-gradient(135deg, #8B7355 0%, #6B5644 100%);
-        color: white;
-        border-radius: 10px;
-        font-size: 1.25rem;
-    }
-
     .form-group {
         margin-bottom: 1.5rem;
     }
@@ -92,6 +80,82 @@
         min-height: 140px;
         resize: vertical;
         line-height: 1.6;
+    }
+
+    /* Image Upload Styling */
+    .image-upload-wrapper {
+        position: relative;
+        border: 2px dashed #e0e0e0;
+        border-radius: 12px;
+        padding: 2rem;
+        text-align: center;
+        transition: all 0.3s ease;
+        background: #fafafa;
+    }
+
+    .image-upload-wrapper:hover {
+        border-color: #8B7355;
+        background: #f5f5f5;
+    }
+
+    .image-upload-wrapper input[type="file"] {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        opacity: 0;
+        cursor: pointer;
+    }
+
+    .upload-icon {
+        font-size: 3rem;
+        color: #8B7355;
+        margin-bottom: 1rem;
+    }
+
+    .upload-text {
+        color: #666;
+        font-size: 0.95rem;
+    }
+
+    .upload-text strong {
+        color: #8B7355;
+    }
+
+    .image-preview {
+        margin-top: 1rem;
+        display: none;
+        position: relative;
+    }
+
+    .image-preview img {
+        max-width: 100%;
+        max-height: 300px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .remove-image {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: #e74c3c;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 32px;
+        height: 32px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+    }
+
+    .remove-image:hover {
+        background: #c0392b;
+        transform: scale(1.1);
     }
 
     .error-message {
@@ -188,7 +252,7 @@
 
 @section('content')
 <div class="form-container">
-    <form action="{{ route('admin.packages.store') }}" method="POST">
+    <form action="{{ route('admin.packages.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
 
         <!-- Package Information -->
@@ -213,6 +277,39 @@
                 @error('name')
                 <div class="error-message">{{ $message }}</div>
                 @enderror
+            </div>
+
+            <div class="form-group">
+                <label for="image" class="form-label">
+                    Package Image <span class="required">*</span>
+                </label>
+                <div class="image-upload-wrapper">
+                    <input 
+                        type="file" 
+                        id="image" 
+                        name="image" 
+                        accept="image/*"
+                        required
+                        onchange="previewImage(event)"
+                    >
+                    <div class="upload-icon">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                    </div>
+                    <div class="upload-text">
+                        <strong>Click to upload</strong> or drag and drop<br>
+                        <small>PNG, JPG, WEBP (max. 2MB)</small>
+                    </div>
+                </div>
+                <div class="image-preview" id="imagePreview">
+                    <button type="button" class="remove-image" onclick="removeImage()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <img id="preview" src="" alt="Preview">
+                </div>
+                @error('image')
+                <div class="error-message">{{ $message }}</div>
+                @enderror
+                <div class="form-help">Upload a high-quality image that represents this package</div>
             </div>
 
             <div class="form-group">
@@ -243,4 +340,24 @@
         </div>
     </form>
 </div>
+
+<script>
+function previewImage(event) {
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('preview').src = e.target.result;
+            document.getElementById('imagePreview').style.display = 'block';
+        }
+        reader.readAsDataURL(file);
+    }
+}
+
+function removeImage() {
+    document.getElementById('image').value = '';
+    document.getElementById('imagePreview').style.display = 'none';
+    document.getElementById('preview').src = '';
+}
+</script>
 @endsection

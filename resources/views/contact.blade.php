@@ -355,12 +355,14 @@
     <!-- Map -->
     <div class="map-container">
         <iframe 
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d31577.27775475!2d115.25447!3d-8.50805!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2dd23d739e93c2c3%3A0x7e7a2bcb3e222771!2sUbud%2C%20Bali%2C%20Indonesia!5e0!3m2!1sen!2sid!4v1234567890"
-            allowfullscreen="" 
-            loading="lazy" 
-            referrerpolicy="no-referrer-when-downgrade">
+            src="https://www.google.com/maps?q=-8.651868,115.2174142&hl=id&z=17&output=embed"
+            width="100%" height="400"
+            style="border:0;" 
+            allowfullscreen 
+            loading="lazy">
         </iframe>
     </div>
+
 </section>
 @endsection
 
