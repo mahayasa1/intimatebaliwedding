@@ -27,29 +27,35 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
-        ]);
+        'email' => 'required|email',
+        'password' => 'required',
+    ]);
 
-        $credentials = $request->only('email', 'password');
-        $remember = $request->boolean('remember');
+    $credentials = $request->only('email', 'password');
+    $remember = $request->boolean('remember'); // Hanya remember jika user centang checkbox
 
-        if (Auth::attempt($credentials, $remember)) {
-            if (Auth::user()->role === 'admin') {
-                $request->session()->regenerate();
-                return redirect()->intended(route('admin.dashboard'))
-                    ->with('success', 'Welcome back, ' . Auth::user()->name . '!');
+    if (Auth::attempt($credentials, $remember)) {
+        if (Auth::user()->role === 'admin') {
+            $request->session()->regenerate();
+            
+            // Set session expire on close jika tidak remember
+            if (!$remember) {
+                config(['session.expire_on_close' => true]);
             }
-
-            Auth::logout();
-            throw ValidationException::withMessages([
-                'email' => 'You do not have admin access.',
-            ]);
+            
+            return redirect()->intended(route('admin.dashboard'))
+                ->with('success', 'Welcome back, ' . Auth::user()->name . '!');
         }
 
+        Auth::logout();
         throw ValidationException::withMessages([
-            'email' => 'The provided credentials do not match our records.',
+            'email' => 'You do not have admin access.',
         ]);
+    }
+
+    throw ValidationException::withMessages([
+        'email' => 'The provided credentials do not match our records.',
+    ]);
     }
 
     /**

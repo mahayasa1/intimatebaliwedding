@@ -9,12 +9,28 @@ use Illuminate\Support\Facades\Storage;
 class PackageController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Display a listing of the resource (Public).
      */
     public function index()
     {
         $packages = Package::withCount('services')->latest()->paginate(12);
         return view('packages.index', compact('packages'));
+    }
+
+    /**
+     * Display the specified resource (Public).
+     */
+    public function show($id)
+    {
+        $package = Package::with('services')->findOrFail($id);
+        
+        // Get other packages (exclude current package, limit to 3)
+        $otherPackages = Package::where('id', '!=', $id)
+                            ->latest()
+                            ->take(3)
+                            ->get();
+        
+        return view('packages.show', compact('package', 'otherPackages'));
     }
 
     /**
@@ -56,9 +72,9 @@ class PackageController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Display the specified resource (Admin).
      */
-    public function show(Package $package)
+    public function adminShow(Package $package)
     {
         $package->load('services');
         return view('admin.packages.show', compact('package'));

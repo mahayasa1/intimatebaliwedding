@@ -154,6 +154,8 @@
     <!-- Include Footer -->
     @include('components.footer')
 
+    
+    <script src="https://snapwidget.com/js/snapwidget.js"></script>
     <!-- Scripts -->
     <script>
         // Mobile Menu Toggle

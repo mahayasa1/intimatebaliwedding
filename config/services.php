@@ -35,4 +35,12 @@ return [
         ],
     ],
 
+    'snapwidget' => [
+        'widget_id' => env('SNAPWIDGET_WIDGET_ID'),
+    ],
+    
+    'instagram' => [
+        'username' => env('INSTAGRAM_USERNAME'),
+    ],
+
 ];

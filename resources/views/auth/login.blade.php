@@ -274,6 +274,11 @@
                 @enderror
             </div>
 
+            <div class="form-group" style="display: flex; align-items: center; margin-bottom: 1rem;">
+                <input type="checkbox" id="remember" name="remember" style="width: auto; margin-right: 0.5rem;">
+                <label for="remember" style="margin: 0; cursor: pointer; font-size: 0.9rem;">Remember me</label>
+            </div>
+
             <button type="submit" class="btn-login">
                 Login
             </button>

@@ -70,6 +70,8 @@
         overflow: hidden;
         aspect-ratio: 1/1;
         cursor: pointer;
+        display: block;
+        text-decoration: none;
     }
 
     .package-image {
@@ -149,6 +151,7 @@
         text-transform: uppercase;
         letter-spacing: 1px;
         transition: all 0.3s ease;
+        color: white;
     }
 
     /* Content yang muncul saat hover */
@@ -161,6 +164,7 @@
         overflow: hidden;
         transform: translateY(20px);
         transition: all 0.5s ease 0.2s;
+        color: white;
     }
 
     .package-card:hover .package-description {
@@ -224,6 +228,7 @@
     .btn-primary:hover {
         transform: translateY(-2px);
         box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
+        color: white;
     }
 
     @media (max-width: 768px) {
@@ -269,7 +274,7 @@
 <!-- Packages Grid -->
 <section class="packages-grid">
     @foreach($packages as $package)
-    <div class="package-card">
+    <a href="{{ route('packages.show', $package->id) }}" class="package-card">
         @if($package->image)
             <img src="{{ asset('storage/' . $package->image) }}" alt="{{ $package->name }}" class="package-image">
         @else
@@ -283,12 +288,9 @@
                 @if($package->description)
                 <p class="package-description">{{ Str::limit($package->description, 150) }}</p>
                 @endif
-                {{-- <span class="package-services-count">
-                    <i class="fas fa-check-circle"></i> {{ $package->services_count }} Services Included
-                </span> --}}
             </div>
         </div>
-    </div>
+    </a>
     @endforeach
 </section>
 

@@ -24,7 +24,9 @@ Route::get('/about', function () {
 })->name('about');
 
 Route::get('/services', [ServiceController::class, 'index'])->name('services.public');
+
 Route::get('/packages', [PackageController::class, 'index'])->name('packages.public');
+Route::get('/packages/{id}', [PackageController::class, 'show'])->name('packages.show');
 
 // Gallery with Google Maps Reviews Integration
 Route::get('/gallery', [GalleryController::class, 'index'])->name('gallery.public');
@@ -87,7 +89,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::get('/', [PackageController::class, 'adminIndex'])->name('index');
             Route::get('/create', [PackageController::class, 'create'])->name('create');
             Route::post('/', [PackageController::class, 'store'])->name('store');
-            Route::get('/{package}', [PackageController::class, 'show'])->name('show');
+            Route::get('/{package}', [PackageController::class, 'adminShow'])->name('show');
             Route::get('/{package}/edit', [PackageController::class, 'edit'])->name('edit');
             Route::put('/{package}', [PackageController::class, 'update'])->name('update');
             Route::delete('/{package}', [PackageController::class, 'destroy'])->name('destroy');

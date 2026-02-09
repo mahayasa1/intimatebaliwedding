@@ -139,8 +139,6 @@
                 {{ Str::limit($service->description, 150) }}
             </p>
             @endif
-            
-            <a href="#contact" class="service-btn">Inquire Now</a>
         </div>
     </div>
     @empty
