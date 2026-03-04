@@ -338,7 +338,7 @@
 
                     <div class="form-group">
                         <label for="guest_count">Guest Count (Approx.)</label>
-                        <input type="number" id="guest_count" name="guest_count" value="{{ old('guest_count') }}" placeholder="50">
+                        <input type="number" id="guest_count" name="guest_count" value="{{ old('guest_count') }}" placeholder="2">
                     </div>
                 </div>
 

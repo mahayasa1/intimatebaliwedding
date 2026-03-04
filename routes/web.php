@@ -7,7 +7,6 @@ use App\Http\Controllers\EnquiryController;
 use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PackageController;
-use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -22,8 +21,6 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/about', function () {
     return view('about');
 })->name('about');
-
-Route::get('/services', [ServiceController::class, 'index'])->name('services.public');
 
 Route::get('/packages', [PackageController::class, 'index'])->name('packages.public');
 Route::get('/packages/{id}', [PackageController::class, 'show'])->name('packages.show');
@@ -72,17 +69,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
         
         // Logout
         Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-        
-        // Services Management
-        Route::prefix('services')->name('services.')->group(function () {
-            Route::get('/', [ServiceController::class, 'adminIndex'])->name('index');
-            Route::get('/create', [ServiceController::class, 'create'])->name('create');
-            Route::post('/', [ServiceController::class, 'store'])->name('store');
-            Route::get('/{service}', [ServiceController::class, 'show'])->name('show');
-            Route::get('/{service}/edit', [ServiceController::class, 'edit'])->name('edit');
-            Route::put('/{service}', [ServiceController::class, 'update'])->name('update');
-            Route::delete('/{service}', [ServiceController::class, 'destroy'])->name('destroy');
-        });
         
         // Packages Management
         Route::prefix('packages')->name('packages.')->group(function () {

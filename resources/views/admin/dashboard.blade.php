@@ -7,19 +7,19 @@
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Work+Sans:wght@400;500;600&display=swap');
 
-    /* Stats Grid */
+    /* Stats Grid - Improved Responsive */
     .stats-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-        gap: 1.5rem;
-        margin-bottom: 2.5rem;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.25rem;
+        margin-bottom: 2rem;
     }
 
     .stat-card {
         background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-        padding: 1.75rem;
-        border-radius: 16px;
-        box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+        padding: 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
         border: 1px solid #e8e8e8;
         position: relative;
         overflow: hidden;
@@ -41,7 +41,7 @@
 
     .stat-card:hover {
         transform: translateY(-4px);
-        box-shadow: 0 8px 24px rgba(139, 115, 85, 0.15);
+        box-shadow: 0 6px 16px rgba(139, 115, 85, 0.15);
         border-color: #8B7355;
     }
 
@@ -53,67 +53,70 @@
         display: flex;
         justify-content: space-between;
         align-items: flex-start;
-        margin-bottom: 1.25rem;
+        margin-bottom: 1rem;
+        gap: 0.75rem;
     }
 
     .stat-title {
         font-family: 'Work Sans', sans-serif;
-        font-size: 0.85rem;
+        font-size: 0.8rem;
         color: #999;
         font-weight: 600;
         text-transform: uppercase;
         letter-spacing: 0.5px;
+        flex: 1;
     }
 
     .stat-icon {
-        width: 48px;
-        height: 48px;
-        border-radius: 12px;
+        width: 42px;
+        height: 42px;
+        border-radius: 10px;
         background: linear-gradient(135deg, #8B7355 0%, #6B5644 100%);
         display: flex;
         align-items: center;
         justify-content: center;
         color: white;
-        font-size: 1.5rem;
-        box-shadow: 0 4px 12px rgba(139, 115, 85, 0.25);
+        font-size: 1.3rem;
+        box-shadow: 0 3px 10px rgba(139, 115, 85, 0.25);
+        flex-shrink: 0;
     }
 
     .stat-value {
         font-family: 'Playfair Display', serif;
-        font-size: 2.75rem;
+        font-size: 2.25rem;
         font-weight: 700;
         color: #1a1a1a;
         line-height: 1;
     }
 
-    /* Chart Card */
+    /* Chart Card - Improved Responsive */
     .chart-card {
         background: white;
-        padding: 2rem;
-        border-radius: 16px;
-        box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+        padding: 1.75rem;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
         border: 1px solid #e8e8e8;
-        margin-bottom: 2.5rem;
+        margin-bottom: 2rem;
     }
 
     .chart-header {
-        margin-bottom: 2rem;
-        padding-bottom: 1.5rem;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1.25rem;
         border-bottom: 2px solid #f0f0f0;
     }
 
     .chart-title {
         font-family: 'Playfair Display', serif;
-        font-size: 1.5rem;
+        font-size: 1.4rem;
         font-weight: 700;
         color: #1a1a1a;
-        margin-bottom: 1rem;
+        margin-bottom: 0.85rem;
         letter-spacing: -0.5px;
     }
 
     .chart-legend {
         display: flex;
-        gap: 2rem;
+        gap: 1.75rem;
         font-size: 0.9rem;
         flex-wrap: wrap;
     }
@@ -121,17 +124,18 @@
     .legend-item {
         display: flex;
         align-items: center;
-        gap: 0.65rem;
+        gap: 0.6rem;
         font-family: 'Work Sans', sans-serif;
         font-weight: 500;
         color: #666;
     }
 
     .legend-dot {
-        width: 12px;
-        height: 12px;
+        width: 11px;
+        height: 11px;
         border-radius: 50%;
         box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+        flex-shrink: 0;
     }
 
     .legend-dot.blue {
@@ -145,22 +149,15 @@
     .chart-container {
         position: relative;
         width: 100%;
-        height: 350px;
-        max-height: 350px;
+        height: 320px;
     }
 
-    #enquiryChart {
-        width: 100% !important;
-        height: 100% !important;
-        max-height: 350px !important;
-    }
-
-    /* Table Card */
+    /* Table Card - Improved Responsive */
     .table-card {
         background: white;
-        padding: 2rem;
-        border-radius: 16px;
-        box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+        padding: 1.75rem;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
         border: 1px solid #e8e8e8;
     }
 
@@ -168,25 +165,27 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 1.5rem;
-        padding-bottom: 1.5rem;
+        margin-bottom: 1.25rem;
+        padding-bottom: 1.25rem;
         border-bottom: 2px solid #f0f0f0;
+        flex-wrap: wrap;
+        gap: 0.75rem;
     }
 
     .table-title {
         font-family: 'Playfair Display', serif;
-        font-size: 1.35rem;
+        font-size: 1.25rem;
         font-weight: 700;
         color: #1a1a1a;
         display: flex;
         align-items: center;
-        gap: 0.65rem;
+        gap: 0.6rem;
     }
 
     .table-responsive {
         overflow-x: auto;
-        margin: 0 -2rem;
-        padding: 0 2rem;
+        margin: 0 -1.75rem;
+        padding: 0 1.75rem;
     }
 
     table {
@@ -194,6 +193,7 @@
         border-collapse: separate;
         border-spacing: 0;
         font-family: 'Work Sans', sans-serif;
+        min-width: 500px;
     }
 
     table thead {
@@ -202,9 +202,9 @@
 
     table th {
         text-align: left;
-        padding: 1rem 0.75rem;
+        padding: 0.9rem 0.7rem;
         font-weight: 600;
-        font-size: 0.85rem;
+        font-size: 0.82rem;
         color: #666;
         text-transform: uppercase;
         letter-spacing: 0.5px;
@@ -223,8 +223,8 @@
     }
 
     table td {
-        padding: 1.15rem 0.75rem;
-        font-size: 0.95rem;
+        padding: 1rem 0.7rem;
+        font-size: 0.9rem;
         color: #333;
     }
 
@@ -241,10 +241,10 @@
     .status-badge {
         display: inline-flex;
         align-items: center;
-        gap: 0.5rem;
-        padding: 0.45rem 1rem;
-        border-radius: 20px;
-        font-size: 0.8rem;
+        gap: 0.45rem;
+        padding: 0.4rem 0.9rem;
+        border-radius: 18px;
+        font-size: 0.78rem;
         font-weight: 600;
         white-space: nowrap;
         letter-spacing: 0.3px;
@@ -252,8 +252,8 @@
 
     .status-badge::before {
         content: '';
-        width: 6px;
-        height: 6px;
+        width: 5px;
+        height: 5px;
         border-radius: 50%;
         animation: pulse 2s infinite;
     }
@@ -303,28 +303,7 @@
         background: #6B7280;
     }
 
-    /* Empty State */
-    .empty-state {
-        text-align: center;
-        padding: 4rem 2rem;
-        color: #999;
-    }
-
-    .empty-state-icon {
-        font-size: 4rem;
-        margin-bottom: 1.5rem;
-        opacity: 0.3;
-        filter: grayscale(1);
-    }
-
-    .empty-state h3 {
-        font-family: 'Playfair Display', serif;
-        font-size: 1.35rem;
-        color: #666;
-        margin-bottom: 0.5rem;
-    }
-
-    /* Responsive */
+    /* Responsive Breakpoints */
     @media (max-width: 1200px) {
         .stats-grid {
             grid-template-columns: repeat(2, 1fr);
@@ -338,95 +317,122 @@
         }
 
         .stat-card {
-            padding: 1.5rem;
-        }
-
-        .stat-value {
-            font-size: 2.25rem;
-        }
-
-        .chart-card,
-        .table-card {
-            padding: 1.5rem;
-            border-radius: 12px;
-        }
-
-        .chart-container {
-            height: 280px;
-            max-height: 280px;
-        }
-
-        #enquiryChart {
-            max-height: 280px !important;
-        }
-
-        .chart-title {
-            font-size: 1.25rem;
-        }
-
-        .table-responsive {
-            margin: 0 -1.5rem;
-            padding: 0 1.5rem;
-        }
-
-        table {
-            font-size: 0.85rem;
-        }
-
-        table th,
-        table td {
-            padding: 0.85rem 0.5rem;
-        }
-    }
-
-    @media (max-width: 480px) {
-        .stat-card {
             padding: 1.25rem;
         }
 
         .stat-icon {
-            width: 40px;
-            height: 40px;
-            font-size: 1.25rem;
+            width: 38px;
+            height: 38px;
+            font-size: 1.15rem;
         }
 
         .stat-value {
             font-size: 2rem;
         }
 
+        .stat-title {
+            font-size: 0.75rem;
+        }
+
         .chart-card,
         .table-card {
             padding: 1.25rem;
+            border-radius: 10px;
         }
 
         .chart-container {
-            height: 240px;
-            max-height: 240px;
+            height: 260px;
         }
 
-        #enquiryChart {
-            max-height: 240px !important;
+        .chart-title {
+            font-size: 1.2rem;
         }
 
         .chart-legend {
-            gap: 1rem;
+            gap: 1.25rem;
+        }
+
+        .table-responsive {
+            margin: 0 -1.25rem;
+            padding: 0 1.25rem;
         }
 
         .table-title {
-            font-size: 1.15rem;
+            font-size: 1.1rem;
+        }
+
+        table th,
+        table td {
+            padding: 0.8rem 0.5rem;
+            font-size: 0.85rem;
         }
 
         table th {
             font-size: 0.75rem;
         }
+    }
+
+    @media (max-width: 480px) {
+        .stat-card {
+            padding: 1rem;
+        }
+
+        .stat-header {
+            gap: 0.5rem;
+        }
+
+        .stat-icon {
+            width: 34px;
+            height: 34px;
+            font-size: 1.05rem;
+        }
+
+        .stat-value {
+            font-size: 1.75rem;
+        }
+
+        .stat-title {
+            font-size: 0.7rem;
+        }
+
+        .chart-card,
+        .table-card {
+            padding: 1rem;
+        }
+
+        .chart-container {
+            height: 220px;
+        }
+
+        .chart-title {
+            font-size: 1.05rem;
+        }
+
+        .chart-legend {
+            gap: 1rem;
+            font-size: 0.82rem;
+        }
+
+        .table-title {
+            font-size: 1rem;
+        }
+
+        table {
+            min-width: 450px;
+        }
+
+        table th {
+            font-size: 0.7rem;
+            padding: 0.7rem 0.4rem;
+        }
 
         table td {
             font-size: 0.8rem;
-            padding: 0.75rem 0.4rem;
+            padding: 0.7rem 0.4rem;
         }
 
         .status-badge {
-            font-size: 0.7rem;
+            font-size: 0.72rem;
             padding: 0.35rem 0.75rem;
         }
     }
@@ -496,8 +502,6 @@
             <i class="fas fa-list"></i> Recent Enquiries
         </h3>
     </div>
-
-    @if(isset($recentEnquiries) && $recentEnquiries->count() > 0)
     <div class="table-responsive">
         <table>
             <thead>
@@ -524,61 +528,20 @@
             </tbody>
         </table>
     </div>
-    @else
-    <!-- Sample Data for Demo -->
-    <div class="table-responsive">
-        <table>
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Type</th>
-                    <th>Status</th>
-                    <th>Date</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td><strong>Nyoman</strong></td>
-                    <td>Consultation</td>
-                    <td><span class="status-badge new">New</span></td>
-                    <td>22 Dec 2022</td>
-                </tr>
-                <tr>
-                    <td><strong>Nyoman</strong></td>
-                    <td>Package interest</td>
-                    <td><span class="status-badge contacted">Contacted</span></td>
-                    <td>22 Dec 2022</td>
-                </tr>
-                <tr>
-                    <td><strong>Nyoman</strong></td>
-                    <td>Consultation</td>
-                    <td><span class="status-badge in-discussion">In Discussion</span></td>
-                    <td>22 Dec 2022</td>
-                </tr>
-                <tr>
-                    <td><strong>Nyoman</strong></td>
-                    <td>Package interest</td>
-                    <td><span class="status-badge closed">Closed</span></td>
-                    <td>22 Dec 2022</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-    @endif
 </div>
 @endsection
 
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    // Enquiry Chart with fixed height
+    // Enquiry Chart with responsive configuration
     const ctx = document.getElementById('enquiryChart');
     
     if (ctx) {
         new Chart(ctx, {
             type: 'line',
             data: {
-                labels: ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUNE', 'JUL', 'AUG'],
+                labels: ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG'],
                 datasets: [{
                     label: 'Last year',
                     data: [45, 52, 38, 65, 70, 65, 58, 50],
@@ -616,14 +579,14 @@
                     },
                     tooltip: {
                         backgroundColor: 'rgba(0, 0, 0, 0.85)',
-                        padding: 14,
-                        borderRadius: 10,
+                        padding: 12,
+                        borderRadius: 8,
                         titleFont: {
-                            size: 14,
+                            size: 13,
                             weight: '600'
                         },
                         bodyFont: {
-                            size: 13
+                            size: 12
                         },
                         displayColors: true,
                         boxWidth: 10,
@@ -638,7 +601,7 @@
                         ticks: {
                             stepSize: 20,
                             font: {
-                                size: 12,
+                                size: 11,
                                 weight: '500'
                             },
                             color: '#999'
@@ -651,7 +614,7 @@
                     x: {
                         ticks: {
                             font: {
-                                size: 11,
+                                size: 10,
                                 weight: '600'
                             },
                             color: '#999'

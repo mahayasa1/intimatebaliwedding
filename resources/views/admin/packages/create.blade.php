@@ -158,6 +158,51 @@
         transform: scale(1.1);
     }
 
+    /* Multiple Photos Grid */
+    .photos-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    .photo-preview-item {
+        position: relative;
+        aspect-ratio: 1;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .photo-preview-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .remove-photo {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        background: #e74c3c;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 28px;
+        height: 28px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.8rem;
+        transition: all 0.3s ease;
+    }
+
+    .remove-photo:hover {
+        background: #c0392b;
+        transform: scale(1.1);
+    }
+
     .error-message {
         font-family: 'Work Sans', sans-serif;
         color: #e74c3c;
@@ -246,6 +291,10 @@
             width: 100%;
             justify-content: center;
         }
+
+        .photos-grid {
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        }
     }
 </style>
 @endpush
@@ -281,7 +330,7 @@
 
             <div class="form-group">
                 <label for="image" class="form-label">
-                    Package Image <span class="required">*</span>
+                    Main Package Image <span class="required">*</span>
                 </label>
                 <div class="image-upload-wrapper">
                     <input 
@@ -297,7 +346,7 @@
                     </div>
                     <div class="upload-text">
                         <strong>Click to upload</strong> or drag and drop<br>
-                        <small>PNG, JPG, WEBP (max. 2MB)</small>
+                        <small>PNG, JPG, WEBP (max. 20MB)</small>
                     </div>
                 </div>
                 <div class="image-preview" id="imagePreview">
@@ -309,7 +358,7 @@
                 @error('image')
                 <div class="error-message">{{ $message }}</div>
                 @enderror
-                <div class="form-help">Upload a high-quality image that represents this package</div>
+                <div class="form-help">Upload a high-quality main image for this package</div>
             </div>
 
             <div class="form-group">
@@ -327,6 +376,42 @@
             </div>
         </div>
 
+        <!-- Gallery Photos -->
+        <div class="form-card">
+            <h3 class="section-title">
+                Package Gallery Photos
+            </h3>
+
+            <div class="form-group">
+                <label for="photos" class="form-label">
+                    Additional Photos
+                </label>
+                <div class="image-upload-wrapper">
+                    <input 
+                        type="file" 
+                        id="photos" 
+                        name="photos[]" 
+                        accept="image/*"
+                        multiple
+                        onchange="previewMultipleImages(event)"
+                    >
+                    <div class="upload-icon">
+                        <i class="fas fa-images"></i>
+                    </div>
+                    <div class="upload-text">
+                        <strong>Click to upload</strong> or drag and drop<br>
+                        <small>PNG, JPG, WEBP (max. 20MB each) - Multiple files allowed</small>
+                    </div>
+                </div>
+                @error('photos.*')
+                <div class="error-message">{{ $message }}</div>
+                @enderror
+                <div class="form-help">Upload multiple photos to showcase this package</div>
+            </div>
+
+            <div id="photosGrid" class="photos-grid" style="display: none;"></div>
+        </div>
+
         <!-- Actions -->
         <div class="action-section">
             <div class="action-buttons">
@@ -342,6 +427,7 @@
 </div>
 
 <script>
+// Preview main image
 function previewImage(event) {
     const file = event.target.files[0];
     if (file) {
@@ -354,10 +440,63 @@ function previewImage(event) {
     }
 }
 
+// Remove main image
 function removeImage() {
     document.getElementById('image').value = '';
     document.getElementById('imagePreview').style.display = 'none';
     document.getElementById('preview').src = '';
+}
+
+// Preview multiple photos
+let photoFiles = [];
+
+function previewMultipleImages(event) {
+    const files = Array.from(event.target.files);
+    photoFiles = [...photoFiles, ...files];
+    
+    displayPhotos();
+}
+
+function displayPhotos() {
+    const grid = document.getElementById('photosGrid');
+    grid.innerHTML = '';
+    
+    if (photoFiles.length > 0) {
+        grid.style.display = 'grid';
+        
+        photoFiles.forEach((file, index) => {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                const div = document.createElement('div');
+                div.className = 'photo-preview-item';
+                div.innerHTML = `
+                    <img src="${e.target.result}" alt="Photo ${index + 1}">
+                    <button type="button" class="remove-photo" onclick="removePhoto(${index})">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+                grid.appendChild(div);
+            }
+            
+            reader.readAsDataURL(file);
+        });
+    } else {
+        grid.style.display = 'none';
+    }
+}
+
+function removePhoto(index) {
+    photoFiles.splice(index, 1);
+    
+    // Update file input
+    const dataTransfer = new DataTransfer();
+    photoFiles.forEach(file => {
+        dataTransfer.items.add(file);
+    });
+    document.getElementById('photos').files = dataTransfer.files;
+    
+    displayPhotos();
 }
 </script>
 @endsection

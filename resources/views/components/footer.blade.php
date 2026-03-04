@@ -315,12 +315,12 @@
             <div class="footer-section">
                 <h3>Quick Menu</h3>
                 <div class="footer-links">
-                    <a href="#home">Home</a>
-                    <a href="#about">About Us</a>
-                    <a href="#packages">Wedding Packages</a>
-                    <a href="#gallery">Gallery</a>
-                    <a href="#testimonials">Testimonials</a>
-                    <a href="#contact">Contact Us</a>
+                    <a href="{{ route('home') }}">Home</a>
+                    <a href="{{ route('about') }}">About Us</a>
+                    <a href="{{ route('packages.public') }}">Wedding Packages</a>
+                    <a href="{{ route('gallery.public') }}">Gallery & Testimonials</a>
+                    <a href="{{ route('blogs.public') }}">Blog</a>
+                    <a href="{{ route('contact') }}">Contact Us</a>
                 </div>
             </div>
 

@@ -369,7 +369,6 @@
         <!-- Desktop Menu - Center -->
         <div class="navbar-menu">
             <a href="{{ route('home') }}">Home</a>
-            <a href="{{ route('services.public') }}">Services</a>
             <a href="{{ route('packages.public') }}">Packages</a>
             <a href="{{ route('about') }}">About</a>
             <a href="{{ route('gallery.public') }}">Gallery</a>
@@ -400,7 +399,6 @@
     </div>
     <div class="mobile-menu-links">
         <a href="{{ route('home') }}">Home</a>
-        <a href="{{ route('services.public') }}">Services</a>
         <a href="{{ route('packages.public') }}">Packages</a>
         <a href="{{ route('about') }}">About</a>
         <a href="{{ route('gallery.public') }}">Gallery</a>

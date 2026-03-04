@@ -30,6 +30,8 @@
         display: flex;
         align-items: center;
         gap: 0.75rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #f0f0f0;
     }
 
     .card-title-icon {
@@ -44,6 +46,20 @@
         font-size: 1.25rem;
     }
 
+    /* Main Image */
+    .main-image-container {
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+
+    .main-image {
+        width: 100%;
+        max-width: 600px;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+
+    /* Info Grid */
     .info-grid {
         display: grid;
         gap: 1.5rem;
@@ -88,49 +104,64 @@
         white-space: pre-wrap;
     }
 
-    /* Services List */
-    .services-list {
-        list-style: none;
-        padding: 0;
-        margin: 0;
+    /* Photo Gallery Grid */
+    .photo-gallery {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-top: 1.5rem;
     }
 
-    .service-item {
-        padding: 1rem;
-        background: white;
-        border: 1px solid #e8e8e8;
-        border-radius: 8px;
-        margin-bottom: 0.75rem;
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
+    .gallery-item {
+        position: relative;
+        aspect-ratio: 1;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        cursor: pointer;
         transition: all 0.3s ease;
     }
 
-    .service-item:hover {
-        background: #f8f9fa;
-        transform: translateX(4px);
-        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    .gallery-item:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.15);
     }
 
-    .service-icon {
-        width: 40px;
-        height: 40px;
+    .gallery-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+
+    .gallery-item:hover img {
+        transform: scale(1.1);
+    }
+
+    .gallery-item-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.5);
         display: flex;
         align-items: center;
         justify-content: center;
-        background: linear-gradient(135deg, #8B7355 0%, #6B5644 100%);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .gallery-item:hover .gallery-item-overlay {
+        opacity: 1;
+    }
+
+    .gallery-item-overlay i {
         color: white;
-        border-radius: 8px;
-        font-size: 1rem;
-        flex-shrink: 0;
+        font-size: 2rem;
     }
 
-    .service-name {
-        font-weight: 600;
-        color: #1a1a1a;
-    }
-
+    /* Empty State */
     .empty-state {
         text-align: center;
         padding: 3rem 2rem;
@@ -141,6 +172,87 @@
         font-size: 3rem;
         margin-bottom: 1rem;
         opacity: 0.3;
+    }
+
+    /* Lightbox */
+    .lightbox {
+        display: none;
+        position: fixed;
+        z-index: 9999;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.9);
+        align-items: center;
+        justify-content: center;
+    }
+
+    .lightbox.active {
+        display: flex;
+    }
+
+    .lightbox-content {
+        max-width: 90%;
+        max-height: 90%;
+        position: relative;
+    }
+
+    .lightbox-content img {
+        width: 100%;
+        height: auto;
+        border-radius: 8px;
+    }
+
+    .lightbox-close {
+        position: absolute;
+        top: -40px;
+        right: 0;
+        color: white;
+        font-size: 2rem;
+        cursor: pointer;
+        background: rgba(255,255,255,0.1);
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+    }
+
+    .lightbox-close:hover {
+        background: rgba(255,255,255,0.2);
+        transform: scale(1.1);
+    }
+
+    .lightbox-nav {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        color: white;
+        font-size: 2rem;
+        cursor: pointer;
+        background: rgba(255,255,255,0.1);
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+    }
+
+    .lightbox-nav:hover {
+        background: rgba(255,255,255,0.2);
+    }
+
+    .lightbox-prev {
+        left: 20px;
+    }
+
+    .lightbox-next {
+        right: 20px;
     }
 
     /* Action Buttons */
@@ -220,6 +332,24 @@
             width: 100%;
             justify-content: center;
         }
+
+        .photo-gallery {
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        }
+
+        .lightbox-nav {
+            width: 40px;
+            height: 40px;
+            font-size: 1.5rem;
+        }
+
+        .lightbox-prev {
+            left: 10px;
+        }
+
+        .lightbox-next {
+            right: 10px;
+        }
     }
 </style>
 @endpush
@@ -229,8 +359,18 @@
     <!-- Package Information -->
     <div class="detail-card">
         <h3 class="card-title">
+            <div class="card-title-icon"><i class="fas fa-box"></i></div>
             Package Information
         </h3>
+
+        @if($package->image)
+        <div class="main-image-container">
+            <img src="{{ asset('storage/' . $package->image) }}" 
+                 alt="{{ $package->name }}" 
+                 class="main-image">
+        </div>
+        @endif
+        
         <div class="info-grid">
             <div class="info-item">
                 <div class="info-label">Package Name</div>
@@ -245,8 +385,11 @@
             @endif
 
             <div class="info-item">
-                <div class="info-label">Total Services</div>
-                <div class="info-value">{{ $package->services->count() }} Service{{ $package->services->count() != 1 ? 's' : '' }}</div>
+                <div class="info-label">Gallery Photos</div>
+                @php
+                    $photoCount = is_array($package->photo) ? count($package->photo) : 0;
+                @endphp
+                <div class="info-value">{{ $photoCount }} Photo{{ $photoCount != 1 ? 's' : '' }}</div>
             </div>
 
             <div class="info-item">
@@ -261,25 +404,28 @@
         </div>
     </div>
 
-    <!-- Services in Package -->
+    <!-- Photo Gallery -->
     <div class="detail-card">
         <h3 class="card-title">
-            Services in this Package
+            <div class="card-title-icon"><i class="fas fa-images"></i></div>
+            Photo Gallery
         </h3>
         
-        @if($package->services->count() > 0)
-        <ul class="services-list">
-            @foreach($package->services as $service)
-            <li class="service-item">
-                <i class="fas fa-check-circle"></i>
-                <div class="service-name">{{ $service->name }}</div>
-            </li>
+        @if(is_array($package->photo) && count($package->photo) > 0)
+        <div class="photo-gallery">
+            @foreach($package->photo as $index => $photoPath)
+            <div class="gallery-item" onclick="openLightbox({{ $index }})">
+                <img src="{{ asset('storage/' . $photoPath) }}" alt="Photo {{ $index + 1 }}">
+                <div class="gallery-item-overlay">
+                    <i class="fas fa-search-plus"></i>
+                </div>
+            </div>
             @endforeach
-        </ul>
+        </div>
         @else
         <div class="empty-state">
-            <div class="empty-state-icon"><i class="fas fa-inbox"></i></div>
-            <p>No services assigned to this package yet.</p>
+            <div class="empty-state-icon"><i class="fas fa-images"></i></div>
+            <p>No gallery photos uploaded yet.</p>
         </div>
         @endif
     </div>
@@ -296,9 +442,76 @@
             <form action="{{ route('admin.packages.destroy', $package) }}" method="POST" style="margin: 0;" onsubmit="return confirm('Are you sure you want to delete this package? This action cannot be undone.');">
                 @csrf
                 @method('DELETE')
-                <button type="submit" class="btn btn-danger"><i class="fas fa-trash-alt"></i> Delete</button>
+                <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-trash-alt"></i> Delete Package
+                </button>
             </form>
         </div>
     </div>
 </div>
+
+<!-- Lightbox -->
+<div id="lightbox" class="lightbox" onclick="closeLightbox(event)">
+    <div class="lightbox-content">
+        <span class="lightbox-close" onclick="closeLightbox(event)">
+            <i class="fas fa-times"></i>
+        </span>
+        @if(is_array($package->photo) && count($package->photo) > 1)
+        <span class="lightbox-nav lightbox-prev" onclick="event.stopPropagation(); changePhoto(-1)">
+            <i class="fas fa-chevron-left"></i>
+        </span>
+        <span class="lightbox-nav lightbox-next" onclick="event.stopPropagation(); changePhoto(1)">
+            <i class="fas fa-chevron-right"></i>
+        </span>
+        @endif
+        <img id="lightboxImage" src="" alt="Gallery Photo">
+    </div>
+</div>
+
+<script>
+@if(is_array($package->photo) && count($package->photo) > 0)
+const photos = @json(array_map(function($photoPath) { return asset('storage/' . $photoPath); }, $package->photo));
+let currentPhotoIndex = 0;
+
+function openLightbox(index) {
+    currentPhotoIndex = index;
+    document.getElementById('lightboxImage').src = photos[currentPhotoIndex];
+    document.getElementById('lightbox').classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeLightbox(event) {
+    if (event.target.id === 'lightbox' || event.target.closest('.lightbox-close')) {
+        document.getElementById('lightbox').classList.remove('active');
+        document.body.style.overflow = 'auto';
+    }
+}
+
+function changePhoto(direction) {
+    currentPhotoIndex += direction;
+    
+    if (currentPhotoIndex < 0) {
+        currentPhotoIndex = photos.length - 1;
+    } else if (currentPhotoIndex >= photos.length) {
+        currentPhotoIndex = 0;
+    }
+    
+    document.getElementById('lightboxImage').src = photos[currentPhotoIndex];
+}
+
+// Keyboard navigation
+document.addEventListener('keydown', function(e) {
+    if (document.getElementById('lightbox').classList.contains('active')) {
+        if (e.key === 'Escape') {
+            document.getElementById('lightbox').classList.remove('active');
+            document.body.style.overflow = 'auto';
+        } else if (e.key === 'ArrowLeft') {
+            changePhoto(-1);
+        } else if (e.key === 'ArrowRight') {
+            changePhoto(1);
+        }
+    }
+});
+@endif
+</script>
 @endsection

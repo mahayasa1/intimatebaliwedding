@@ -6,10 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Blog;
 use App\Models\Gallery;
 use App\Models\Package;
-use App\Models\Service;
 use App\Services\GoogleMapsService;
 use App\Services\InstagramFeedService;
-use Illuminate\Http\Request;
 
 class HomeController extends Controller
 {
@@ -28,7 +26,7 @@ class HomeController extends Controller
     public function index()
     {
         // Fetch featured packages (limit to 4 for homepage)
-        $packages = Package::withCount('services')
+        $packages = Package::orderBy('created_at', 'desc')
                     ->latest()
                     ->take(4)
                     ->get();
@@ -59,9 +57,9 @@ class HomeController extends Controller
         // If no hero slides, use default images
         if ($heroSlides->isEmpty()) {
             $heroSlides = collect([
-                (object)['image' => 'assets/intimate/web/Background/home_1.jpg'],
-                (object)['image' => 'assets/intimate/web/Background/home_2.jpg'],
-                (object)['image' => 'assets/intimate/web/Background/home_3.jpg'],
+                (object)['image' => 'assets/background/home_1.jpg'],
+                (object)['image' => 'assets/background/home_2.jpg'],
+                (object)['image' => 'assets/background/home_3.jpg'],
             ]);
         }
 

@@ -59,12 +59,12 @@
     .packages-grid {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
-        gap: 0;
+        gap: 2rem;  /* <-- Gap ditambahkan */
         max-width: 1400px;
         margin: 2rem auto;
         padding: 0 2rem;
     }
-
+    
     .package-card {
         position: relative;
         overflow: hidden;
@@ -72,6 +72,14 @@
         cursor: pointer;
         display: block;
         text-decoration: none;
+        border-radius: 12px;  /* <-- Tambahkan rounded corners */
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);  /* <-- Tambahkan shadow */
+        transition: all 0.3s ease;
+    }
+    
+    .package-card:hover {
+        transform: translateY(-8px);  /* <-- Efek hover lebih smooth */
+        box-shadow: 0 8px 25px rgba(0,0,0,0.2);
     }
 
     .package-image {
@@ -239,6 +247,7 @@
         .packages-grid {
             grid-template-columns: 1fr;
             padding: 0 1rem;
+            gap: 1.5rem;
         }
 
         .packages-intro {

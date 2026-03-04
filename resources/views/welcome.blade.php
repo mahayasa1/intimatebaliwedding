@@ -85,11 +85,11 @@
     .package-grid {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
-        gap: 0;
+        gap: 2rem;  /* <-- Gap ditambahkan */
         max-width: 1400px;
         margin: 0 auto;
     }
-
+    
     .package-card {
         position: relative;
         overflow: hidden;
@@ -97,7 +97,16 @@
         cursor: pointer;
         text-decoration: none;
         display: block;
+        border-radius: 12px;  /* <-- Tambahkan rounded corners */
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);  /* <-- Tambahkan shadow */
+        transition: all 0.3s ease;
     }
+
+    .package-card:hover {
+        transform: translateY(-8px);  /* <-- Efek hover lebih smooth */
+        box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+    }
+
 
     .package-card img {
         width: 100%;
@@ -670,6 +679,7 @@
 
         .package-grid {
             grid-template-columns: 1fr;
+            gap: 1.5rem;
         }
 
         .package-title {
@@ -756,7 +766,6 @@
         </p>
         <div style="text-align: center;">
             <a href="{{ route('about') }}" class="btn-primary">Learn More</a>
-            <a href="{{ route('services.public') }}" class="btn-primary" style="margin-left: 1rem;">Our Services</a>
         </div>
     </div>
 </section>

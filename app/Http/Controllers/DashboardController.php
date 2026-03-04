@@ -7,9 +7,6 @@ use App\Models\Blog;
 use App\Models\Enquiry;
 use App\Models\Gallery;
 use App\Models\Package;
-use App\Models\Service;
-use Illuminate\Http\Request;
-
 class DashboardController extends Controller
 {
     /**
@@ -18,7 +15,6 @@ class DashboardController extends Controller
     public function index()
     {
         $stats = [
-            'services' => Service::count(),
             'packages' => Package::count(),
             'galleries' => Gallery::count(),
             'blogs' => Blog::count(),

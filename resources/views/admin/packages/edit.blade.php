@@ -71,11 +71,6 @@
         transform: translateY(-2px);
     }
 
-    .form-control.error {
-        border-color: #e74c3c;
-        background: #fff5f5;
-    }
-
     textarea.form-control {
         min-height: 140px;
         resize: vertical;
@@ -85,22 +80,22 @@
     /* Current Image Display */
     .current-image {
         margin-bottom: 1rem;
-        border-radius: 8px;
-        overflow: hidden;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        position: relative;
+        display: inline-block;
     }
 
     .current-image img {
-        width: 100%;
-        max-height: 300px;
-        object-fit: cover;
+        max-width: 300px;
+        max-height: 200px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
 
     .current-image-label {
+        display: block;
         font-size: 0.85rem;
         color: #666;
         margin-bottom: 0.5rem;
-        display: block;
     }
 
     /* Image Upload Styling */
@@ -144,53 +139,95 @@
         color: #8B7355;
     }
 
-    .image-preview {
-        margin-top: 1rem;
-        display: none;
+    /* Existing Photos Grid */
+    .existing-photos-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .existing-photo-item {
         position: relative;
-    }
-
-    .image-preview img {
-        max-width: 100%;
-        max-height: 300px;
+        aspect-ratio: 1;
         border-radius: 8px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
 
-    .remove-image {
+    .existing-photo-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .remove-existing-photo {
         position: absolute;
-        top: 10px;
-        right: 10px;
+        top: 5px;
+        right: 5px;
         background: #e74c3c;
         color: white;
         border: none;
         border-radius: 50%;
-        width: 32px;
-        height: 32px;
+        width: 28px;
+        height: 28px;
         cursor: pointer;
         display: flex;
         align-items: center;
         justify-content: center;
+        font-size: 0.8rem;
         transition: all 0.3s ease;
+        z-index: 10;
     }
 
-    .remove-image:hover {
+    .remove-existing-photo:hover {
         background: #c0392b;
         transform: scale(1.1);
     }
 
-    .error-message {
-        font-family: 'Work Sans', sans-serif;
-        color: #e74c3c;
-        font-size: 0.85rem;
-        margin-top: 0.5rem;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
+    /* New Photos Grid */
+    .photos-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
     }
 
-    .error-message::before {
-        content: '⚠️';
+    .photo-preview-item {
+        position: relative;
+        aspect-ratio: 1;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .photo-preview-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .remove-photo {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        background: #e74c3c;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 28px;
+        height: 28px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.8rem;
+        transition: all 0.3s ease;
+    }
+
+    .remove-photo:hover {
+        background: #c0392b;
+        transform: scale(1.1);
     }
 
     .form-help {
@@ -267,6 +304,11 @@
             width: 100%;
             justify-content: center;
         }
+
+        .existing-photos-grid,
+        .photos-grid {
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        }
     }
 </style>
 @endpush
@@ -276,6 +318,8 @@
     <form action="{{ route('admin.packages.update', $package) }}" method="POST" enctype="multipart/form-data">
         @csrf
         @method('PUT')
+
+        <input type="hidden" name="removed_photos" id="removed_photos" value="">
 
         <!-- Package Information -->
         <div class="form-card">
@@ -291,24 +335,20 @@
                     type="text" 
                     id="name" 
                     name="name" 
-                    class="form-control @error('name') error @enderror"
+                    class="form-control"
                     value="{{ old('name', $package->name) }}"
                     required
-                    placeholder="e.g., Beach Wedding Package"
                 >
-                @error('name')
-                <div class="error-message">{{ $message }}</div>
-                @enderror
             </div>
 
             <div class="form-group">
                 <label for="image" class="form-label">
-                    Package Image
+                    Main Package Image
                 </label>
                 
                 @if($package->image)
-                <span class="current-image-label">Current Image:</span>
                 <div class="current-image">
+                    <span class="current-image-label">Current Image:</span>
                     <img src="{{ asset('storage/' . $package->image) }}" alt="{{ $package->name }}">
                 </div>
                 @endif
@@ -319,26 +359,16 @@
                         id="image" 
                         name="image" 
                         accept="image/*"
-                        onchange="previewImage(event)"
                     >
                     <div class="upload-icon">
                         <i class="fas fa-cloud-upload-alt"></i>
                     </div>
                     <div class="upload-text">
                         <strong>Click to upload</strong> or drag and drop<br>
-                        <small>PNG, JPG, WEBP (max. 2MB)</small>
+                        <small>PNG, JPG, WEBP (max. 20MB) - Leave empty to keep current image</small>
                     </div>
                 </div>
-                <div class="image-preview" id="imagePreview">
-                    <button type="button" class="remove-image" onclick="removeImage()">
-                        <i class="fas fa-times"></i>
-                    </button>
-                    <img id="preview" src="" alt="Preview">
-                </div>
-                @error('image')
-                <div class="error-message">{{ $message }}</div>
-                @enderror
-                <div class="form-help">Leave empty to keep current image</div>
+                <div class="form-help">Upload a new image to replace the current one</div>
             </div>
 
             <div class="form-group">
@@ -346,14 +376,59 @@
                 <textarea 
                     id="description" 
                     name="description" 
-                    class="form-control @error('description') error @enderror"
-                    placeholder="Describe the package and what it includes..."
+                    class="form-control"
                 >{{ old('description', $package->description) }}</textarea>
-                @error('description')
-                <div class="error-message">{{ $message }}</div>
-                @enderror
-                <div class="form-help">Provide details about what's included in this package</div>
             </div>
+        </div>
+
+        <!-- Gallery Photos -->
+        <div class="form-card">
+            <h3 class="section-title">
+                Package Gallery Photos
+            </h3>
+
+            @if($package->photo && count($package->photo) > 0)
+            <div class="form-group">
+                <label class="form-label">Existing Photos</label>
+                <div class="existing-photos-grid" id="existingPhotosGrid">
+                    @foreach($package->photo as $index => $photoPath)
+                    <div class="existing-photo-item" data-photo="{{ $photoPath }}">
+                        <img src="{{ asset('storage/' . $photoPath) }}" alt="Photo {{ $index + 1 }}">
+                        <button type="button" class="remove-existing-photo" onclick="removeExistingPhoto('{{ $photoPath }}', this)">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    @endforeach
+                </div>
+                <div class="form-help">Click × to remove photos</div>
+            </div>
+            @endif
+
+            <div class="form-group">
+                <label for="photos" class="form-label">
+                    Add New Photos
+                </label>
+                <div class="image-upload-wrapper">
+                    <input 
+                        type="file" 
+                        id="photos" 
+                        name="photos[]" 
+                        accept="image/*"
+                        multiple
+                        onchange="previewMultipleImages(event)"
+                    >
+                    <div class="upload-icon">
+                        <i class="fas fa-images"></i>
+                    </div>
+                    <div class="upload-text">
+                        <strong>Click to upload</strong> or drag and drop<br>
+                        <small>PNG, JPG, WEBP (max. 20MB each) - Multiple files allowed</small>
+                    </div>
+                </div>
+                <div class="form-help">Upload additional photos to add to the gallery</div>
+            </div>
+
+            <div id="photosGrid" class="photos-grid" style="display: none;"></div>
         </div>
 
         <!-- Actions -->
@@ -363,7 +438,7 @@
                     ← Cancel
                 </a>
                 <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-save"></i> Update Package
+                    Update Package
                 </button>
             </div>
         </div>
@@ -371,22 +446,77 @@
 </div>
 
 <script>
-function previewImage(event) {
-    const file = event.target.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            document.getElementById('preview').src = e.target.result;
-            document.getElementById('imagePreview').style.display = 'block';
+// Track removed photos
+let removedPhotos = [];
+
+// Remove existing photo
+function removeExistingPhoto(photoPath, button) {
+    if (confirm('Are you sure you want to remove this photo?')) {
+        // Add to removed list
+        removedPhotos.push(photoPath);
+        document.getElementById('removed_photos').value = JSON.stringify(removedPhotos);
+        
+        // Remove from UI
+        button.closest('.existing-photo-item').remove();
+        
+        // Check if grid is empty
+        const grid = document.getElementById('existingPhotosGrid');
+        if (grid && grid.children.length === 0) {
+            grid.parentElement.remove();
         }
-        reader.readAsDataURL(file);
     }
 }
 
-function removeImage() {
-    document.getElementById('image').value = '';
-    document.getElementById('imagePreview').style.display = 'none';
-    document.getElementById('preview').src = '';
+// Preview new photos
+let photoFiles = [];
+
+function previewMultipleImages(event) {
+    const files = Array.from(event.target.files);
+    photoFiles = [...photoFiles, ...files];
+    
+    displayPhotos();
+}
+
+function displayPhotos() {
+    const grid = document.getElementById('photosGrid');
+    grid.innerHTML = '';
+    
+    if (photoFiles.length > 0) {
+        grid.style.display = 'grid';
+        
+        photoFiles.forEach((file, index) => {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                const div = document.createElement('div');
+                div.className = 'photo-preview-item';
+                div.innerHTML = `
+                    <img src="${e.target.result}" alt="Photo ${index + 1}">
+                    <button type="button" class="remove-photo" onclick="removePhoto(${index})">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+                grid.appendChild(div);
+            }
+            
+            reader.readAsDataURL(file);
+        });
+    } else {
+        grid.style.display = 'none';
+    }
+}
+
+function removePhoto(index) {
+    photoFiles.splice(index, 1);
+    
+    // Update file input
+    const dataTransfer = new DataTransfer();
+    photoFiles.forEach(file => {
+        dataTransfer.items.add(file);
+    });
+    document.getElementById('photos').files = dataTransfer.files;
+    
+    displayPhotos();
 }
 </script>
 @endsection

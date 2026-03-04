@@ -30,26 +30,29 @@
 
     /* Main Content Container */
     .package-detail-container {
-        max-width: 900px;
+        max-width: 1200px;
         margin: 0 auto;
         padding: 4rem 2rem;
         background: white;
     }
 
-    /* Package Image */
+    /* Package Image - REDUCED SIZE */
     .package-main-image {
         width: 100%;
-        max-width: 600px;
+        max-width: 600px;  /* Dikurangi dari 800px */
+        height: auto;
+        max-height: 400px;  /* Tambahkan batas tinggi */
+        object-fit: cover;  /* Maintain aspect ratio */
         margin: 0 auto 3rem;
         display: block;
-        border-radius: 8px;
+        border-radius: 12px;
         box-shadow: 0 4px 20px rgba(0,0,0,0.1);
     }
 
-    /* Package Title & Description */
+    /* Package Header */
     .package-header {
         text-align: center;
-        margin-bottom: 3rem;
+        margin-bottom: 2rem;
     }
 
     .package-header h2 {
@@ -60,74 +63,168 @@
         line-height: 1.4;
     }
 
-    /* Price Display */
-    .package-price {
-        font-size: 1.5rem;
-        color: #D4AF37;
-        font-weight: 700;
-        margin: 1.5rem 0;
-    }
-
-    .package-price-note {
-        font-size: 0.9rem;
+    /* Package Description */
+    .package-description {
+        text-align: center;
         color: #666;
-        font-style: italic;
+        line-height: 1.8;
+        margin-bottom: 3rem;
+        font-size: 1.05rem;
+        max-width: 800px;
+        margin-left: auto;
+        margin-right: auto;
     }
 
-    /* Services List */
-    .services-list {
-        list-style: none;
-        padding: 0;
-        margin: 2rem 0;
+    /* Package Gallery Section */
+    .package-gallery-section {
+        margin: 4rem 0;
     }
 
-    .services-list li {
-        padding: 0.8rem 0;
-        border-bottom: 1px solid #eee;
-        color: #555;
-        line-height: 1.6;
-        position: relative;
-        padding-left: 2rem;
+    .gallery-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.8rem;
+        color: #333;
+        text-align: center;
+        margin-bottom: 2rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
     }
 
-    .services-list li:before {
-        content: "•";
-        position: absolute;
-        left: 0.5rem;
-        color: #D4AF37;
-        font-size: 1.5rem;
-        line-height: 1.2;
-    }
-
-    .services-list li:last-child {
-        border-bottom: none;
-    }
-
-    /* Gallery Grid */
+    /* Grid Gallery - BETTER LAYOUT */
     .package-gallery {
         display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 1rem;
-        margin: 2rem 0;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1.5rem;
+        margin: 0 auto;
+        max-width: 1200px;
     }
 
-    .package-gallery img {
-        width: 100%;
-        aspect-ratio: 4/3;
-        object-fit: cover;
-        border-radius: 8px;
+    .gallery-item {
+        position: relative;
+        overflow: hidden;
+        border-radius: 12px;
         cursor: pointer;
-        transition: transform 0.3s;
+        aspect-ratio: 4/3;  /* Consistent aspect ratio */
+        background: #f0f0f0;
+        transition: all 0.3s ease;
     }
 
-    .package-gallery img:hover {
-        transform: scale(1.05);
+    .gallery-item:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 12px 30px rgba(0,0,0,0.2);
+    }
+
+    .gallery-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        transition: transform 0.4s ease;
+    }
+
+    .gallery-item:hover img {
+        transform: scale(1.1);
+    }
+
+    /* Lightbox Modal */
+    .lightbox {
+        display: none;
+        position: fixed;
+        z-index: 9999;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.95);
+        align-items: center;
+        justify-content: center;
+    }
+
+    .lightbox.active {
+        display: flex;
+    }
+
+    .lightbox-content {
+        max-width: 90%;
+        max-height: 90%;
+        position: relative;
+    }
+
+    .lightbox-content img {
+        max-width: 100%;
+        max-height: 90vh;
+        object-fit: contain;
+    }
+
+    .lightbox-close {
+        position: absolute;
+        top: 20px;
+        right: 40px;
+        font-size: 40px;
+        color: white;
+        cursor: pointer;
+        z-index: 10000;
+        transition: all 0.3s ease;
+        background: rgba(0,0,0,0.5);
+        width: 50px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+    }
+
+    .lightbox-close:hover {
+        background: rgba(255,255,255,0.2);
+        transform: rotate(90deg);
+    }
+
+    .lightbox-nav {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 50px;
+        color: white;
+        cursor: pointer;
+        background: rgba(0,0,0,0.5);
+        width: 60px;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: all 0.3s ease;
+        user-select: none;
+    }
+
+    .lightbox-nav:hover {
+        background: rgba(255,255,255,0.2);
+    }
+
+    .lightbox-prev {
+        left: 40px;
+    }
+
+    .lightbox-next {
+        right: 40px;
+    }
+
+    .lightbox-counter {
+        position: absolute;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        color: white;
+        font-size: 16px;
+        background: rgba(0,0,0,0.7);
+        padding: 10px 20px;
+        border-radius: 20px;
     }
 
     /* Enquiry Button */
     .enquiry-btn {
         display: inline-block;
-        background: #333;
+        background: linear-gradient(135deg, #D4AF37 0%, #AA8B2A 100%);
         color: white;
         padding: 1rem 3rem;
         border-radius: 30px;
@@ -136,12 +233,13 @@
         transition: all 0.3s ease;
         margin: 2rem 0;
         text-align: center;
+        box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
     }
 
     .enquiry-btn:hover {
-        background: #555;
+        background: linear-gradient(135deg, #AA8B2A 0%, #D4AF37 100%);
         transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+        box-shadow: 0 6px 20px rgba(212, 175, 55, 0.5);
         color: white;
     }
 
@@ -164,7 +262,7 @@
 
     .other-packages-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
         gap: 2rem;
         max-width: 1200px;
         margin: 0 auto;
@@ -172,7 +270,7 @@
 
     .other-package-card {
         background: white;
-        border-radius: 8px;
+        border-radius: 12px;
         overflow: hidden;
         box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         transition: all 0.3s ease;
@@ -181,8 +279,8 @@
     }
 
     .other-package-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        transform: translateY(-8px);
+        box-shadow: 0 12px 30px rgba(0,0,0,0.2);
     }
 
     .other-package-image {
@@ -210,6 +308,13 @@
     }
 
     /* Responsive */
+    @media (max-width: 1024px) {
+        .package-gallery {
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.25rem;
+        }
+    }
+
     @media (max-width: 768px) {
         .package-detail-hero {
             height: 30vh;
@@ -223,16 +328,61 @@
             padding: 2rem 1rem;
         }
 
+        .package-main-image {
+            max-width: 100%;
+            max-height: 300px;
+            margin-bottom: 2rem;
+        }
+
         .package-header h2 {
             font-size: 1.5rem;
         }
 
         .package-gallery {
-            grid-template-columns: 1fr;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
         }
 
         .other-packages-grid {
             grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+
+        .lightbox-nav {
+            width: 50px;
+            height: 50px;
+            font-size: 30px;
+        }
+
+        .lightbox-prev {
+            left: 10px;
+        }
+
+        .lightbox-next {
+            right: 10px;
+        }
+
+        .lightbox-close {
+            top: 10px;
+            right: 10px;
+            width: 40px;
+            height: 40px;
+            font-size: 30px;
+        }
+
+        .enquiry-btn {
+            padding: 0.875rem 2.5rem;
+            font-size: 0.95rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .package-gallery {
+            grid-template-columns: 1fr;
+        }
+
+        .package-main-image {
+            max-height: 250px;
         }
     }
 </style>
@@ -242,7 +392,7 @@
 <!-- Hero Section -->
 <section class="package-detail-hero">
     <div>
-        <h1>PACKAGE</h1>
+        <h1>{{ strtoupper($package->name) }}</h1>
     </div>
 </section>
 
@@ -256,51 +406,55 @@
     <!-- Package Header -->
     <div class="package-header">
         <h2>{{ $package->name }}</h2>
-        
-        <!-- Price Display (Optional - uncomment if you add price field) -->
-        {{-- 
-        <div class="package-price">
-            IDR 22,000,000 Net (USD 1,355)
-        </div>
-        --}}
     </div>
 
     <!-- Package Description -->
     @if($package->description)
-    <div style="text-align: center; color: #666; line-height: 1.8; margin-bottom: 2rem;">
+    <div class="package-description">
         {!! nl2br(e($package->description)) !!}
     </div>
     @endif
 
-    <!-- Services List -->
-    @if($package->services->count() > 0)
-    <ul class="services-list">
-        @foreach($package->services as $service)
-        <li>{{ $service->name }}{{ $service->description ? ': ' . $service->description : '' }}</li>
-        @endforeach
-    </ul>
-    @endif
-
-    <!-- Package Gallery (from services photos) -->
-    @php
-        $servicePhotos = $package->services->filter(fn($s) => $s->foto)->take(4);
-    @endphp
-    
-    @if($servicePhotos->count() > 0)
-    <div class="package-gallery">
-        @foreach($servicePhotos as $service)
-        <img src="{{ asset('storage/' . $service->foto) }}" alt="{{ $service->name }}" loading="lazy">
-        @endforeach
+    <!-- Package Gallery Photos -->
+    @if(is_array($package->photo) && count($package->photo) > 0)
+    <div class="package-gallery-section">
+        <h3 class="gallery-title">Gallery</h3>
+        
+        <div class="package-gallery" id="packageGallery">
+            @foreach($package->photo as $index => $photoPath)
+            <div class="gallery-item" onclick="openLightbox({{ $index }})">
+                <img src="{{ asset('storage/' . $photoPath) }}" 
+                     alt="{{ $package->name }} - Photo {{ $index + 1 }}" 
+                     loading="lazy">
+            </div>
+            @endforeach
+        </div>
     </div>
     @endif
 
     <!-- Enquiry Button -->
     <div style="text-align: center;">
-        <a href="{{ route('contact') }}" class="enquiry-btn">Enquiry</a>
+        <a href="{{ route('contact') }}" class="enquiry-btn">Make an Enquiry</a>
     </div>
 </section>
 
+<!-- Lightbox Modal -->
+@if(is_array($package->photo) && count($package->photo) > 0)
+<div id="lightbox" class="lightbox" onclick="closeLightbox(event)">
+    <span class="lightbox-close" onclick="closeLightbox()">&times;</span>
+    <span class="lightbox-prev" onclick="changeImage(-1)">&#10094;</span>
+    <div class="lightbox-content">
+        <img id="lightbox-img" src="" alt="">
+    </div>
+    <span class="lightbox-next" onclick="changeImage(1)">&#10095;</span>
+    <div class="lightbox-counter">
+        <span id="current-index">1</span> / <span id="total-images">{{ count($package->photo) }}</span>
+    </div>
+</div>
+@endif
+
 <!-- Other Packages Section -->
+@if($otherPackages && $otherPackages->count() > 0)
 <section class="other-packages-section">
     <h3>Other Packages</h3>
     
@@ -323,4 +477,79 @@
         @endforeach
     </div>
 </section>
+@endif
+
+@if(is_array($package->photo) && count($package->photo) > 0)
+<script>
+// Gallery photos data
+const galleryPhotos = @json($package->photo);
+let currentImageIndex = 0;
+
+// Open lightbox
+function openLightbox(index) {
+    currentImageIndex = index;
+    const lightbox = document.getElementById('lightbox');
+    const img = document.getElementById('lightbox-img');
+    
+    img.src = '{{ asset("storage") }}/' + galleryPhotos[currentImageIndex];
+    lightbox.classList.add('active');
+    updateCounter();
+    
+    // Prevent body scroll
+    document.body.style.overflow = 'hidden';
+}
+
+// Close lightbox
+function closeLightbox(event) {
+    // Close only if clicking outside the image or on close button
+    if (!event || event.target.id === 'lightbox' || event.target.classList.contains('lightbox-close')) {
+        const lightbox = document.getElementById('lightbox');
+        lightbox.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+}
+
+// Change image
+function changeImage(direction) {
+    currentImageIndex += direction;
+    
+    // Loop around
+    if (currentImageIndex < 0) {
+        currentImageIndex = galleryPhotos.length - 1;
+    } else if (currentImageIndex >= galleryPhotos.length) {
+        currentImageIndex = 0;
+    }
+    
+    const img = document.getElementById('lightbox-img');
+    img.src = '{{ asset("storage") }}/' + galleryPhotos[currentImageIndex];
+    updateCounter();
+}
+
+// Update counter
+function updateCounter() {
+    document.getElementById('current-index').textContent = currentImageIndex + 1;
+}
+
+// Keyboard navigation
+document.addEventListener('keydown', function(e) {
+    const lightbox = document.getElementById('lightbox');
+    if (lightbox.classList.contains('active')) {
+        if (e.key === 'ArrowLeft') {
+            changeImage(-1);
+        } else if (e.key === 'ArrowRight') {
+            changeImage(1);
+        } else if (e.key === 'Escape') {
+            closeLightbox();
+        }
+    }
+});
+
+// Prevent right-click on gallery images (optional)
+document.querySelectorAll('.gallery-item img').forEach(img => {
+    img.addEventListener('contextmenu', function(e) {
+        e.preventDefault();
+    });
+});
+</script>
+@endif
 @endsection

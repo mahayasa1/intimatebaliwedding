@@ -80,8 +80,12 @@
         }
 
         .logo-icon {
-            font-size: 1.5rem;
             transition: all var(--transition-speed) ease;
+        }
+
+        .logo-icon img {
+            height: 50px;
+            width: auto;
         }
 
         .sidebar.expanded .logo-icon {
@@ -90,11 +94,13 @@
 
         .logo-box {
             display: none;
-            font-size: 0.95rem;
-            font-weight: 600;
-            letter-spacing: 1.5px;
             transition: all var(--transition-speed) ease;
             white-space: nowrap;
+        }
+
+        .logo-box img {
+            height: 70px;
+            width: auto;
         }
 
         .sidebar.expanded .logo-box {
@@ -113,28 +119,22 @@
             }
         }
 
-        .logo-box:hover {
-            background: white;
-            color: var(--primary);
-            transform: scale(1.05);
-        }
-
         /* Sidebar Menu */
         .sidebar-menu {
-            padding: 2rem 0;
+            padding: 1.5rem 0;
         }
 
         .sidebar-menu a {
             display: flex;
             align-items: center;
             gap: 0.85rem;
-            padding: 0.95rem 1.25rem;
+            padding: 0.9rem 1.15rem;
             color: rgba(255,255,255,0.7);
             text-decoration: none;
             transition: all var(--transition-speed) ease;
             position: relative;
             font-weight: 500;
-            font-size: 0.95rem;
+            font-size: 0.92rem;
             white-space: nowrap;
         }
 
@@ -172,9 +172,9 @@
         }
 
         .sidebar-menu a .icon {
-            width: 22px;
+            width: 20px;
             text-align: center;
-            font-size: 1.2rem;
+            font-size: 1.15rem;
             flex-shrink: 0;
         }
 
@@ -193,11 +193,11 @@
             margin-left: auto;
             background: #e74c3c;
             color: white;
-            padding: 0.2rem 0.6rem;
-            border-radius: 12px;
-            font-size: 0.7rem;
+            padding: 0.2rem 0.55rem;
+            border-radius: 10px;
+            font-size: 0.68rem;
             font-weight: 700;
-            min-width: 20px;
+            min-width: 18px;
             text-align: center;
             box-shadow: 0 2px 4px rgba(231, 76, 60, 0.3);
             opacity: 0;
@@ -211,10 +211,6 @@
         }
 
         /* Tooltip for collapsed state */
-        .sidebar:not(.expanded) .sidebar-menu a {
-            position: relative;
-        }
-
         .sidebar:not(.expanded) .sidebar-menu a::after {
             content: attr(data-tooltip);
             position: absolute;
@@ -223,9 +219,9 @@
             transform: translateY(-50%);
             background: rgba(0,0,0,0.9);
             color: white;
-            padding: 0.5rem 0.75rem;
+            padding: 0.45rem 0.7rem;
             border-radius: 6px;
-            font-size: 0.85rem;
+            font-size: 0.82rem;
             white-space: nowrap;
             opacity: 0;
             pointer-events: none;
@@ -244,7 +240,7 @@
             bottom: 0;
             left: 0;
             right: 0;
-            padding: 1.5rem 1.25rem;
+            padding: 1.25rem 1.15rem;
             border-top: 1px solid rgba(255,255,255,0.1);
             background: rgba(0,0,0,0.1);
         }
@@ -252,14 +248,14 @@
         .user-info-sidebar {
             display: flex;
             align-items: center;
-            gap: 0.85rem;
-            margin-bottom: 1rem;
+            gap: 0.75rem;
+            margin-bottom: 0.85rem;
             overflow: hidden;
         }
 
         .user-avatar-sidebar {
-            width: 40px;
-            height: 40px;
+            width: 38px;
+            height: 38px;
             border-radius: 50%;
             background: white;
             display: flex;
@@ -267,13 +263,13 @@
             justify-content: center;
             color: var(--primary);
             font-weight: 700;
-            font-size: 1rem;
+            font-size: 0.95rem;
             flex-shrink: 0;
         }
 
         .user-details-sidebar {
             flex: 1;
-            font-size: 0.85rem;
+            font-size: 0.82rem;
             min-width: 0;
             opacity: 0;
             transform: translateX(-10px);
@@ -287,15 +283,7 @@
 
         .user-name-sidebar {
             font-weight: 600;
-            margin-bottom: 0.2rem;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .user-role-sidebar {
-            opacity: 0.7;
-            font-size: 0.75rem;
+            margin-bottom: 0.15rem;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -303,7 +291,7 @@
 
         .logout-btn-sidebar {
             width: 100%;
-            padding: 0.6rem;
+            padding: 0.55rem;
             background: rgba(255,255,255,0.15);
             color: white;
             border: 1px solid rgba(255,255,255,0.25);
@@ -311,7 +299,7 @@
             cursor: pointer;
             font-weight: 600;
             transition: all var(--transition-speed) ease;
-            font-size: 0.85rem;
+            font-size: 0.82rem;
             font-family: 'Work Sans', sans-serif;
             display: flex;
             align-items: center;
@@ -319,12 +307,8 @@
             gap: 0.5rem;
         }
 
-        .sidebar:not(.expanded) .logout-btn-sidebar {
-            padding: 0.6rem 0.5rem;
-        }
-
         .logout-btn-sidebar .logout-icon {
-            font-size: 1.1rem;
+            font-size: 1.05rem;
         }
 
         .logout-btn-sidebar .logout-text {
@@ -360,7 +344,7 @@
         /* Top Bar */
         .top-bar {
             background: white;
-            padding: 1.25rem 2rem;
+            padding: 1rem 1.75rem;
             box-shadow: 0 2px 8px rgba(0,0,0,0.04);
             display: flex;
             justify-content: space-between;
@@ -368,29 +352,32 @@
             position: sticky;
             top: 0;
             z-index: 100;
-            height: var(--topbar-height);
+            min-height: var(--topbar-height);
         }
 
         .top-bar-left {
             display: flex;
             align-items: center;
             gap: 1rem;
+            flex: 1;
+            min-width: 0;
         }
 
         .sidebar-toggle-btn {
-            width: 44px;
-            height: 44px;
-            border-radius: 12px;
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
             background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             color: white;
             border: none;
             cursor: pointer;
-            font-size: 1.25rem;
+            font-size: 1.2rem;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: all 0.3s ease;
             box-shadow: 0 2px 8px rgba(139, 115, 85, 0.2);
+            flex-shrink: 0;
         }
 
         .sidebar-toggle-btn:hover {
@@ -404,22 +391,26 @@
 
         .top-bar-left h2 {
             font-family: 'Playfair Display', serif;
-            font-size: 1.65rem;
+            font-size: 1.5rem;
             color: #1a1a1a;
             font-weight: 700;
             letter-spacing: -0.5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .top-bar-right {
             display: flex;
             align-items: center;
-            gap: 1.25rem;
+            gap: 1rem;
+            flex-shrink: 0;
         }
 
         .notification-icon {
             position: relative;
-            width: 44px;
-            height: 44px;
+            width: 42px;
+            height: 42px;
             border-radius: 50%;
             background: linear-gradient(135deg, #FFE5E5 0%, #FFD0D0 100%);
             display: flex;
@@ -427,8 +418,9 @@
             justify-content: center;
             cursor: pointer;
             color: #e74c3c;
-            font-size: 1.25rem;
+            font-size: 1.2rem;
             transition: all 0.3s ease;
+            flex-shrink: 0;
         }
 
         .notification-icon:hover {
@@ -442,55 +434,22 @@
             right: -4px;
             background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
             color: white;
-            width: 20px;
-            height: 20px;
+            min-width: 19px;
+            height: 19px;
             border-radius: 50%;
-            font-size: 0.7rem;
+            font-size: 0.68rem;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 700;
             border: 2px solid white;
             box-shadow: 0 2px 6px rgba(231, 76, 60, 0.4);
-        }
-
-        .upcoming-wedding {
-            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-            padding: 0.85rem 1.35rem;
-            border-radius: 14px;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-            border: 1px solid #e8e8e8;
-            transition: all 0.3s ease;
-        }
-
-        .upcoming-wedding:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 16px rgba(0,0,0,0.12);
-        }
-
-        .upcoming-wedding-title {
-            font-size: 0.75rem;
-            color: #999;
-            margin-bottom: 0.3rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .upcoming-wedding-couple {
-            font-weight: 600;
-            color: #1a1a1a;
-            font-size: 0.95rem;
-            margin-bottom: 0.2rem;
-        }
-
-        .upcoming-wedding-date {
-            font-size: 0.8rem;
-            color: #666;
+            padding: 0 4px;
         }
 
         /* Content */
         .content {
-            padding: 2rem;
+            padding: 1.75rem;
             max-width: 100%;
             margin: 0 auto;
         }
@@ -506,14 +465,14 @@
 
         /* Alert Messages */
         .alert {
-            padding: 1.15rem 1.5rem;
-            border-radius: 12px;
-            margin-bottom: 1.5rem;
+            padding: 1rem 1.35rem;
+            border-radius: 10px;
+            margin-bottom: 1.35rem;
             border-left: 4px solid;
             font-weight: 500;
             display: flex;
             align-items: center;
-            gap: 0.75rem;
+            gap: 0.7rem;
             animation: slideInDown 0.4s ease;
         }
 
@@ -540,11 +499,10 @@
             border-left-color: #dc3545;
         }
 
-        /* Responsive */
+        /* Responsive Breakpoints */
         @media (max-width: 1024px) {
-            .sidebar-toggle-btn {
-                width: 40px;
-                height: 40px;
+            .top-bar-left h2 {
+                font-size: 1.35rem;
             }
 
             .content {
@@ -602,46 +560,46 @@
             }
 
             .top-bar {
-                padding: 1rem 1.25rem;
-                flex-wrap: wrap;
-                gap: 1rem;
-                height: auto;
+                padding: 0.9rem 1.15rem;
+                min-height: 60px;
             }
 
             .top-bar-left h2 {
-                font-size: 1.35rem;
+                font-size: 1.2rem;
             }
 
             .top-bar-right {
                 gap: 0.75rem;
             }
 
-            .upcoming-wedding {
-                display: none;
+            .notification-icon {
+                width: 38px;
+                height: 38px;
+                font-size: 1.1rem;
             }
 
             .content {
-                padding: 1.25rem;
+                padding: 1.15rem;
             }
 
-            .notification-icon {
-                width: 40px;
-                height: 40px;
+            .alert {
+                padding: 0.9rem 1.15rem;
+                font-size: 0.9rem;
             }
 
             /* Mobile Toggle Button */
             .mobile-toggle {
                 position: fixed;
-                top: 1rem;
-                left: 1rem;
+                top: 0.85rem;
+                left: 0.85rem;
                 z-index: 1100;
                 background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
                 color: white;
                 border: none;
-                padding: 0.65rem 0.85rem;
-                border-radius: 10px;
+                padding: 0.6rem 0.8rem;
+                border-radius: 8px;
                 cursor: pointer;
-                font-size: 1.25rem;
+                font-size: 1.2rem;
                 box-shadow: 0 4px 12px rgba(139, 115, 85, 0.3);
                 transition: all 0.3s ease;
             }
@@ -656,8 +614,30 @@
         }
 
         @media (max-width: 480px) {
+            :root {
+                --topbar-height: 56px;
+            }
+
+            .top-bar {
+                padding: 0.75rem 1rem;
+                min-height: 56px;
+            }
+
             .top-bar-left h2 {
-                font-size: 1.15rem;
+                font-size: 1.05rem;
+            }
+
+            .sidebar-toggle-btn,
+            .notification-icon {
+                width: 36px;
+                height: 36px;
+                font-size: 1rem;
+            }
+
+            .notification-badge {
+                min-width: 17px;
+                height: 17px;
+                font-size: 0.65rem;
             }
 
             .content {
@@ -665,8 +645,66 @@
             }
 
             .alert {
-                padding: 1rem;
+                padding: 0.8rem 1rem;
+                font-size: 0.85rem;
+            }
+
+            .mobile-toggle {
+                top: 0.7rem;
+                left: 0.7rem;
+                padding: 0.55rem 0.7rem;
+                font-size: 1.1rem;
+            }
+
+            /* Sidebar adjustments */
+            .sidebar-logo {
+                min-height: 56px;
+            }
+
+            .logo-icon img {
+                height: 42px;
+            }
+
+            .logo-box img {
+                height: 60px;
+            }
+
+            .sidebar-menu {
+                padding: 1.25rem 0;
+            }
+
+            .sidebar-menu a {
+                padding: 0.8rem 1rem;
+                font-size: 0.88rem;
+            }
+
+            .sidebar-menu a .icon {
+                font-size: 1.05rem;
+            }
+
+            .user-avatar-sidebar {
+                width: 34px;
+                height: 34px;
                 font-size: 0.9rem;
+            }
+
+            .user-details-sidebar {
+                font-size: 0.78rem;
+            }
+
+            .logout-btn-sidebar {
+                padding: 0.5rem;
+                font-size: 0.78rem;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .top-bar-left h2 {
+                font-size: 0.95rem;
+            }
+
+            .content {
+                padding: 0.85rem;
             }
         }
     </style>
@@ -685,8 +723,8 @@
     <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-logo">
-            <div class="logo-icon"><img src="{{ asset('assets/Logo_IBW_1.png') }}" alt="" height="70px"></div>
-            <div class="logo-box"><img src="{{ asset('assets/Logo_IBW_1.png') }}" alt="" height="100px"></div>
+            <div class="logo-icon"><img src="{{ asset('assets/Logo_IBW_1.png') }}" alt="IBW Logo"></div>
+            <div class="logo-box"><img src="{{ asset('assets/Logo_IBW_1.png') }}" alt="IBW Logo"></div>
         </div>
 
         <nav class="sidebar-menu">
@@ -701,12 +739,6 @@
                data-tooltip="Packages">
                 <span class="icon"><i class="fas fa-box"></i></span>
                 <span class="menu-text">Packages</span>
-            </a>
-            <a href="{{ route('admin.services.index') }}" 
-               class="{{ request()->routeIs('admin.services.*') ? 'active' : '' }}"
-               data-tooltip="Services">
-                <span class="icon"><i class="fas fa-cog"></i></span>
-                <span class="menu-text">Services</span>
             </a>
             <a href="{{ route('admin.galleries.index') }}" 
                class="{{ request()->routeIs('admin.galleries.*') ? 'active' : '' }}"
@@ -774,12 +806,6 @@
                     <span class="notification-badge">{{ $stats['new_enquiries'] }}</span>
                     @endif
                 </div>
-
-                {{-- <div class="upcoming-wedding">
-                    <div class="upcoming-wedding-title">Upcoming Wedding</div>
-                    <div class="upcoming-wedding-couple">Nyoman & Dayu</div>
-                    <div class="upcoming-wedding-date">22 December 2022</div>
-                </div> --}}
             </div>
         </div>
 
@@ -787,14 +813,14 @@
         <div class="content">
             @if(session('success'))
             <div class="alert alert-success">
-                <span style="font-size: 1.25rem;"><i class="fas fa-check-circle"></i></span>
+                <span style="font-size: 1.2rem;"><i class="fas fa-check-circle"></i></span>
                 <span>{{ session('success') }}</span>
             </div>
             @endif
 
             @if(session('error'))
             <div class="alert alert-error">
-                <span style="font-size: 1.25rem;"><i class="fas fa-times-circle"></i></span>
+                <span style="font-size: 1.2rem;"><i class="fas fa-times-circle"></i></span>
                 <span>{{ session('error') }}</span>
             </div>
             @endif
@@ -814,7 +840,7 @@
 
         // Check if sidebar should be expanded by default (from localStorage)
         const sidebarState = localStorage.getItem('sidebarExpanded');
-        if (sidebarState === 'true') {
+        if (sidebarState === 'true' && window.innerWidth > 768) {
             sidebar.classList.add('expanded');
             mainContent.classList.add('expanded');
             if (toggleIcon) toggleIcon.innerHTML = '<i class="fas fa-times"></i>';
@@ -896,6 +922,17 @@
                     mainContent.classList.remove('expanded');
                 }
             }, 250);
+        });
+
+        // Auto-dismiss alerts after 5 seconds
+        document.addEventListener('DOMContentLoaded', function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                setTimeout(() => {
+                    alert.style.animation = 'slideInDown 0.4s ease reverse';
+                    setTimeout(() => alert.remove(), 400);
+                }, 5000);
+            });
         });
     </script>
 

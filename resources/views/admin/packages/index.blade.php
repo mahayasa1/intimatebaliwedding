@@ -227,6 +227,24 @@
         border-bottom: none;
     }
 
+    .package-info {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+    }
+
+    .package-thumbnail {
+        width: 80px;
+        height: 80px;
+        border-radius: 8px;
+        object-fit: cover;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .package-details {
+        flex: 1;
+    }
+
     .package-name {
         font-weight: 600;
         color: #1a1a1a;
@@ -238,10 +256,10 @@
         color: #666;
         font-size: 0.85rem;
         line-height: 1.5;
-        max-width: 500px;
+        max-width: 400px;
     }
 
-    .services-count {
+    .photos-count {
         display: inline-flex;
         align-items: center;
         gap: 0.5rem;
@@ -390,6 +408,11 @@
             padding: 1rem 0.75rem;
         }
 
+        .package-info {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
         .action-buttons {
             flex-direction: column;
         }
@@ -423,10 +446,10 @@
 
     <div class="stat-card">
         <div class="stat-header">
-            <div class="stat-title">Active Services</div>
-            <div class="stat-icon"><i class="fas fa-cog"></i></div>
+            <div class="stat-title">Total Photos</div>
+            <div class="stat-icon"><i class="fas fa-images"></i></div>
         </div>
-        <div class="stat-value">{{ $packages->sum('services_count') }}</div>
+        <div class="stat-value">{{ $packages->sum(function($p) { return is_array($p->photo) ? count($p->photo) : 0; }) }}</div>
     </div>
 
     <div class="stat-card">
@@ -453,7 +476,7 @@
             <thead>
                 <tr>
                     <th>Package Details</th>
-                    <th>Services</th>
+                    <th>Gallery Photos</th>
                     <th>Created Date</th>
                     <th>Actions</th>
                 </tr>
@@ -462,16 +485,33 @@
                 @foreach($packages as $package)
                 <tr>
                     <td>
-                        <div class="package-name">{{ $package->name }}</div>
-                        @if($package->description)
-                        <div class="package-description">
-                            {{ Str::limit($package->description, 100) }}
+                        <div class="package-info">
+                            @if($package->image)
+                            <img src="{{ asset('storage/' . $package->image) }}" 
+                                 alt="{{ $package->name }}" 
+                                 class="package-thumbnail">
+                            @else
+                            <div class="package-thumbnail" style="background: #e0e0e0; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-image" style="color: #999;"></i>
+                            </div>
+                            @endif
+                            <div class="package-details">
+                                <div class="package-name">{{ $package->name }}</div>
+                                @if($package->description)
+                                <div class="package-description">
+                                    {{ Str::limit($package->description, 80) }}
+                                </div>
+                                @endif
+                            </div>
                         </div>
-                        @endif
                     </td>
                     <td>
-                        <span class="services-count">
-                            <i class="fas fa-cog"></i> {{ $package->services_count }} Service{{ $package->services_count != 1 ? 's' : '' }}
+                        @php
+                            $photoCount = is_array($package->photo) ? count($package->photo) : 0;
+                        @endphp
+                        <span class="photos-count">
+                            <i class="fas fa-images"></i> 
+                            {{ $photoCount }} Photo{{ $photoCount != 1 ? 's' : '' }}
                         </span>
                     </td>
                     <td>
