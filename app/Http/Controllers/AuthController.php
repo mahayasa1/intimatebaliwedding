@@ -43,7 +43,7 @@ class AuthController extends Controller
                 config(['session.expire_on_close' => true]);
             }
             
-            return redirect()->intended(route('admin.dashboard'))
+            return redirect()->route('admin.dashboard')
                 ->with('success', 'Welcome back, ' . Auth::user()->name . '!');
         }
 

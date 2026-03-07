@@ -33,7 +33,7 @@
 
     .contact-grid {
         display: grid;
-        grid-template-columns: 1fr 1.5fr;
+        grid-template-columns: 0.5fr 2fr;
         gap: 4rem;
         margin-top: 3rem;
     }
@@ -238,9 +238,8 @@
                 <div class="contact-details">
                     <h4>Our Office</h4>
                     <p>
-                        Jl. Raya Ubud No. 123<br>
-                        Ubud, Gianyar<br>
-                        Bali 80571, Indonesia
+                        Jl. Puri Dewata No. 98,<br>
+                        Sidakarya, Denpasar, Bali<br>
                     </p>
                 </div>
             </div>
@@ -250,7 +249,6 @@
                 <div class="contact-details">
                     <h4>Email</h4>
                     <a href="mailto:hello@intimatebaliwedding.com">hello@intimatebaliwedding.com</a><br>
-                    <a href="mailto:info@intimatebaliwedding.com">info@intimatebaliwedding.com</a>
                 </div>
             </div>
 
@@ -259,11 +257,10 @@
                 <div class="contact-details">
                     <h4>Phone / WhatsApp</h4>
                     <a href="tel:+6282145678901">+62 821 4567 8901</a><br>
-                    <a href="tel:+6282198765432">+62 821 9876 5432</a>
                 </div>
             </div>
 
-            <div class="contact-item">
+            {{-- <div class="contact-item">
                 <div class="contact-icon">🕐</div>
                 <div class="contact-details">
                     <h4>Working Hours</h4>
@@ -273,7 +270,7 @@
                         Sunday: By Appointment
                     </p>
                 </div>
-            </div>
+            </div> --}}
         </div>
 
         <!-- Contact Form -->
@@ -355,11 +352,13 @@
     <!-- Map -->
     <div class="map-container">
         <iframe 
-            src="https://www.google.com/maps?q=-8.651868,115.2174142&hl=id&z=17&output=embed"
-            width="100%" height="400"
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3943.9420480960516!2d115.22811858456305!3d-8.697053657340675!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2dd241042d75b901%3A0xf63a36a1e45364d9!2sJl.%20Puri%20Dewata%20No.98%2C%20Sidakarya%2C%20Denpasar%20Selatan%2C%20Kota%20Denpasar%2C%20Bali%2080224!5e0!3m2!1sid!2sid!4v1772613900681!5m2!1sid!2sid" 
+            width="600" 
+            height="450" 
             style="border:0;" 
-            allowfullscreen 
-            loading="lazy">
+            allowfullscreen="" 
+            loading="lazy" 
+            referrerpolicy="no-referrer-when-downgrade">
         </iframe>
     </div>
 

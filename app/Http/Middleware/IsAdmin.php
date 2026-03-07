@@ -17,13 +17,14 @@ class IsAdmin
     public function handle(Request $request, Closure $next): Response
     {
         if (!Auth::check()) {
-            return redirect()->route('admin.login')->with('error', 'Please login to access admin panel.');
+            return redirect()->route('admin.login')
+                ->with('error', 'Please login to access admin panel.');
         }
-
+    
         if (Auth::user()->role !== 'admin') {
             abort(403, 'Unauthorized. Admin access required.');
         }
-
+    
         return $next($request);
     }
 }

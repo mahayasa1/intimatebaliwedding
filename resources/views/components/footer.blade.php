@@ -343,9 +343,8 @@
                 <div class="contact-info-item">
                     <div class="contact-icon">📍</div>
                     <div class="contact-text">
-                        Jl. Raya Ubud No. 123<br>
-                        Ubud, Gianyar<br>
-                        Bali 80571, Indonesia
+                        Jl. Puri Dewata No. 98<br>
+                        Sidakarya, Denpasar, Bali<br>
                     </div>
                 </div>
             </div>

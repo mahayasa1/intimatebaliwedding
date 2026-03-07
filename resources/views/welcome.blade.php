@@ -839,12 +839,14 @@
         <div class="instagram-feed-wrapper" style="position: relative; max-width: 1200px; margin: 2rem auto;">
             <div class="instagram-feed-container" style="background: white; border-radius: 12px; padding: 2rem; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
                 <!-- SnapWidget -->
-                <iframe src="https://snapwidget.com/embed/1117710" 
+                <!-- SnapWidget -->
+                <script src="https://snapwidget.com/js/snapwidget.js"></script>
+                <iframe src="https://snapwidget.com/embed/1119589" 
                         class="snapwidget-widget" 
                         allowtransparency="true" 
                         frameborder="0" 
                         scrolling="no" 
-                        style="border:none; overflow:hidden; width:100%; pointer-events: none;" 
+                        style="border:none; overflow:hidden;  width:100%; " 
                         title="Posts from Instagram">
                 </iframe>
             </div>
