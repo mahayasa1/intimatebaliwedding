@@ -30,10 +30,7 @@ Route::get('/gallery', [GalleryController::class, 'index'])->name('gallery.publi
 
 Route::get('/blog', [BlogController::class, 'index'])->name('blogs.public');
 Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blogs.show');
-Route::get('/contact', function () {
-    return view('contact');
-})->name('contact');
-
+Route::get('/contact', [EnquiryController::class, 'create'])->name('contact');
 // Enquiry Submission
 Route::post('/enquiry', [EnquiryController::class, 'store'])->name('enquiry.store');
 

@@ -2,8 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\EnquiryAutoReply;
+use App\Mail\EnquiryReceived;
 use App\Models\Enquiry;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class EnquiryController extends Controller
 {
@@ -27,7 +31,7 @@ class EnquiryController extends Controller
      */
     public function create()
     {
-        return view('enquiries.create');
+        return view('contact');
     }
 
     /**
@@ -37,16 +41,19 @@ class EnquiryController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
-            'phone' => 'nullable|string|max:255',
+            'name'         => 'required|string|max:255',
+            'email'        => 'required|email|max:255',
+            'phone'        => 'nullable|string|max:255',
             'wedding_date' => 'nullable|string|max:255',
             'wedding_type' => 'nullable|string|max:255',
-            'guest_count' => 'nullable|integer',
-            'message' => 'required|string',
+            'guest_count'  => 'nullable|integer',
+            'message'      => 'required|string',
         ]);
 
-        Enquiry::create($validated);
+        $enquiry = Enquiry::create($validated);
+
+        // Send emails
+        $this->sendEnquiryEmails($enquiry);
 
         if ($request->ajax()) {
             return response()->json([
@@ -56,7 +63,34 @@ class EnquiryController extends Controller
         }
 
         return redirect()->back()
-            ->with('success', 'Thank you for your enquiry. We will contact you soon!');
+            ->with('success', 'Thank you for your enquiry! We\'ve sent a confirmation to your email and will be in touch soon.');
+    }
+
+    /**
+     * Send notification to admin and auto-reply to user.
+     */
+    private function sendEnquiryEmails(Enquiry $enquiry): void
+    {
+        $adminEmail = config('mail.admin_email', env('MAIL_FROM_ADDRESS'));
+
+        // 1. Notify admin
+        try {
+            Mail::to($adminEmail)->send(new EnquiryReceived($enquiry));
+        } catch (\Exception $e) {
+            Log::error('Failed to send admin enquiry notification: ' . $e->getMessage(), [
+                'enquiry_id' => $enquiry->id,
+            ]);
+        }
+
+        // 2. Auto-reply to the enquirer
+        try {
+            Mail::to($enquiry->email)->send(new EnquiryAutoReply($enquiry));
+        } catch (\Exception $e) {
+            Log::error('Failed to send enquiry auto-reply: ' . $e->getMessage(), [
+                'enquiry_id' => $enquiry->id,
+                'recipient'  => $enquiry->email,
+            ]);
+        }
     }
 
     /**
@@ -81,14 +115,14 @@ class EnquiryController extends Controller
     public function update(Request $request, Enquiry $enquiry)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
-            'phone' => 'nullable|string|max:255',
+            'name'         => 'required|string|max:255',
+            'email'        => 'required|email|max:255',
+            'phone'        => 'nullable|string|max:255',
             'wedding_date' => 'nullable|string|max:255',
             'wedding_type' => 'nullable|string|max:255',
-            'guest_count' => 'nullable|integer',
-            'message' => 'required|string',
-            'status' => 'required|in:new,contacted,in_progress,completed,cancelled',
+            'guest_count'  => 'nullable|integer',
+            'message'      => 'required|string',
+            'status'       => 'required|in:new,contacted,in_progress,completed,cancelled',
         ]);
 
         $enquiry->update($validated);
@@ -122,13 +156,12 @@ class EnquiryController extends Controller
     {
         $query = Enquiry::latest();
 
-        // Filter by status if provided
         if ($request->has('status') && $request->status != '') {
             $query->where('status', $request->status);
         }
 
         $enquiries = $query->paginate(20)->withQueryString();
-        
+
         return view('admin.enquiries.index', compact('enquiries'));
     }
 
@@ -154,14 +187,14 @@ class EnquiryController extends Controller
     public function adminUpdate(Request $request, Enquiry $enquiry)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
-            'phone' => 'nullable|string|max:255',
+            'name'         => 'required|string|max:255',
+            'email'        => 'required|email|max:255',
+            'phone'        => 'nullable|string|max:255',
             'wedding_date' => 'nullable|string|max:255',
             'wedding_type' => 'nullable|string|max:255',
-            'guest_count' => 'nullable|integer',
-            'message' => 'required|string',
-            'status' => 'required|in:new,contacted,in_progress,completed,cancelled',
+            'guest_count'  => 'nullable|integer',
+            'message'      => 'required|string',
+            'status'       => 'required|in:new,contacted,in_progress,completed,cancelled',
         ]);
 
         $enquiry->update($validated);
