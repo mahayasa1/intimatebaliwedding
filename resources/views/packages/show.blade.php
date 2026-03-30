@@ -1,4 +1,5 @@
 @extends('layouts.app')
+@php use App\Helpers\ImageHelper; @endphp
 
 @section('title', $package->name . ' - Intimate Bali Wedding')
 
@@ -39,10 +40,10 @@
     /* Package Image - REDUCED SIZE */
     .package-main-image {
         width: 100%;
-        max-width: 600px;  /* Dikurangi dari 800px */
+        max-width: 600px;
         height: auto;
-        max-height: 400px;  /* Tambahkan batas tinggi */
-        object-fit: cover;  /* Maintain aspect ratio */
+        max-height: 400px;
+        object-fit: cover;
         margin: 0 auto 3rem;
         display: block;
         border-radius: 12px;
@@ -90,7 +91,7 @@
         letter-spacing: 2px;
     }
 
-    /* Grid Gallery - BETTER LAYOUT */
+    /* Grid Gallery */
     .package-gallery {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -104,7 +105,7 @@
         overflow: hidden;
         border-radius: 12px;
         cursor: pointer;
-        aspect-ratio: 4/3;  /* Consistent aspect ratio */
+        aspect-ratio: 4/3;
         background: #f0f0f0;
         transition: all 0.3s ease;
     }
@@ -201,13 +202,8 @@
         background: rgba(255,255,255,0.2);
     }
 
-    .lightbox-prev {
-        left: 40px;
-    }
-
-    .lightbox-next {
-        right: 40px;
-    }
+    .lightbox-prev { left: 40px; }
+    .lightbox-next { right: 40px; }
 
     .lightbox-counter {
         position: absolute;
@@ -316,74 +312,23 @@
     }
 
     @media (max-width: 768px) {
-        .package-detail-hero {
-            height: 30vh;
-        }
-
-        .package-detail-hero h1 {
-            font-size: 2rem;
-        }
-
-        .package-detail-container {
-            padding: 2rem 1rem;
-        }
-
-        .package-main-image {
-            max-width: 100%;
-            max-height: 300px;
-            margin-bottom: 2rem;
-        }
-
-        .package-header h2 {
-            font-size: 1.5rem;
-        }
-
-        .package-gallery {
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 1rem;
-        }
-
-        .other-packages-grid {
-            grid-template-columns: 1fr;
-            gap: 1.5rem;
-        }
-
-        .lightbox-nav {
-            width: 50px;
-            height: 50px;
-            font-size: 30px;
-        }
-
-        .lightbox-prev {
-            left: 10px;
-        }
-
-        .lightbox-next {
-            right: 10px;
-        }
-
-        .lightbox-close {
-            top: 10px;
-            right: 10px;
-            width: 40px;
-            height: 40px;
-            font-size: 30px;
-        }
-
-        .enquiry-btn {
-            padding: 0.875rem 2.5rem;
-            font-size: 0.95rem;
-        }
+        .package-detail-hero { height: 30vh; }
+        .package-detail-hero h1 { font-size: 2rem; }
+        .package-detail-container { padding: 2rem 1rem; }
+        .package-main-image { max-width: 100%; max-height: 300px; margin-bottom: 2rem; }
+        .package-header h2 { font-size: 1.5rem; }
+        .package-gallery { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; }
+        .other-packages-grid { grid-template-columns: 1fr; gap: 1.5rem; }
+        .lightbox-nav { width: 50px; height: 50px; font-size: 30px; }
+        .lightbox-prev { left: 10px; }
+        .lightbox-next { right: 10px; }
+        .lightbox-close { top: 10px; right: 10px; width: 40px; height: 40px; font-size: 30px; }
+        .enquiry-btn { padding: 0.875rem 2.5rem; font-size: 0.95rem; }
     }
 
     @media (max-width: 480px) {
-        .package-gallery {
-            grid-template-columns: 1fr;
-        }
-
-        .package-main-image {
-            max-height: 250px;
-        }
+        .package-gallery { grid-template-columns: 1fr; }
+        .package-main-image { max-height: 250px; }
     }
 </style>
 @endpush
@@ -398,9 +343,11 @@
 
 <!-- Package Detail Content -->
 <section class="package-detail-container">
-    <!-- Main Package Image -->
+    <!-- Main Package Image (pakai thumbnail) -->
     @if($package->image)
-    <img src="{{ asset('storage/' . $package->image) }}" alt="{{ $package->name }}" class="package-main-image">
+    <img src="{{ asset('storage/' . ImageHelper::thumb($package->image)) }}"
+         alt="{{ $package->name }}"
+         class="package-main-image">
     @endif
 
     <!-- Package Header -->
@@ -419,12 +366,13 @@
     @if(is_array($package->photo) && count($package->photo) > 0)
     <div class="package-gallery-section">
         <h3 class="gallery-title">Gallery</h3>
-        
+
         <div class="package-gallery" id="packageGallery">
             @foreach($package->photo as $index => $photoPath)
             <div class="gallery-item" onclick="openLightbox({{ $index }})">
-                <img src="{{ asset('storage/' . $photoPath) }}" 
-                     alt="{{ $package->name }} - Photo {{ $index + 1 }}" 
+                {{-- Grid pakai thumbnail (kecil & cepat) --}}
+                <img src="{{ asset('storage/' . ImageHelper::thumb($photoPath)) }}"
+                     alt="{{ $package->name }} - Photo {{ $index + 1 }}"
                      loading="lazy">
             </div>
             @endforeach
@@ -444,6 +392,7 @@
     <span class="lightbox-close" onclick="closeLightbox()">&times;</span>
     <span class="lightbox-prev" onclick="changeImage(-1)">&#10094;</span>
     <div class="lightbox-content">
+        {{-- Lightbox load foto ORIGINAL (full size) --}}
         <img id="lightbox-img" src="" alt="">
     </div>
     <span class="lightbox-next" onclick="changeImage(1)">&#10095;</span>
@@ -457,16 +406,20 @@
 @if($otherPackages && $otherPackages->count() > 0)
 <section class="other-packages-section">
     <h3>Other Packages</h3>
-    
+
     <div class="other-packages-grid">
         @foreach($otherPackages as $otherPackage)
         <a href="{{ route('packages.show', $otherPackage->id) }}" class="other-package-card">
             @if($otherPackage->image)
-            <img src="{{ asset('storage/' . $otherPackage->image) }}" alt="{{ $otherPackage->name }}" class="other-package-image">
+            <img src="{{ asset('storage/' . ImageHelper::thumb($otherPackage->image)) }}"
+                 alt="{{ $otherPackage->name }}"
+                 class="other-package-image">
             @else
-            <img src="https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=400&q=80" alt="{{ $otherPackage->name }}" class="other-package-image">
+            <img src="https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=400&q=80"
+                 alt="{{ $otherPackage->name }}"
+                 class="other-package-image">
             @endif
-            
+
             <div class="other-package-content">
                 <h4 class="other-package-title">{{ $otherPackage->name }}</h4>
                 @if($otherPackage->description)
@@ -481,74 +434,52 @@
 
 @if(is_array($package->photo) && count($package->photo) > 0)
 <script>
-// Gallery photos data
+// Path foto ORIGINAL untuk lightbox (bukan thumbnail)
 const galleryPhotos = @json($package->photo);
 let currentImageIndex = 0;
 
-// Open lightbox
 function openLightbox(index) {
     currentImageIndex = index;
     const lightbox = document.getElementById('lightbox');
-    const img = document.getElementById('lightbox-img');
-    
+    const img      = document.getElementById('lightbox-img');
+
     img.src = '{{ asset("storage") }}/' + galleryPhotos[currentImageIndex];
     lightbox.classList.add('active');
     updateCounter();
-    
-    // Prevent body scroll
     document.body.style.overflow = 'hidden';
 }
 
-// Close lightbox
 function closeLightbox(event) {
-    // Close only if clicking outside the image or on close button
     if (!event || event.target.id === 'lightbox' || event.target.classList.contains('lightbox-close')) {
-        const lightbox = document.getElementById('lightbox');
-        lightbox.classList.remove('active');
+        document.getElementById('lightbox').classList.remove('active');
         document.body.style.overflow = '';
     }
 }
 
-// Change image
 function changeImage(direction) {
     currentImageIndex += direction;
-    
-    // Loop around
-    if (currentImageIndex < 0) {
-        currentImageIndex = galleryPhotos.length - 1;
-    } else if (currentImageIndex >= galleryPhotos.length) {
-        currentImageIndex = 0;
-    }
-    
-    const img = document.getElementById('lightbox-img');
-    img.src = '{{ asset("storage") }}/' + galleryPhotos[currentImageIndex];
+    if (currentImageIndex < 0) currentImageIndex = galleryPhotos.length - 1;
+    else if (currentImageIndex >= galleryPhotos.length) currentImageIndex = 0;
+
+    document.getElementById('lightbox-img').src = '{{ asset("storage") }}/' + galleryPhotos[currentImageIndex];
     updateCounter();
 }
 
-// Update counter
 function updateCounter() {
     document.getElementById('current-index').textContent = currentImageIndex + 1;
 }
 
-// Keyboard navigation
-document.addEventListener('keydown', function(e) {
+document.addEventListener('keydown', function (e) {
     const lightbox = document.getElementById('lightbox');
     if (lightbox.classList.contains('active')) {
-        if (e.key === 'ArrowLeft') {
-            changeImage(-1);
-        } else if (e.key === 'ArrowRight') {
-            changeImage(1);
-        } else if (e.key === 'Escape') {
-            closeLightbox();
-        }
+        if (e.key === 'ArrowLeft')  changeImage(-1);
+        if (e.key === 'ArrowRight') changeImage(1);
+        if (e.key === 'Escape')     closeLightbox();
     }
 });
 
-// Prevent right-click on gallery images (optional)
 document.querySelectorAll('.gallery-item img').forEach(img => {
-    img.addEventListener('contextmenu', function(e) {
-        e.preventDefault();
-    });
+    img.addEventListener('contextmenu', e => e.preventDefault());
 });
 </script>
 @endif

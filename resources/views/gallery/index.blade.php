@@ -1,4 +1,5 @@
 @extends('layouts.app')
+@php use App\Helpers\ImageHelper; @endphp
 
 @section('title', 'Gallery - Intimate Bali Wedding')
 
@@ -78,15 +79,6 @@
         grid-auto-flow: dense;
     }
 
-    .gallery-item {
-        position: relative;
-        overflow: hidden;
-        border-radius: 8px;
-        cursor: pointer;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        transition: all 0.3s;
-    }
-
     /* Horizontal images span 2 columns */
     .gallery-item.horizontal {
         grid-column: span 2;
@@ -102,6 +94,16 @@
     /* Default aspect ratio */
     .gallery-item:not(.horizontal):not(.vertical) {
         aspect-ratio: 4/3;
+    }
+
+    .gallery-item {
+        position: relative;
+        overflow: hidden;
+        border-radius: 8px;
+        cursor: pointer;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        transition: all 0.3s;
+        background: #f0f0f0;
     }
 
     .gallery-item:hover {
@@ -233,9 +235,7 @@
         flex-wrap: wrap;
     }
 
-    .stat-item {
-        text-align: center;
-    }
+    .stat-item { text-align: center; }
 
     .stat-number {
         font-size: 2.5rem;
@@ -360,35 +360,14 @@
     }
 
     @media (max-width: 768px) {
-        .gallery-hero h1 {
-            font-size: 2.5rem;
-        }
-
-        .gallery-grid {
-            grid-template-columns: 1fr;
-        }
-
+        .gallery-hero h1 { font-size: 2.5rem; }
+        .gallery-grid { grid-template-columns: 1fr; }
         .gallery-item.horizontal,
-        .gallery-item.vertical {
-            grid-column: span 1;
-            aspect-ratio: 4/3;
-        }
-
-        .gallery-section {
-            padding: 3rem 1rem;
-        }
-
-        .testimonials-grid {
-            grid-template-columns: 1fr;
-        }
-
-        .testimonials-section {
-            padding: 3rem 1rem;
-        }
-
-        .google-stats {
-            gap: 1rem;
-        }
+        .gallery-item.vertical { grid-column: span 1; aspect-ratio: 4/3; }
+        .gallery-section { padding: 3rem 1rem; }
+        .testimonials-grid { grid-template-columns: 1fr; }
+        .testimonials-section { padding: 3rem 1rem; }
+        .google-stats { gap: 1rem; }
     }
 </style>
 @endpush
@@ -420,19 +399,23 @@
 
     <!-- Gallery Grid -->
     <div class="gallery-grid">
-        <!-- Dynamic Gallery Items from Database -->
         @foreach($galleries as $gallery)
         @php
-            $imagePath = storage_path('app/public/' . $gallery->image);
+            $imagePath   = storage_path('app/public/' . $gallery->image);
             $orientation = '';
-            
-            if (file_exists($imagePath)) {
-                list($width, $height) = getimagesize($imagePath);
+
+            if ($gallery->image && file_exists($imagePath)) {
+                [$width, $height] = getimagesize($imagePath);
                 $orientation = $width > $height ? 'horizontal' : 'vertical';
             }
         @endphp
-        <div class="gallery-item {{ $orientation }}" data-category="{{ $gallery->category ?? 'Other' }}">
-            <img src="{{ asset('storage/' . $gallery->image) }}" alt="{{ $gallery->title }}" loading="lazy">
+        <div class="gallery-item {{ $orientation }}"
+             data-category="{{ $gallery->category ?? 'Other' }}"
+             data-full="{{ asset('storage/' . $gallery->image) }}">
+            {{-- Grid pakai thumbnail (kecil & cepat) --}}
+            <img src="{{ asset('storage/' . ImageHelper::thumb($gallery->image)) }}"
+                 alt="{{ $gallery->title }}"
+                 loading="lazy">
             <div class="gallery-overlay">
                 <div class="gallery-title">{{ $gallery->title }}</div>
                 @if($gallery->category)
@@ -456,7 +439,7 @@
     <div class="testimonials-header">
         <h2>What Our Couples Say</h2>
         <p>Real reviews from Google Maps</p>
-        
+
         @if(!empty($businessStats))
         <div class="google-verified">
             <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/39/Google_Maps_icon_%282015-2020%29.svg/512px-Google_Maps_icon_%282015-2020%29.svg.png" alt="Google">
@@ -472,13 +455,7 @@
             <div class="stat-label">Average Rating</div>
             <div class="testimonial-rating">
                 @for($i = 1; $i <= 5; $i++)
-                    @if($i <= floor($businessStats['rating']))
-                        ★
-                    @elseif($i - 0.5 <= $businessStats['rating'])
-                        ★
-                    @else
-                        ☆
-                    @endif
+                    {{ $i <= floor($businessStats['rating']) ? '★' : '☆' }}
                 @endfor
             </div>
         </div>
@@ -493,22 +470,22 @@
     <div class="testimonials-grid">
         @foreach($googleReviews['reviews'] as $review)
         <div class="testimonial-card" onclick="window.open('{{ $googleReviews['place_url'] }}', '_blank')">
-            <!-- Google Maps Badge -->
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/39/Google_Maps_icon_%282015-2020%29.svg/512px-Google_Maps_icon_%282015-2020%29.svg.png" 
-                 alt="Google Maps" 
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/39/Google_Maps_icon_%282015-2020%29.svg/512px-Google_Maps_icon_%282015-2020%29.svg.png"
+                 alt="Google Maps"
                  class="google-maps-badge">
-            
+
             <div class="testimonial-header-content">
                 @if(isset($review['author_photo']) && $review['author_photo'])
-                <img src="{{ $review['author_photo'] }}" 
-                     alt="{{ $review['author_name'] }}" 
+                <img src="{{ $review['author_photo'] }}"
+                     alt="{{ $review['author_name'] }}"
                      class="testimonial-avatar"
                      onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                 @endif
-                <div class="testimonial-avatar" style="background: #D4AF37; display: {{ isset($review['author_photo']) && $review['author_photo'] ? 'none' : 'flex' }}; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 1.5rem;">
+                <div class="testimonial-avatar"
+                     style="background: #D4AF37; display: {{ isset($review['author_photo']) && $review['author_photo'] ? 'none' : 'flex' }}; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 1.5rem;">
                     {{ strtoupper(substr($review['author_name'], 0, 1)) }}
                 </div>
-                
+
                 <div class="testimonial-info">
                     <h4>{{ $review['author_name'] }}</h4>
                     <div class="testimonial-time">{{ $review['relative_time'] }}</div>
@@ -519,9 +496,7 @@
                 {{ str_repeat('★', $review['rating']) }}{{ str_repeat('☆', 5 - $review['rating']) }}
             </div>
 
-            <div class="testimonial-review">
-                {{ $review['text'] }}
-            </div>
+            <div class="testimonial-review">{{ $review['text'] }}</div>
         </div>
         @endforeach
     </div>
@@ -544,6 +519,7 @@
 <!-- Lightbox -->
 <div class="lightbox" id="lightbox">
     <span class="lightbox-close" onclick="closeLightbox()">&times;</span>
+    {{-- Lightbox load foto ORIGINAL (full size) --}}
     <img src="" alt="" id="lightbox-img">
 </div>
 @endsection
@@ -552,30 +528,25 @@
 <script>
     // Gallery Filter
     document.querySelectorAll('.filter-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            // Update active state
+        btn.addEventListener('click', function () {
             document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
             this.classList.add('active');
 
             const category = this.dataset.category;
-            const items = document.querySelectorAll('.gallery-item');
-
-            items.forEach(item => {
-                if (category === 'all' || item.dataset.category === category) {
-                    item.style.display = 'block';
-                } else {
-                    item.style.display = 'none';
-                }
+            document.querySelectorAll('.gallery-item').forEach(item => {
+                item.style.display = (category === 'all' || item.dataset.category === category)
+                    ? 'block'
+                    : 'none';
             });
         });
     });
 
-    // Lightbox
-    document.querySelectorAll('.gallery-item img').forEach(img => {
-        img.addEventListener('click', function(e) {
-            e.stopPropagation();
+    // Lightbox — pakai data-full (path original) bukan src thumbnail
+    document.querySelectorAll('.gallery-item').forEach(item => {
+        item.addEventListener('click', function () {
+            const fullSrc = this.dataset.full;
+            document.getElementById('lightbox-img').src = fullSrc;
             document.getElementById('lightbox').classList.add('active');
-            document.getElementById('lightbox-img').src = this.src;
             document.body.style.overflow = 'hidden';
         });
     });
@@ -585,10 +556,12 @@
         document.body.style.overflow = '';
     }
 
-    document.getElementById('lightbox').addEventListener('click', function(e) {
-        if (e.target === this) {
-            closeLightbox();
-        }
+    document.getElementById('lightbox').addEventListener('click', function (e) {
+        if (e.target === this) closeLightbox();
+    });
+
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') closeLightbox();
     });
 </script>
 @endpush

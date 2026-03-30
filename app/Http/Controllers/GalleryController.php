@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\ImageHelper;
 use App\Models\Gallery;
 use App\Services\GoogleMapsService;
 use Illuminate\Http\Request;
@@ -23,28 +24,23 @@ class GalleryController extends Controller
     {
         // Ambil semua galleries dan sort berdasarkan orientasi gambar
         $allGalleries = Gallery::orderBy('order')->latest()->get();
-        
-        // Pisahkan berdasarkan orientasi (horizontal terlebih dahulu, lalu vertikal)
+
+        // Urutkan: horizontal (landscape) duluan, lalu vertikal (portrait)
         $sortedGalleries = $allGalleries->sortByDesc(function ($gallery) {
             if (!$gallery->image) return 0;
-            
+
             $imagePath = storage_path('app/public/' . $gallery->image);
-            
+
             if (file_exists($imagePath)) {
-                list($width, $height) = getimagesize($imagePath);
-                
-                // Hitung rasio aspek
-                $aspectRatio = $width / $height;
-                
-                // Return nilai tinggi untuk horizontal (landscape), rendah untuk vertical (portrait)
-                return $aspectRatio;
+                [$width, $height] = getimagesize($imagePath);
+                return $width / $height;
             }
-            
+
             return 0;
         });
-        
-        // Paginate hasil sorted
-        $page = request()->get('page', 1);
+
+        // Manual pagination
+        $page    = request()->get('page', 1);
         $perPage = 12;
         $galleries = new \Illuminate\Pagination\LengthAwarePaginator(
             $sortedGalleries->forPage($page, $perPage),
@@ -53,23 +49,23 @@ class GalleryController extends Controller
             $page,
             ['path' => request()->url(), 'query' => request()->query()]
         );
-        
+
         $categories = Gallery::distinct()->pluck('category')->filter();
-        
-        // Fetch testimonials langsung dari Google Maps API
-        $googleReviews = $this->googleMapsService->getReviews(6);
-        $businessStats = $this->googleMapsService->getBusinessStats();
-        
+
+        // Fetch testimonials dari Google Maps API
+        $googleReviews  = $this->googleMapsService->getReviews(6);
+        $businessStats  = $this->googleMapsService->getBusinessStats();
+
         return view('gallery.index', compact('galleries', 'categories', 'googleReviews', 'businessStats'));
     }
 
     /**
-     * Refresh Google Maps reviews cache
+     * Refresh Google Maps reviews cache.
      */
     public function refreshReviews()
     {
         $this->googleMapsService->clearCache();
-        
+
         return redirect()->route('gallery.index')
             ->with('success', 'Google Maps reviews refreshed successfully!');
     }
@@ -97,15 +93,17 @@ class GalleryController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'image' => 'required|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'title'       => 'required|string|max:255',
+            'image'       => 'required|image|mimes:jpeg,png,jpg,webp|max:20480',
             'description' => 'nullable|string',
-            'category' => 'nullable|string|max:255',
-            'order' => 'nullable|integer',
+            'category'    => 'nullable|string|max:255',
+            'order'       => 'nullable|integer',
         ]);
 
         if ($request->hasFile('image')) {
-            $validated['image'] = $request->file('image')->store('gallery', 'public');
+            $path = $request->file('image')->store('gallery', 'public');
+            ImageHelper::createThumbnail($path);
+            $validated['image'] = $path;
         }
 
         Gallery::create($validated);
@@ -136,19 +134,22 @@ class GalleryController extends Controller
     public function update(Request $request, Gallery $gallery)
     {
         $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'title'       => 'required|string|max:255',
+            'image'       => 'nullable|image|mimes:jpeg,png,jpg,webp|max:20480',
             'description' => 'nullable|string',
-            'category' => 'nullable|string|max:255',
-            'order' => 'nullable|integer',
+            'category'    => 'nullable|string|max:255',
+            'order'       => 'nullable|integer',
         ]);
 
         if ($request->hasFile('image')) {
-            // Delete old image
+            // Hapus file lama + thumbnail-nya
             if ($gallery->image) {
                 Storage::disk('public')->delete($gallery->image);
+                ImageHelper::deleteThumb($gallery->image);
             }
-            $validated['image'] = $request->file('image')->store('gallery', 'public');
+            $path = $request->file('image')->store('gallery', 'public');
+            ImageHelper::createThumbnail($path);
+            $validated['image'] = $path;
         }
 
         $gallery->update($validated);
@@ -164,6 +165,7 @@ class GalleryController extends Controller
     {
         if ($gallery->image) {
             Storage::disk('public')->delete($gallery->image);
+            ImageHelper::deleteThumb($gallery->image);
         }
 
         $gallery->delete();

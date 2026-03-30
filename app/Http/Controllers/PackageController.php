@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\ImageHelper;
 use App\Models\Package;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -23,13 +24,13 @@ class PackageController extends Controller
     public function show($id)
     {
         $package = Package::findOrFail($id);
-        
+
         // Get other packages (exclude current package, limit to 3)
         $otherPackages = Package::where('id', '!=', $id)
-                            ->latest()
-                            ->take(3)
-                            ->get();
-        
+            ->latest()
+            ->take(3)
+            ->get();
+
         return view('packages.show', compact('package', 'otherPackages'));
     }
 
@@ -56,30 +57,31 @@ class PackageController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'name'        => 'required|string|max:255',
             'description' => 'nullable|string',
-            'image' => 'required|image|mimes:jpeg,png,jpg,webp|max:20480',
-            'photos.*' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:20480',
+            'image'       => 'required|image|mimes:jpeg,png,jpg,webp|max:20480',
+            'photos.*'    => 'nullable|image|mimes:jpeg,png,jpg,webp|max:20480',
         ]);
 
-        // Upload main image
+        // Upload main image + buat thumbnail
         if ($request->hasFile('image')) {
-            $validated['image'] = $request->file('image')->store('packages', 'public');
+            $path = $request->file('image')->store('packages', 'public');
+            ImageHelper::createThumbnail($path);
+            $validated['image'] = $path;
         }
 
-        // Upload multiple photos and store as array
+        // Upload multiple photos + buat thumbnail masing-masing
         $photos = [];
         if ($request->hasFile('photos')) {
             foreach ($request->file('photos') as $photo) {
                 $path = $photo->store('packages/photos', 'public');
+                ImageHelper::createThumbnail($path);
                 $photos[] = $path;
             }
         }
-        
-        // Store photos as 'photo' field (matching database column name)
+
+        // Simpan sebagai field 'photo' (sesuai kolom database)
         $validated['photo'] = $photos;
-        
-        // Remove 'photos' from validated if it exists
         unset($validated['photos']);
 
         Package::create($validated);
@@ -110,47 +112,49 @@ class PackageController extends Controller
     public function update(Request $request, Package $package)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'name'        => 'required|string|max:255',
             'description' => 'nullable|string',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:20480',
-            'photos.*' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:20480',
+            'image'       => 'nullable|image|mimes:jpeg,png,jpg,webp|max:20480',
+            'photos.*'    => 'nullable|image|mimes:jpeg,png,jpg,webp|max:20480',
         ]);
 
-        // Update main image if provided
+        // Update main image jika ada file baru
         if ($request->hasFile('image')) {
-            // Delete old image
+            // Hapus file lama + thumbnail-nya
             if ($package->image) {
                 Storage::disk('public')->delete($package->image);
+                ImageHelper::deleteThumb($package->image);
             }
-            $validated['image'] = $request->file('image')->store('packages', 'public');
+            $path = $request->file('image')->store('packages', 'public');
+            ImageHelper::createThumbnail($path);
+            $validated['image'] = $path;
         }
 
-        // Handle photos update
+        // Ambil foto-foto yang masih ada
         $existingPhotos = $package->photo ?? [];
-        
-        // Remove deleted photos
+
+        // Hapus foto yang di-remove oleh admin
         if ($request->has('removed_photos')) {
             $removedPhotos = json_decode($request->removed_photos, true);
             if (is_array($removedPhotos)) {
                 foreach ($removedPhotos as $photoPath) {
                     Storage::disk('public')->delete($photoPath);
+                    ImageHelper::deleteThumb($photoPath);
                     $existingPhotos = array_filter($existingPhotos, fn($p) => $p !== $photoPath);
                 }
             }
         }
 
-        // Add new photos
+        // Tambahkan foto baru + buat thumbnail
         if ($request->hasFile('photos')) {
             foreach ($request->file('photos') as $photo) {
                 $path = $photo->store('packages/photos', 'public');
+                ImageHelper::createThumbnail($path);
                 $existingPhotos[] = $path;
             }
         }
 
-        // Store as 'photo' field with array values reset
         $validated['photo'] = array_values($existingPhotos);
-        
-        // Remove 'photos' from validated if it exists
         unset($validated['photos']);
 
         $package->update($validated);
@@ -164,15 +168,17 @@ class PackageController extends Controller
      */
     public function destroy(Package $package)
     {
-        // Delete main image if exists
+        // Hapus main image + thumbnail
         if ($package->image) {
             Storage::disk('public')->delete($package->image);
+            ImageHelper::deleteThumb($package->image);
         }
 
-        // Delete all photos
+        // Hapus semua gallery photos + thumbnail masing-masing
         if ($package->photo && is_array($package->photo)) {
             foreach ($package->photo as $photo) {
                 Storage::disk('public')->delete($photo);
+                ImageHelper::deleteThumb($photo);
             }
         }
 
