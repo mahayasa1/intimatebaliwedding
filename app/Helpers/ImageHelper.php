@@ -16,6 +16,10 @@ class ImageHelper
      */
     public static function createThumbnail(string $storagePath, int $width = 800, int $quality = 82): ?string
     {
+        if (!extension_loaded('gd')) {
+        return $storagePath;
+        }
+
         $fullPath = Storage::disk('public')->path($storagePath);
 
         if (!file_exists($fullPath)) {

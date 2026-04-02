@@ -94,14 +94,14 @@ class GalleryController extends Controller
     {
         $validated = $request->validate([
             'title'       => 'required|string|max:255',
-            'image'       => 'required|image|mimes:jpeg,png,jpg,webp|max:20480',
+            'foto'       => 'required|image|mimes:jpeg,png,jpg,webp|max:20480',
             'description' => 'nullable|string',
             'category'    => 'nullable|string|max:255',
             'order'       => 'nullable|integer',
         ]);
 
-        if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('gallery', 'public');
+        if ($request->hasFile('foto')) {
+            $path = $request->file('foto')->store('gallery', 'public');
             ImageHelper::createThumbnail($path);
             $validated['image'] = $path;
         }
@@ -135,19 +135,19 @@ class GalleryController extends Controller
     {
         $validated = $request->validate([
             'title'       => 'required|string|max:255',
-            'image'       => 'nullable|image|mimes:jpeg,png,jpg,webp|max:20480',
+            'foto'       => 'nullable|image|mimes:jpeg,png,jpg,webp|max:20480',
             'description' => 'nullable|string',
             'category'    => 'nullable|string|max:255',
             'order'       => 'nullable|integer',
         ]);
 
-        if ($request->hasFile('image')) {
+        if ($request->hasFile('foto')) {
             // Hapus file lama + thumbnail-nya
             if ($gallery->image) {
                 Storage::disk('public')->delete($gallery->image);
                 ImageHelper::deleteThumb($gallery->image);
             }
-            $path = $request->file('image')->store('gallery', 'public');
+            $path = $request->file('foto')->store('gallery', 'public');
             ImageHelper::createThumbnail($path);
             $validated['image'] = $path;
         }
