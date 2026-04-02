@@ -447,13 +447,45 @@ function removeImage() {
     document.getElementById('preview').src = '';
 }
 
-// Preview multiple photos
+// Resize image sebelum preview & upload
+async function resizeImage(file, maxWidth = 1920) {
+    return new Promise((resolve) => {
+        const img = new Image();
+        const url = URL.createObjectURL(file);
+        img.onload = () => {
+            URL.revokeObjectURL(url);
+            if (img.width <= maxWidth) {
+                resolve(file); // tidak perlu resize
+                return;
+            }
+            const canvas = document.createElement('canvas');
+            const ratio = maxWidth / img.width;
+            canvas.width = maxWidth;
+            canvas.height = img.height * ratio;
+            canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+            canvas.toBlob((blob) => {
+                resolve(new File([blob], file.name, { type: 'image/jpeg' }));
+            }, 'image/jpeg', 0.85);
+        };
+        img.src = url;
+    });
+}
+
+// Preview multiple photos (dengan resize otomatis)
 let photoFiles = [];
 
-function previewMultipleImages(event) {
+async function previewMultipleImages(event) {
     const files = Array.from(event.target.files);
-    photoFiles = [...photoFiles, ...files];
-    
+
+    // Resize semua file dulu
+    const resized = await Promise.all(files.map(f => resizeImage(f)));
+    photoFiles = [...photoFiles, ...resized];
+
+    // Update file input dengan file yang sudah di-resize
+    const dataTransfer = new DataTransfer();
+    photoFiles.forEach(file => dataTransfer.items.add(file));
+    document.getElementById('photos').files = dataTransfer.files;
+
     displayPhotos();
 }
 
