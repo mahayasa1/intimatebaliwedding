@@ -248,7 +248,7 @@
                 <div class="contact-icon">📧</div>
                 <div class="contact-details">
                     <h4>Email</h4>
-                    <a href="mailto:hello@intimatebaliwedding.com">hello@intimatebaliwedding.com</a><br>
+                    <a href="mailto:initmatebaliwedding@gmail.com">initmatebaliwedding@gmail.com</a><br>
                 </div>
             </div>
 

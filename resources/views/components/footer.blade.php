@@ -330,7 +330,7 @@
                 <div class="contact-info-item">
                     <div class="contact-icon">📧</div>
                     <div class="contact-text">
-                        <a href="mailto:hello@intimatebaliwedding.com">hello@intimatebaliwedding.com</a>
+                        <a href="mailto:initmatebaliwedding@gmail.com">intimatebaliwedding@gmail.com</a>
                     </div>
                 </div>
                 <div class="contact-info-item">
