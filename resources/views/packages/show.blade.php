@@ -42,105 +42,127 @@
     }
 
     /* ===================== SUBPACKAGES SELECTOR ===================== */
-    .subpackages-section {
-        margin: 3.5rem 0 0;
-        padding: 3.5rem 0;
-        border-top: 1px solid #e8e8e8;
-    }
+.subpackages-section {
+    margin: 3.5rem 0 0;
+    padding: 3.5rem 0;
+    border-top: 1px solid #e8e8e8;
+}
 
-    .subpackages-section .section-title {
-        font-family: 'Playfair Display', serif;
-        font-size: 1.75rem; color: #1a1a1a; text-align: center;
-        margin-bottom: 0.4rem; text-transform: uppercase; letter-spacing: 2.5px;
-    }
+.subpackages-section .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.75rem; color: #1a1a1a; text-align: center;
+    margin-bottom: 0.4rem; text-transform: uppercase; letter-spacing: 2.5px;
+}
 
-    .subpackages-section .section-subtitle {
-        text-align: center; color: #999; font-size: 0.9rem;
-        margin-bottom: 2.5rem; letter-spacing: 0.4px;
-    }
+.subpackages-section .section-subtitle {
+    text-align: center; color: #999; font-size: 0.9rem;
+    margin-bottom: 2.5rem; letter-spacing: 0.4px;
+}
 
-    .subpackages-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-        gap: 1.5rem;
-        max-width: 1000px;
-        margin: 0 auto;
-    }
+.subpackages-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+    max-width: 1000px;
+    margin: 0 auto;
+}
 
-    /* Card subpackage — klikable menuju halaman detail */
-    .subpackage-card {
-        display: block;
-        text-decoration: none;
-        background: white;
-        border: 2px solid #e8e8e8;
-        border-radius: 16px;
-        overflow: hidden;
-        transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        position: relative;
-    }
+/* Card subpackage — sama persis seperti package card */
+.subpackage-card {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 1/1;
+    cursor: pointer;
+    display: block;
+    text-decoration: none;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+}
 
-    .subpackage-card::after {
-        content: '';
-        position: absolute; bottom: 0; left: 0; right: 0; height: 3px;
-        background: linear-gradient(90deg, #D4AF37, #AA8B2A);
-        transform: scaleX(0); transform-origin: left;
-        transition: transform 0.4s ease;
-    }
+.subpackage-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+}
 
-    .subpackage-card:hover {
-        transform: translateY(-7px);
-        box-shadow: 0 16px 40px rgba(212,175,55,0.18);
-        border-color: #D4AF37;
-    }
+.subpackage-card-img-wrap {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    inset: 0;
+}
 
-    .subpackage-card:hover::after { transform: scaleX(1); }
+.subpackage-card-img-wrap img {
+    width: 100%; height: 100%; object-fit: cover; display: block;
+    transition: transform 0.5s ease;
+}
 
-    .subpackage-card-img-wrap {
-        overflow: hidden;
-        aspect-ratio: 4/3;
-        background: linear-gradient(135deg, #f5f0eb, #ede5d8);
-    }
+.subpackage-card:hover .subpackage-card-img-wrap img { transform: scale(1.05); }
 
-    .subpackage-card-img-wrap img {
-        width: 100%; height: 100%; object-fit: cover; display: block;
-        transition: transform 0.5s ease;
-    }
+.subpackage-card-placeholder {
+    width: 100%; height: 100%;
+    background: linear-gradient(135deg, #f5f0eb, #ede5d8);
+    display: flex; align-items: center; justify-content: center;
+    color: #D4AF37; font-size: 3rem;
+}
 
-    .subpackage-card:hover .subpackage-card-img-wrap img { transform: scale(1.07); }
+.subpackage-overlay {
+    position: absolute;
+    bottom: 0; left: 0; right: 0; height: 100%;
+    padding: 1.5rem;
+    background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 50%);
+    color: white;
+    display: flex; flex-direction: column; justify-content: flex-end;
+    transition: background 0.3s ease;
+    pointer-events: none;
+    text-align: center;
+}
 
-    .subpackage-card-placeholder {
-        width: 100%; aspect-ratio: 4/3;
-        background: linear-gradient(135deg, #f5f0eb, #ede5d8);
-        display: flex; align-items: center; justify-content: center;
-        color: #D4AF37; font-size: 3rem;
-    }
+.subpackage-overlay::before {
+    content: '';
+    position: absolute; bottom: 0; left: 0; right: 0; height: 0;
+    background: rgba(0,0,0,0.356);
+    transition: height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1;
+}
 
-    .subpackage-card-body { padding: 1.4rem 1.5rem 1.6rem; }
+.subpackage-card:hover .subpackage-overlay::before { height: 100%; }
 
-    .subpackage-card-name {
-        font-family: 'Playfair Display', serif;
-        font-size: 1.15rem; font-weight: 700;
-        color: #1a1a1a; margin-bottom: 0.5rem;
-    }
+.subpackage-content {
+    position: relative; z-index: 2;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
 
-    .subpackage-card-desc {
-        color: #777; font-size: 0.88rem;
-        line-height: 1.6;
-        display: -webkit-box;
-        -webkit-line-clamp: 3;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-        margin-bottom: 1rem;
-    }
+.subpackage-card:hover .subpackage-content { transform: translateY(-30%); }
 
-    .subpackage-card-cta {
-        display: inline-flex; align-items: center; gap: 0.4rem;
-        color: #AA8B2A; font-weight: 600; font-size: 0.88rem;
-        letter-spacing: 0.3px;
-        transition: gap 0.2s ease;
-    }
+.subpackage-type {
+    font-size: 0.72rem; color: #D4AF37;
+    text-transform: uppercase; letter-spacing: 2px;
+    margin-bottom: 0.4rem; font-weight: 600;
+}
 
-    .subpackage-card:hover .subpackage-card-cta { gap: 0.7rem; }
+.subpackage-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 1px; color: white;
+}
+
+.subpackage-desc-hover {
+    font-size: 0.9rem; line-height: 1.6;
+    margin: 0.8rem 0;
+    max-height: 0; opacity: 0; overflow: hidden;
+    transform: translateY(20px);
+    transition: all 0.5s ease 0.2s; color: white;
+}
+
+.subpackage-card:hover .subpackage-desc-hover {
+    max-height: 150px; opacity: 1; transform: translateY(0);
+}
+
+@media (max-width: 768px) {
+    .subpackages-grid { grid-template-columns: 1fr; }
+    .subpackage-card:hover .subpackage-content { transform: translateY(-20%); }
+}
 
     /* Photo strip */
     .subpackage-photo-strip {
@@ -327,11 +349,10 @@
     <div class="subpackages-section">
         <h3 class="section-title">What's Available</h3>
         <p class="section-subtitle">Choose the option that best fits your dream wedding</p>
-
+    
         <div class="subpackages-grid">
             @foreach($package->subpackages as $sub)
             <a href="{{ route('subpackages.show', [$package->id, $sub->id]) }}" class="subpackage-card">
-                {{-- Main image --}}
                 <div class="subpackage-card-img-wrap">
                     @if($sub->image)
                     <img src="{{ asset('storage/' . ImageHelper::thumb($sub->image)) }}" alt="{{ $sub->name }}">
@@ -339,28 +360,15 @@
                     <div class="subpackage-card-placeholder"><i class="fas fa-gem"></i></div>
                     @endif
                 </div>
-
-                <div class="subpackage-card-body">
-                    <div class="subpackage-card-name">{{ $sub->name }}</div>
-                    @if($sub->description)
-                    <div class="subpackage-card-desc">{{ $sub->description }}</div>
-                    @endif
-                    <span class="subpackage-card-cta">
-                        View Details <i class="fas fa-arrow-right"></i>
-                    </span>
+                <div class="subpackage-overlay">
+                    <div class="subpackage-content">
+                        <div class="subpackage-type">{{ $package->name }}</div>
+                        <div class="subpackage-title">{{ $sub->name }}</div>
+                        @if($sub->description)
+                        <div class="subpackage-desc-hover">{{ Str::limit($sub->description, 120) }}</div>
+                        @endif
+                    </div>
                 </div>
-
-                {{-- Mini photo strip --}}
-                @if(is_array($sub->photo) && count($sub->photo) > 0)
-                <div class="subpackage-photo-strip">
-                    @foreach(array_slice($sub->photo, 0, 4) as $sPhoto)
-                    <img src="{{ asset('storage/' . ImageHelper::thumb($sPhoto)) }}" alt="">
-                    @endforeach
-                    @if(count($sub->photo) > 4)
-                    <div class="sub-photo-more">+{{ count($sub->photo) - 4 }}</div>
-                    @endif
-                </div>
-                @endif
             </a>
             @endforeach
         </div>

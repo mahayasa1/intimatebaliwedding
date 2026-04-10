@@ -318,6 +318,117 @@
         box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
     }
 
+    /* Subpackage Grid */
+    .subpackage-grid-admin {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 1.5rem;
+        margin-top: 1rem;
+    }
+
+    .subpackage-admin-card {
+        border: 1px solid #e8e8e8;
+        border-radius: 12px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        background: white;
+    }
+
+    .subpackage-admin-card:hover {
+        box-shadow: 0 8px 24px rgba(139,115,85,0.12);
+        border-color: #8B7355;
+        transform: translateY(-4px);
+    }
+
+    .subpackage-admin-img {
+        width: 100%;
+        aspect-ratio: 4/3;
+        object-fit: cover;
+        display: block;
+    }
+
+    .subpackage-admin-placeholder {
+        width: 100%;
+        aspect-ratio: 4/3;
+        background: linear-gradient(135deg, #f5f0eb, #ede5d8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #D4AF37;
+        font-size: 3rem;
+    }
+
+    .subpackage-admin-body {
+        padding: 1.25rem;
+    }
+
+    .subpackage-admin-name {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #1a1a1a;
+        margin-bottom: 0.5rem;
+    }
+
+    .subpackage-admin-desc {
+        color: #666;
+        font-size: 0.88rem;
+        line-height: 1.6;
+        margin-bottom: 1rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .subpackage-photo-strip-admin {
+        display: flex;
+        gap: 6px;
+        flex-wrap: nowrap;
+        overflow: hidden;
+    }
+
+    .subpackage-photo-strip-admin img {
+        width: 44px;
+        height: 44px;
+        object-fit: cover;
+        border-radius: 6px;
+        border: 2px solid white;
+        box-shadow: 0 1px 4px rgba(0,0,0,.1);
+        cursor: pointer;
+        transition: transform 0.2s ease;
+    }
+
+    .subpackage-photo-strip-admin img:hover { transform: scale(1.1); }
+
+    .sub-photo-more-admin {
+        width: 44px;
+        height: 44px;
+        border-radius: 6px;
+        background: rgba(139,115,85,0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #8B7355;
+        font-weight: 700;
+        font-size: 0.78rem;
+        flex-shrink: 0;
+    }
+
+    .badge-count {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.3rem 0.75rem;
+        background: linear-gradient(135deg, #e8f4f8 0%, #d1ecf1 100%);
+        color: #0d47a1;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        border: 1px solid #90caf9;
+        margin-top: 0.5rem;
+}
+
     /* Responsive */
     @media (max-width: 768px) {
         .detail-card {
@@ -404,6 +515,58 @@
         </div>
     </div>
 
+    {{-- Subpackages --}}
+    @if($package->subpackages && $package->subpackages->count() > 0)
+    <div class="detail-card">
+        <h3 class="card-title">
+            <div class="card-title-icon"><i class="fas fa-list-ul"></i></div>
+            Sub-packages
+            <span class="badge-count" style="font-family:'Work Sans',sans-serif;">
+                <i class="fas fa-layer-group"></i> {{ $package->subpackages->count() }} option{{ $package->subpackages->count() > 1 ? 's' : '' }}
+            </span>
+        </h3>
+
+        <div class="subpackage-grid-admin">
+            @foreach($package->subpackages as $sub)
+            <div class="subpackage-admin-card">
+                {{-- Main image --}}
+                @if($sub->image)
+                <img src="{{ asset('storage/' . $sub->image) }}"
+                     alt="{{ $sub->name }}" class="subpackage-admin-img"
+                     onclick="openLightbox('sub', '{{ asset('storage/' . $sub->image) }}', 0)">
+                @else
+                <div class="subpackage-admin-placeholder">
+                    <i class="fas fa-gem"></i>
+                </div>
+                @endif
+
+                <div class="subpackage-admin-body">
+                    <div class="subpackage-admin-name">{{ $sub->name }}</div>
+
+                    @if($sub->description)
+                    <div class="subpackage-admin-desc">{{ $sub->description }}</div>
+                    @endif
+
+                    {{-- Photo strip --}}
+                    @if(is_array($sub->photo) && count($sub->photo) > 0)
+                    <div class="subpackage-photo-strip-admin">
+                        @foreach(array_slice($sub->photo, 0, 4) as $idx => $sPhoto)
+                        <img src="{{ asset('storage/' . $sPhoto) }}"
+                             alt="Photo {{ $idx + 1 }}"
+                             onclick="openSubLightbox({{ $package->subpackages->search(fn($s) => $s->id === $sub->id) }}, {{ $idx }})">
+                        @endforeach
+                        @if(count($sub->photo) > 4)
+                        <div class="sub-photo-more-admin">+{{ count($sub->photo) - 4 }}</div>
+                        @endif
+                    </div>
+                    @endif
+                </div>
+            </div>
+            @endforeach
+        </div>
+    </div>
+    @endif
+
     <!-- Photo Gallery -->
     <div class="detail-card">
         <h3 class="card-title">
@@ -414,7 +577,7 @@
         @if(is_array($package->photo) && count($package->photo) > 0)
         <div class="photo-gallery">
             @foreach($package->photo as $index => $photoPath)
-            <div class="gallery-item" onclick="openLightbox({{ $index }})">
+            <div class="gallery-item" onclick="openLightbox('main', '', {{ $index }})">
                 <img src="{{ asset('storage/' . $photoPath) }}" alt="Photo {{ $index + 1 }}">
                 <div class="gallery-item-overlay">
                     <i class="fas fa-search-plus"></i>
@@ -470,14 +633,45 @@
 
 <script>
 @if(is_array($package->photo) && count($package->photo) > 0)
-const photos = @json(array_map(function($photoPath) { return asset('storage/' . $photoPath); }, $package->photo));
-let currentPhotoIndex = 0;
+const photos = @json(array_map(function($p) { return asset('storage/' . $p); }, $package->photo));
+@else
+const photos = [];
+@endif
 
-function openLightbox(index) {
+const subPhotos = @json($package->subpackages->map(fn($s) => array_map(fn($p) => asset('storage/' . $p), is_array($s->photo) ? $s->photo : [])));
+
+let currentPhotoIndex = 0;
+let currentPool = [];
+
+function openLightbox(pool, singleSrc, index) {
+    if (pool === 'main') {
+        currentPool = photos;
+    } else {
+        currentPool = [singleSrc];
+    }
     currentPhotoIndex = index;
-    document.getElementById('lightboxImage').src = photos[currentPhotoIndex];
+    document.getElementById('lightboxImage').src = currentPool[currentPhotoIndex];
     document.getElementById('lightbox').classList.add('active');
     document.body.style.overflow = 'hidden';
+
+    const hasPrev = document.querySelector('.lightbox-prev');
+    const hasNext = document.querySelector('.lightbox-next');
+    if (hasPrev) hasPrev.style.display = currentPool.length > 1 ? 'flex' : 'none';
+    if (hasNext) hasNext.style.display = currentPool.length > 1 ? 'flex' : 'none';
+}
+
+function openSubLightbox(subIndex, photoIndex) {
+    currentPool = subPhotos[subIndex] || [];
+    currentPhotoIndex = photoIndex;
+    if (!currentPool.length) return;
+    document.getElementById('lightboxImage').src = currentPool[currentPhotoIndex];
+    document.getElementById('lightbox').classList.add('active');
+    document.body.style.overflow = 'hidden';
+
+    const hasPrev = document.querySelector('.lightbox-prev');
+    const hasNext = document.querySelector('.lightbox-next');
+    if (hasPrev) hasPrev.style.display = currentPool.length > 1 ? 'flex' : 'none';
+    if (hasNext) hasNext.style.display = currentPool.length > 1 ? 'flex' : 'none';
 }
 
 function closeLightbox(event) {
@@ -489,29 +683,17 @@ function closeLightbox(event) {
 
 function changePhoto(direction) {
     currentPhotoIndex += direction;
-    
-    if (currentPhotoIndex < 0) {
-        currentPhotoIndex = photos.length - 1;
-    } else if (currentPhotoIndex >= photos.length) {
-        currentPhotoIndex = 0;
-    }
-    
-    document.getElementById('lightboxImage').src = photos[currentPhotoIndex];
+    if (currentPhotoIndex < 0) currentPhotoIndex = currentPool.length - 1;
+    else if (currentPhotoIndex >= currentPool.length) currentPhotoIndex = 0;
+    document.getElementById('lightboxImage').src = currentPool[currentPhotoIndex];
 }
 
-// Keyboard navigation
 document.addEventListener('keydown', function(e) {
     if (document.getElementById('lightbox').classList.contains('active')) {
-        if (e.key === 'Escape') {
-            document.getElementById('lightbox').classList.remove('active');
-            document.body.style.overflow = 'auto';
-        } else if (e.key === 'ArrowLeft') {
-            changePhoto(-1);
-        } else if (e.key === 'ArrowRight') {
-            changePhoto(1);
-        }
+        if (e.key === 'Escape') closeLightbox({ target: document.getElementById('lightbox') });
+        else if (e.key === 'ArrowLeft') changePhoto(-1);
+        else if (e.key === 'ArrowRight') changePhoto(1);
     }
 });
-@endif
 </script>
 @endsection
