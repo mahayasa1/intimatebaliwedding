@@ -15,6 +15,7 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->string('title');
             $table->string('image');
+            $table->json('photo')->nullable();
             $table->text('description')->nullable();
             $table->string('category')->nullable();
             $table->integer('order')->default(0);

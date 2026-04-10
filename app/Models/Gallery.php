@@ -14,6 +14,7 @@ class Gallery extends Model
     protected $fillable = [
         'title',
         'image',
+        'photo',
         'description',
         'category',
         'order',
@@ -21,5 +22,24 @@ class Gallery extends Model
 
     protected $casts = [
         'order' => 'integer',
+        'photo' => 'array',
     ];
+
+    public function getPhotoAttribute($value)
+    {
+        if (is_null($value)) return [];
+        if (is_string($value)) return json_decode($value, true) ?? [];
+        return $value;
+    }
+
+    public function setPhotoAttribute($value)
+    {
+        if (is_array($value)) {
+            $this->attributes['photo'] = json_encode($value);
+        } elseif (is_null($value)) {
+            $this->attributes['photo'] = json_encode([]);
+        } else {
+            $this->attributes['photo'] = $value;
+        }
+    }
 }

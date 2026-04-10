@@ -22,24 +22,18 @@ class GalleryController extends Controller
      */
     public function index()
     {
-        // Ambil semua galleries dan sort berdasarkan orientasi gambar
         $allGalleries = Gallery::orderBy('order')->latest()->get();
 
-        // Urutkan: horizontal (landscape) duluan, lalu vertikal (portrait)
         $sortedGalleries = $allGalleries->sortByDesc(function ($gallery) {
             if (!$gallery->image) return 0;
-
             $imagePath = storage_path('app/public/' . $gallery->image);
-
             if (file_exists($imagePath)) {
                 [$width, $height] = getimagesize($imagePath);
                 return $width / $height;
             }
-
             return 0;
         });
 
-        // Manual pagination
         $page    = request()->get('page', 1);
         $perPage = 12;
         $galleries = new \Illuminate\Pagination\LengthAwarePaginator(
@@ -52,7 +46,6 @@ class GalleryController extends Controller
 
         $categories = Gallery::distinct()->pluck('category')->filter();
 
-        // Fetch testimonials dari Google Maps API
         $googleReviews  = $this->googleMapsService->getReviews(6);
         $businessStats  = $this->googleMapsService->getBusinessStats();
 
@@ -65,7 +58,6 @@ class GalleryController extends Controller
     public function refreshReviews()
     {
         $this->googleMapsService->clearCache();
-
         return redirect()->route('gallery.index')
             ->with('success', 'Google Maps reviews refreshed successfully!');
     }
@@ -94,18 +86,32 @@ class GalleryController extends Controller
     {
         $validated = $request->validate([
             'title'       => 'required|string|max:255',
-            'foto'       => 'required|image|mimes:jpeg,png,jpg,webp|max:20480',
+            'foto'        => 'required|image|mimes:jpeg,png,jpg,webp|max:20480',
+            'photos.*'    => 'nullable|image|mimes:jpeg,png,jpg,webp|max:20480',
             'description' => 'nullable|string',
             'category'    => 'nullable|string|max:255',
             'order'       => 'nullable|integer',
         ]);
 
+        // Upload main image + thumbnail
         if ($request->hasFile('foto')) {
             $path = $request->file('foto')->store('gallery', 'public');
             ImageHelper::createThumbnail($path);
             $validated['image'] = $path;
         }
 
+        // Upload additional photos + thumbnails
+        $photos = [];
+        if ($request->hasFile('photos')) {
+            foreach ($request->file('photos') as $photo) {
+                $path = $photo->store('gallery/photos', 'public');
+                ImageHelper::createThumbnail($path);
+                $photos[] = $path;
+            }
+        }
+        $validated['photo'] = $photos;
+
+        unset($validated['foto'], $validated['photos']);
         Gallery::create($validated);
 
         return redirect()->route('admin.galleries.index')
@@ -135,14 +141,15 @@ class GalleryController extends Controller
     {
         $validated = $request->validate([
             'title'       => 'required|string|max:255',
-            'foto'       => 'nullable|image|mimes:jpeg,png,jpg,webp|max:20480',
+            'foto'        => 'nullable|image|mimes:jpeg,png,jpg,webp|max:20480',
+            'photos.*'    => 'nullable|image|mimes:jpeg,png,jpg,webp|max:20480',
             'description' => 'nullable|string',
             'category'    => 'nullable|string|max:255',
             'order'       => 'nullable|integer',
         ]);
 
+        // Update main image jika ada file baru
         if ($request->hasFile('foto')) {
-            // Hapus file lama + thumbnail-nya
             if ($gallery->image) {
                 Storage::disk('public')->delete($gallery->image);
                 ImageHelper::deleteThumb($gallery->image);
@@ -151,6 +158,33 @@ class GalleryController extends Controller
             ImageHelper::createThumbnail($path);
             $validated['image'] = $path;
         }
+
+        // Ambil foto-foto yang masih ada
+        $existingPhotos = $gallery->photo ?? [];
+
+        // Hapus foto yang di-remove oleh admin
+        if ($request->has('removed_photos')) {
+            $removedPhotos = json_decode($request->removed_photos, true);
+            if (is_array($removedPhotos)) {
+                foreach ($removedPhotos as $photoPath) {
+                    Storage::disk('public')->delete($photoPath);
+                    ImageHelper::deleteThumb($photoPath);
+                    $existingPhotos = array_filter($existingPhotos, fn($p) => $p !== $photoPath);
+                }
+            }
+        }
+
+        // Upload foto baru + buat thumbnail
+        if ($request->hasFile('photos')) {
+            foreach ($request->file('photos') as $photo) {
+                $path = $photo->store('gallery/photos', 'public');
+                ImageHelper::createThumbnail($path);
+                $existingPhotos[] = $path;
+            }
+        }
+
+        $validated['photo'] = array_values($existingPhotos);
+        unset($validated['foto'], $validated['photos']);
 
         $gallery->update($validated);
 
@@ -166,6 +200,13 @@ class GalleryController extends Controller
         if ($gallery->image) {
             Storage::disk('public')->delete($gallery->image);
             ImageHelper::deleteThumb($gallery->image);
+        }
+
+        if ($gallery->photo && is_array($gallery->photo)) {
+            foreach ($gallery->photo as $photo) {
+                Storage::disk('public')->delete($photo);
+                ImageHelper::deleteThumb($photo);
+            }
         }
 
         $gallery->delete();
