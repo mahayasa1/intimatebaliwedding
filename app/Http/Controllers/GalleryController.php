@@ -52,6 +52,23 @@ class GalleryController extends Controller
         return view('gallery.index', compact('galleries', 'categories', 'googleReviews', 'businessStats'));
     }
 
+    public function show($id)
+    {
+        $gallery = Gallery::findOrFail($id);
+
+        $additionalPhotos = is_array($gallery->photo) ? $gallery->photo : [];
+
+        $allPhotos = [];
+        if ($gallery->image) $allPhotos[] = $gallery->image;
+        $allPhotos = array_merge($allPhotos, $additionalPhotos);
+
+        $allPhotosUrl = array_map(fn($p) => asset('storage/' . $p), $allPhotos);
+
+        $totalPhotos = count($allPhotos);
+
+        return view('gallery.show', compact('gallery', 'allPhotos', 'allPhotosUrl', 'totalPhotos'));
+    }
+
     /**
      * Refresh Google Maps reviews cache.
      */
@@ -121,7 +138,7 @@ class GalleryController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Gallery $gallery)
+    public function adminShow(Gallery $gallery)
     {
         return view('admin.galleries.show', compact('gallery'));
     }

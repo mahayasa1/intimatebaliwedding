@@ -1,239 +1,565 @@
 @extends('layouts.admin')
 
-@section('title', 'Photo Details')
-@section('page-title', 'Photo Details')
+@section('title', 'Package Details')
+@section('page-title', 'Package Details')
 
 @push('styles')
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Work+Sans:wght@400;500;600&display=swap');
 
-    .detail-container { max-width: 1200px; margin: 0 auto; }
-
-    /* Main photo */
-    .main-photo-section {
-        margin-bottom: 2rem; border-radius: 16px; overflow: hidden;
-        box-shadow: 0 8px 30px rgba(0,0,0,0.12); background: white; padding: 2rem;
+    .detail-container {
+        max-width: 1200px;
+        margin: 0 auto;
     }
 
-    .main-photo-wrapper {
-        position: relative; border-radius: 12px; overflow: hidden;
-        background: #f5f5f5; cursor: pointer;
-        max-height: 550px; display: flex; align-items: center; justify-content: center;
-    }
-
-    .main-photo-wrapper img {
-        width: 100%; height: auto; max-height: 550px;
-        object-fit: contain; display: block; transition: transform 0.3s ease;
-    }
-
-    .main-photo-wrapper:hover img { transform: scale(1.02); }
-
-    .photo-zoom-hint {
-        position: absolute; bottom: 12px; right: 12px;
-        background: rgba(0,0,0,0.6); color: white;
-        font-size: 0.78rem; padding: 5px 10px; border-radius: 6px;
-        display: flex; align-items: center; gap: 5px;
-        font-family: 'Work Sans', sans-serif; opacity: 0;
-        transition: opacity 0.3s ease;
-    }
-
-    .main-photo-wrapper:hover .photo-zoom-hint { opacity: 1; }
-
-    /* Additional photos */
-    .additional-photos-section {
-        background: white; padding: 2.5rem; border-radius: 16px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.06); border: 1px solid #e8e8e8; margin-bottom: 2rem;
+    .detail-card {
+        background: white;
+        padding: 2.5rem;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+        border: 1px solid #e8e8e8;
+        margin-bottom: 2rem;
     }
 
     .card-title {
-        font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 700;
-        color: #1a1a1a; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;
-        padding-bottom: 1rem; border-bottom: 2px solid #f0f0f0;
+        font-family: 'Playfair Display', serif;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #1a1a1a;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #f0f0f0;
     }
 
     .card-title-icon {
-        width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         background: linear-gradient(135deg, #8B7355 0%, #6B5644 100%);
-        color: white; border-radius: 10px; font-size: 1.1rem;
+        color: white;
+        border-radius: 10px;
+        font-size: 1.25rem;
     }
 
-    .photos-grid {
-        display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-        gap: 1rem;
+    /* Main Image */
+    .main-image-container {
+        margin-bottom: 2rem;
+        text-align: center;
     }
 
-    .photo-grid-item {
-        position: relative; aspect-ratio: 1; border-radius: 10px; overflow: hidden;
-        cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    .main-image {
+        width: 100%;
+        max-width: 600px;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+
+    /* Info Grid */
+    .info-grid {
+        display: grid;
+        gap: 1.5rem;
+    }
+
+    .info-item {
+        padding: 1.25rem;
+        background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+        border-radius: 12px;
+        border: 1px solid #e8e8e8;
         transition: all 0.3s ease;
     }
 
-    .photo-grid-item:hover {
-        transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    .info-item:hover {
+        transform: translateX(4px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.06);
     }
-
-    .photo-grid-item img {
-        width: 100%; height: 100%; object-fit: cover; display: block;
-        transition: transform 0.3s ease;
-    }
-
-    .photo-grid-item:hover img { transform: scale(1.08); }
-
-    .photo-grid-overlay {
-        position: absolute; inset: 0; background: rgba(0,0,0,0);
-        display: flex; align-items: center; justify-content: center;
-        transition: all 0.3s ease; color: white; font-size: 1.5rem;
-    }
-
-    .photo-grid-item:hover .photo-grid-overlay { background: rgba(0,0,0,0.35); }
-
-    /* Detail Card */
-    .detail-card {
-        background: white; padding: 2rem; border-radius: 16px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.06); border: 1px solid #e8e8e8; margin-bottom: 2rem;
-    }
-
-    .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.25rem; }
-
-    .info-item {
-        padding: 1.15rem; background: linear-gradient(135deg, #f8f9fa, #ffffff);
-        border-radius: 12px; border: 1px solid #e8e8e8; transition: all 0.3s ease;
-    }
-
-    .info-item:hover { transform: translateX(4px); box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
 
     .info-label {
-        font-family: 'Work Sans', sans-serif; font-size: 0.78rem; color: #999;
-        text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.6rem; font-weight: 600;
+        font-family: 'Work Sans', sans-serif;
+        font-size: 0.8rem;
+        color: #999;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.75rem;
+        font-weight: 600;
     }
 
     .info-value {
-        font-family: 'Work Sans', sans-serif; font-size: 1rem; color: #1a1a1a; font-weight: 500;
+        font-family: 'Work Sans', sans-serif;
+        font-size: 1.1rem;
+        color: #1a1a1a;
+        font-weight: 500;
+        word-break: break-word;
+    }
+
+    .description-text {
+        font-family: 'Work Sans', sans-serif;
+        font-size: 1.05rem;
+        line-height: 1.8;
+        color: #333;
+        white-space: pre-wrap;
+    }
+
+    /* Photo Gallery Grid */
+    .photo-gallery {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-top: 1.5rem;
+    }
+
+    .gallery-item {
+        position: relative;
+        aspect-ratio: 1;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .gallery-item:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    }
+
+    .gallery-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+
+    .gallery-item:hover img {
+        transform: scale(1.1);
+    }
+
+    .gallery-item-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .gallery-item:hover .gallery-item-overlay {
+        opacity: 1;
+    }
+
+    .gallery-item-overlay i {
+        color: white;
+        font-size: 2rem;
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 3rem 2rem;
+        color: #999;
+    }
+
+    .empty-state-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.3;
     }
 
     /* Lightbox */
     .lightbox {
-        display: none; position: fixed; inset: 0;
-        background: rgba(0,0,0,0.96); z-index: 9999;
-        align-items: center; justify-content: center;
+        display: none;
+        position: fixed;
+        z-index: 9999;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.9);
+        align-items: center;
+        justify-content: center;
     }
 
-    .lightbox.active { display: flex; }
+    .lightbox.active {
+        display: flex;
+    }
 
-    .lightbox-content { max-width: 90vw; max-height: 90vh; position: relative; }
+    .lightbox-content {
+        max-width: 90%;
+        max-height: 90%;
+        position: relative;
+    }
 
     .lightbox-content img {
-        max-width: 100%; max-height: 90vh; object-fit: contain; border-radius: 4px; display: block;
+        width: 100%;
+        height: auto;
+        border-radius: 8px;
     }
 
-    .lb-close {
-        position: fixed; top: 20px; right: 28px; color: white;
-        font-size: 1.75rem; cursor: pointer; background: rgba(255,255,255,0.1);
-        width: 48px; height: 48px; border-radius: 50%;
-        display: flex; align-items: center; justify-content: center;
-        transition: all 0.3s ease; z-index: 10001; border: none;
+    .lightbox-close {
+        position: absolute;
+        top: -40px;
+        right: 0;
+        color: white;
+        font-size: 2rem;
+        cursor: pointer;
+        background: rgba(255,255,255,0.1);
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
     }
 
-    .lb-close:hover { background: rgba(255,255,255,0.2); transform: rotate(90deg); }
-
-    .lb-nav {
-        position: fixed; top: 50%; transform: translateY(-50%); color: white;
-        font-size: 1.75rem; cursor: pointer; background: rgba(255,255,255,0.1);
-        width: 52px; height: 52px; border-radius: 50%;
-        display: flex; align-items: center; justify-content: center;
-        transition: all 0.3s ease; user-select: none; z-index: 10001; border: none;
+    .lightbox-close:hover {
+        background: rgba(255,255,255,0.2);
+        transform: scale(1.1);
     }
 
-    .lb-nav:hover { background: rgba(255,255,255,0.22); }
-    .lb-prev { left: 20px; }
-    .lb-next { right: 20px; }
+    .lightbox-nav {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        color: white;
+        font-size: 2rem;
+        cursor: pointer;
+        background: rgba(255,255,255,0.1);
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+    }
 
-    .lb-counter {
-        position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-        color: white; font-size: 0.88rem; background: rgba(0,0,0,0.65);
-        padding: 8px 18px; border-radius: 20px; z-index: 10001;
-        font-family: 'Work Sans', sans-serif;
+    .lightbox-nav:hover {
+        background: rgba(255,255,255,0.2);
+    }
+
+    .lightbox-prev {
+        left: 20px;
+    }
+
+    .lightbox-next {
+        right: 20px;
     }
 
     /* Action Buttons */
     .action-section {
-        background: white; padding: 2rem; border-radius: 16px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.06); border: 1px solid #e8e8e8;
+        background: white;
+        padding: 2rem;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+        border: 1px solid #e8e8e8;
     }
 
-    .action-buttons { display: flex; gap: 1rem; flex-wrap: wrap; }
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
 
     .btn {
-        font-family: 'Work Sans', sans-serif; display: inline-flex; align-items: center;
-        gap: 0.5rem; padding: 0.875rem 1.75rem; border-radius: 12px; text-decoration: none;
-        font-weight: 600; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        border: none; cursor: pointer; font-size: 0.95rem;
+        font-family: 'Work Sans', sans-serif;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.875rem 1.75rem;
+        border-radius: 12px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        border: none;
+        cursor: pointer;
+        font-size: 0.95rem;
     }
 
-    .btn-secondary { background: linear-gradient(135deg, #95a5a6, #7f8c8d); color: white; }
-    .btn-secondary:hover { transform: translateY(-2px); }
-    .btn-primary { background: linear-gradient(135deg, #8B7355, #6B5644); color: white; }
-    .btn-primary:hover { transform: translateY(-2px); }
-    .btn-danger { background: linear-gradient(135deg, #e74c3c, #c0392b); color: white; }
-    .btn-danger:hover { transform: translateY(-2px); }
+    .btn-secondary {
+        background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
+        color: white;
+        box-shadow: 0 2px 8px rgba(149, 165, 166, 0.2);
+    }
 
+    .btn-secondary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(149, 165, 166, 0.3);
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #8B7355 0%, #6B5644 100%);
+        color: white;
+        box-shadow: 0 2px 8px rgba(139, 115, 85, 0.2);
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(139, 115, 85, 0.3);
+    }
+
+    .btn-danger {
+        background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        color: white;
+        box-shadow: 0 2px 8px rgba(231, 76, 60, 0.2);
+    }
+
+    .btn-danger:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+    }
+
+    /* Subpackage Grid */
+    .subpackage-grid-admin {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 1.5rem;
+        margin-top: 1rem;
+    }
+
+    .subpackage-admin-card {
+        border: 1px solid #e8e8e8;
+        border-radius: 12px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        background: white;
+    }
+
+    .subpackage-admin-card:hover {
+        box-shadow: 0 8px 24px rgba(139,115,85,0.12);
+        border-color: #8B7355;
+        transform: translateY(-4px);
+    }
+
+    .subpackage-admin-img {
+        width: 100%;
+        aspect-ratio: 4/3;
+        object-fit: cover;
+        display: block;
+    }
+
+    .subpackage-admin-placeholder {
+        width: 100%;
+        aspect-ratio: 4/3;
+        background: linear-gradient(135deg, #f5f0eb, #ede5d8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #D4AF37;
+        font-size: 3rem;
+    }
+
+    .subpackage-admin-body {
+        padding: 1.25rem;
+    }
+
+    .subpackage-admin-name {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #1a1a1a;
+        margin-bottom: 0.5rem;
+    }
+
+    .subpackage-admin-desc {
+        color: #666;
+        font-size: 0.88rem;
+        line-height: 1.6;
+        margin-bottom: 1rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .subpackage-photo-strip-admin {
+        display: flex;
+        gap: 6px;
+        flex-wrap: nowrap;
+        overflow: hidden;
+    }
+
+    .subpackage-photo-strip-admin img {
+        width: 44px;
+        height: 44px;
+        object-fit: cover;
+        border-radius: 6px;
+        border: 2px solid white;
+        box-shadow: 0 1px 4px rgba(0,0,0,.1);
+        cursor: pointer;
+        transition: transform 0.2s ease;
+    }
+
+    .subpackage-photo-strip-admin img:hover { transform: scale(1.1); }
+
+    .sub-photo-more-admin {
+        width: 44px;
+        height: 44px;
+        border-radius: 6px;
+        background: rgba(139,115,85,0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #8B7355;
+        font-weight: 700;
+        font-size: 0.78rem;
+        flex-shrink: 0;
+    }
+
+    .badge-count {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.3rem 0.75rem;
+        background: linear-gradient(135deg, #e8f4f8 0%, #d1ecf1 100%);
+        color: #0d47a1;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        border: 1px solid #90caf9;
+        margin-top: 0.5rem;
+}
+
+    /* Responsive */
     @media (max-width: 768px) {
-        .detail-card, .main-photo-section, .additional-photos-section { padding: 1.5rem; }
-        .action-buttons { flex-direction: column; }
-        .btn { width: 100%; justify-content: center; }
-        .photos-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
-        .lb-nav { width: 42px; height: 42px; font-size: 1.4rem; }
-        .lb-prev { left: 8px; } .lb-next { right: 8px; }
+        .detail-card {
+            padding: 1.5rem;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+        }
+
+        .btn {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .photo-gallery {
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        }
+
+        .lightbox-nav {
+            width: 40px;
+            height: 40px;
+            font-size: 1.5rem;
+        }
+
+        .lightbox-prev {
+            left: 10px;
+        }
+
+        .lightbox-next {
+            right: 10px;
+        }
     }
 </style>
 @endpush
 
 @section('content')
 <div class="detail-container">
-
-    {{-- Main Photo --}}
-    <div class="main-photo-section">
+    <!-- Package Information -->
+    <div class="detail-card">
         <h3 class="card-title">
-            <span class="card-title-icon"><i class="fa-solid fa-star"></i></span>
-            Main Photo
+            <div class="card-title-icon"><i class="fas fa-box"></i></div>
+            Package Information
         </h3>
 
-        @if($gallery->image)
-        <div class="main-photo-wrapper" onclick="openLightbox('main', 0)">
-            <img src="{{ asset('storage/' . $gallery->image) }}" alt="{{ $gallery->title }}"
-                 onerror="this.onerror=null; this.src='{{ asset('assets/placeholder.jpg') }}';">
-            <div class="photo-zoom-hint">
-                <i class="fa-solid fa-expand"></i> Click to expand
-            </div>
-        </div>
-        @else
-        <div style="height:200px;background:#f5f5f5;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#ccc;font-size:3rem;">
-            <i class="fa-solid fa-image"></i>
+        @if($package->image)
+        <div class="main-image-container">
+            <img src="{{ asset('storage/' . $package->image) }}" 
+                 alt="{{ $package->name }}" 
+                 class="main-image">
         </div>
         @endif
+        
+        <div class="info-grid">
+            <div class="info-item">
+                <div class="info-label">Package Name</div>
+                <div class="info-value">{{ $package->name }}</div>
+            </div>
+
+            @if($package->description)
+            <div class="info-item">
+                <div class="info-label">Description</div>
+                <div class="description-text">{{ $package->description }}</div>
+            </div>
+            @endif
+
+            <div class="info-item">
+                <div class="info-label">Gallery Photos</div>
+                @php
+                    $photoCount = is_array($package->photo) ? count($package->photo) : 0;
+                @endphp
+                <div class="info-value">{{ $photoCount }} Photo{{ $photoCount != 1 ? 's' : '' }}</div>
+            </div>
+
+            <div class="info-item">
+                <div class="info-label">Created At</div>
+                <div class="info-value">{{ $package->created_at->format('F d, Y \a\t h:i A') }}</div>
+            </div>
+
+            <div class="info-item">
+                <div class="info-label">Last Updated</div>
+                <div class="info-value">{{ $package->updated_at->format('F d, Y \a\t h:i A') }}</div>
+            </div>
+        </div>
     </div>
 
-    {{-- Additional Photos --}}
-    @php $photos = is_array($gallery->photo) ? $gallery->photo : []; @endphp
-    @if(count($photos) > 0)
-    <div class="additional-photos-section">
+    {{-- Subpackages --}}
+    @if($package->subpackages && $package->subpackages->count() > 0)
+    <div class="detail-card">
         <h3 class="card-title">
-            <span class="card-title-icon"><i class="fa-solid fa-images"></i></span>
-            Additional Photos
-            <span style="font-size:0.85rem;color:#999;font-weight:400;margin-left:0.5rem;">
-                ({{ count($photos) }} foto)
+            <div class="card-title-icon"><i class="fas fa-list-ul"></i></div>
+            Sub-packages
+            <span class="badge-count" style="font-family:'Work Sans',sans-serif;">
+                <i class="fas fa-layer-group"></i> {{ $package->subpackages->count() }} option{{ $package->subpackages->count() > 1 ? 's' : '' }}
             </span>
         </h3>
 
-        <div class="photos-grid">
-            @foreach($photos as $index => $photoPath)
-            <div class="photo-grid-item" onclick="openLightbox('additional', {{ $index }})">
-                <img src="{{ asset('storage/' . $photoPath) }}" alt="Photo {{ $index + 1 }}"
-                     loading="lazy"
-                     onerror="this.onerror=null; this.parentElement.style.background='#f5f5f5';">
-                <div class="photo-grid-overlay">
-                    <i class="fa-solid fa-search-plus"></i>
+        <div class="subpackage-grid-admin">
+            @foreach($package->subpackages as $sub)
+            <div class="subpackage-admin-card">
+                {{-- Main image --}}
+                @if($sub->image)
+                <img src="{{ asset('storage/' . $sub->image) }}"
+                     alt="{{ $sub->name }}" class="subpackage-admin-img"
+                     onclick="openLightbox('sub', '{{ asset('storage/' . $sub->image) }}', 0)">
+                @else
+                <div class="subpackage-admin-placeholder">
+                    <i class="fas fa-gem"></i>
+                </div>
+                @endif
+
+                <div class="subpackage-admin-body">
+                    <div class="subpackage-admin-name">{{ $sub->name }}</div>
+
+                    @if($sub->description)
+                    <div class="subpackage-admin-desc">{{ $sub->description }}</div>
+                    @endif
+
+                    {{-- Photo strip --}}
+                    @if(is_array($sub->photo) && count($sub->photo) > 0)
+                    <div class="subpackage-photo-strip-admin">
+                        @foreach(array_slice($sub->photo, 0, 4) as $idx => $sPhoto)
+                        <img src="{{ asset('storage/' . $sPhoto) }}"
+                             alt="Photo {{ $idx + 1 }}"
+                             onclick="openSubLightbox({{ $package->subpackages->search(fn($s) => $s->id === $sub->id) }}, {{ $idx }})">
+                        @endforeach
+                        @if(count($sub->photo) > 4)
+                        <div class="sub-photo-more-admin">+{{ count($sub->photo) - 4 }}</div>
+                        @endif
+                    </div>
+                    @endif
                 </div>
             </div>
             @endforeach
@@ -241,149 +567,133 @@
     </div>
     @endif
 
-    {{-- Info --}}
+    <!-- Photo Gallery -->
     <div class="detail-card">
         <h3 class="card-title">
-            <span class="card-title-icon"><i class="fa-solid fa-circle-info"></i></span>
-            Photo Information
+            <div class="card-title-icon"><i class="fas fa-images"></i></div>
+            Photo Gallery
         </h3>
-        <div class="info-grid">
-            <div class="info-item">
-                <div class="info-label">Title</div>
-                <div class="info-value">{{ $gallery->title }}</div>
-            </div>
-
-            @if($gallery->description)
-            <div class="info-item">
-                <div class="info-label">Description</div>
-                <div class="info-value" style="font-size:0.92rem;line-height:1.5;color:#555;">
-                    {{ $gallery->description }}
+        
+        @if(is_array($package->photo) && count($package->photo) > 0)
+        <div class="photo-gallery">
+            @foreach($package->photo as $index => $photoPath)
+            <div class="gallery-item" onclick="openLightbox('main', '', {{ $index }})">
+                <img src="{{ asset('storage/' . $photoPath) }}" alt="Photo {{ $index + 1 }}">
+                <div class="gallery-item-overlay">
+                    <i class="fas fa-search-plus"></i>
                 </div>
             </div>
-            @endif
-
-            @if($gallery->category)
-            <div class="info-item">
-                <div class="info-label">Category</div>
-                <div class="info-value">{{ $gallery->category }}</div>
-            </div>
-            @endif
-
-            <div class="info-item">
-                <div class="info-label">Display Order</div>
-                <div class="info-value">{{ $gallery->order ?? 0 }}</div>
-            </div>
-
-            <div class="info-item">
-                <div class="info-label">Additional Photos</div>
-                <div class="info-value">{{ count($photos) }} foto</div>
-            </div>
-
-            <div class="info-item">
-                <div class="info-label">Uploaded On</div>
-                <div class="info-value">{{ $gallery->created_at->format('d F Y, H:i') }}</div>
-            </div>
-
-            <div class="info-item">
-                <div class="info-label">Last Updated</div>
-                <div class="info-value">{{ $gallery->updated_at->format('d F Y, H:i') }}</div>
-            </div>
+            @endforeach
         </div>
+        @else
+        <div class="empty-state">
+            <div class="empty-state-icon"><i class="fas fa-images"></i></div>
+            <p>No gallery photos uploaded yet.</p>
+        </div>
+        @endif
     </div>
 
-    {{-- Actions --}}
+    <!-- Actions -->
     <div class="action-section">
         <div class="action-buttons">
-            <a href="{{ route('admin.galleries.index') }}" class="btn btn-secondary">
-                <i class="fa-solid fa-arrow-left"></i> Back to Gallery
+            <a href="{{ route('admin.packages.index') }}" class="btn btn-secondary">
+                ← Back to List
             </a>
-            <a href="{{ route('admin.galleries.edit', $gallery) }}" class="btn btn-primary">
-                <i class="fa-solid fa-pen"></i> Edit Photo
+            <a href="{{ route('admin.packages.edit', $package) }}" class="btn btn-primary">
+                <i class="fas fa-edit"></i> Edit Package
             </a>
-            <form action="{{ route('admin.galleries.destroy', $gallery) }}" method="POST"
-                style="margin:0;" onsubmit="return confirm('Hapus foto ini? Tindakan ini tidak bisa dibatalkan.');">
+            <form action="{{ route('admin.packages.destroy', $package) }}" method="POST" style="margin: 0;" onsubmit="return confirm('Are you sure you want to delete this package? This action cannot be undone.');">
                 @csrf
                 @method('DELETE')
                 <button type="submit" class="btn btn-danger">
-                    <i class="fa-solid fa-trash"></i> Delete
+                    <i class="fas fa-trash-alt"></i> Delete Package
                 </button>
             </form>
         </div>
     </div>
 </div>
 
-{{-- Lightbox --}}
+<!-- Lightbox -->
 <div id="lightbox" class="lightbox" onclick="closeLightbox(event)">
-    <button class="lb-close" onclick="closeLightbox()">
-        <i class="fa-solid fa-xmark"></i>
-    </button>
-    <button class="lb-nav lb-prev" onclick="event.stopPropagation(); changeLb(-1)">
-        <i class="fa-solid fa-chevron-left"></i>
-    </button>
     <div class="lightbox-content">
-        <img id="lb-img" src="" alt="">
-    </div>
-    <button class="lb-nav lb-next" onclick="event.stopPropagation(); changeLb(1)">
-        <i class="fa-solid fa-chevron-right"></i>
-    </button>
-    <div class="lb-counter">
-        <span id="lb-cur">1</span> / <span id="lb-total">1</span>
+        <span class="lightbox-close" onclick="closeLightbox(event)">
+            <i class="fas fa-times"></i>
+        </span>
+        @if(is_array($package->photo) && count($package->photo) > 1)
+        <span class="lightbox-nav lightbox-prev" onclick="event.stopPropagation(); changePhoto(-1)">
+            <i class="fas fa-chevron-left"></i>
+        </span>
+        <span class="lightbox-nav lightbox-next" onclick="event.stopPropagation(); changePhoto(1)">
+            <i class="fas fa-chevron-right"></i>
+        </span>
+        @endif
+        <img id="lightboxImage" src="" alt="Gallery Photo">
     </div>
 </div>
-@endsection
 
-@push('scripts')
 <script>
-// Build image pool
-const mainPhoto      = @json($gallery->image ? asset('storage/' . $gallery->image) : null);
-const additionalPhotos = @json(array_map(fn($p) => asset('storage/' . $p), $photos));
+@if(is_array($package->photo) && count($package->photo) > 0)
+const photos = @json(array_map(function($p) { return asset('storage/' . $p); }, $package->photo));
+@else
+const photos = [];
+@endif
 
-let pool = [];
-let currentIdx = 0;
+const subPhotos = @json($package->subpackages->map(fn($s) => array_map(fn($p) => asset('storage/' . $p), is_array($s->photo) ? $s->photo : [])));
 
-function openLightbox(source, index) {
-    if (source === 'main') {
-        pool = mainPhoto ? [mainPhoto, ...additionalPhotos] : additionalPhotos;
-        currentIdx = 0;
+let currentPhotoIndex = 0;
+let currentPool = [];
+
+function openLightbox(pool, singleSrc, index) {
+    if (pool === 'main') {
+        currentPool = photos;
     } else {
-        // additional only
-        pool = additionalPhotos;
-        currentIdx = index;
+        currentPool = [singleSrc];
     }
-
-    if (!pool.length) return;
-
-    document.getElementById('lb-img').src = pool[currentIdx];
-    document.getElementById('lb-cur').textContent = currentIdx + 1;
-    document.getElementById('lb-total').textContent = pool.length;
-
-    // Show/hide nav arrows
-    const showNav = pool.length > 1;
-    document.querySelector('.lb-prev').style.display = showNav ? 'flex' : 'none';
-    document.querySelector('.lb-next').style.display = showNav ? 'flex' : 'none';
-
+    currentPhotoIndex = index;
+    document.getElementById('lightboxImage').src = currentPool[currentPhotoIndex];
     document.getElementById('lightbox').classList.add('active');
     document.body.style.overflow = 'hidden';
+
+    const hasPrev = document.querySelector('.lightbox-prev');
+    const hasNext = document.querySelector('.lightbox-next');
+    if (hasPrev) hasPrev.style.display = currentPool.length > 1 ? 'flex' : 'none';
+    if (hasNext) hasNext.style.display = currentPool.length > 1 ? 'flex' : 'none';
 }
 
-function closeLightbox(e) {
-    if (!e || e.target.id === 'lightbox' || e.target.closest?.('.lb-close')) {
+function openSubLightbox(subIndex, photoIndex) {
+    currentPool = subPhotos[subIndex] || [];
+    currentPhotoIndex = photoIndex;
+    if (!currentPool.length) return;
+    document.getElementById('lightboxImage').src = currentPool[currentPhotoIndex];
+    document.getElementById('lightbox').classList.add('active');
+    document.body.style.overflow = 'hidden';
+
+    const hasPrev = document.querySelector('.lightbox-prev');
+    const hasNext = document.querySelector('.lightbox-next');
+    if (hasPrev) hasPrev.style.display = currentPool.length > 1 ? 'flex' : 'none';
+    if (hasNext) hasNext.style.display = currentPool.length > 1 ? 'flex' : 'none';
+}
+
+function closeLightbox(event) {
+    if (event.target.id === 'lightbox' || event.target.closest('.lightbox-close')) {
         document.getElementById('lightbox').classList.remove('active');
-        document.body.style.overflow = '';
+        document.body.style.overflow = 'auto';
     }
 }
 
-function changeLb(dir) {
-    currentIdx = (currentIdx + dir + pool.length) % pool.length;
-    document.getElementById('lb-img').src = pool[currentIdx];
-    document.getElementById('lb-cur').textContent = currentIdx + 1;
+function changePhoto(direction) {
+    currentPhotoIndex += direction;
+    if (currentPhotoIndex < 0) currentPhotoIndex = currentPool.length - 1;
+    else if (currentPhotoIndex >= currentPool.length) currentPhotoIndex = 0;
+    document.getElementById('lightboxImage').src = currentPool[currentPhotoIndex];
 }
 
-document.addEventListener('keydown', e => {
-    if (!document.getElementById('lightbox').classList.contains('active')) return;
-    if (e.key === 'ArrowLeft') changeLb(-1);
-    if (e.key === 'ArrowRight') changeLb(1);
-    if (e.key === 'Escape') closeLightbox();
+document.addEventListener('keydown', function(e) {
+    if (document.getElementById('lightbox').classList.contains('active')) {
+        if (e.key === 'Escape') closeLightbox({ target: document.getElementById('lightbox') });
+        else if (e.key === 'ArrowLeft') changePhoto(-1);
+        else if (e.key === 'ArrowRight') changePhoto(1);
+    }
 });
 </script>
-@endpush
+@endsection

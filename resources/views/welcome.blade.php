@@ -1,4 +1,5 @@
 @extends('layouts.app')
+@php use App\Helpers\ImageHelper; @endphp
 
 @section('title', 'Wedding Venue - Intimate Bali Wedding')
 
@@ -30,6 +31,8 @@
         width: 100%;
         height: 100%;
         object-fit: cover;
+        object-position: center;
+        will-change: opacity;
     }
 
     .hero-overlay {
@@ -85,11 +88,11 @@
     .package-grid {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
-        gap: 2rem;  /* <-- Gap ditambahkan */
+        gap: 2rem;
         max-width: 1400px;
         margin: 0 auto;
     }
-    
+
     .package-card {
         position: relative;
         overflow: hidden;
@@ -97,16 +100,15 @@
         cursor: pointer;
         text-decoration: none;
         display: block;
-        border-radius: 12px;  /* <-- Tambahkan rounded corners */
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);  /* <-- Tambahkan shadow */
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         transition: all 0.3s ease;
     }
 
     .package-card:hover {
-        transform: translateY(-8px);  /* <-- Efek hover lebih smooth */
+        transform: translateY(-8px);
         box-shadow: 0 8px 25px rgba(0,0,0,0.2);
     }
-
 
     .package-card img {
         width: 100%;
@@ -119,7 +121,6 @@
         transform: scale(1.05);
     }
 
-    /* Base overlay - gradient dari bawah, selalu terlihat */
     .package-overlay {
         position: absolute;
         bottom: 0;
@@ -137,7 +138,6 @@
         text-align: center;
     }
 
-    /* Black overlay yang slide dari bawah */
     .package-overlay::before {
         content: '';
         position: absolute;
@@ -150,19 +150,16 @@
         z-index: 1;
     }
 
-    /* Saat hover, black overlay naik ke atas */
     .package-card:hover .package-overlay::before {
         height: 100%;
     }
 
-    /* Content wrapper */
     .package-content {
         position: relative;
         z-index: 2;
         transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    /* Saat hover, content bergeser ke tengah */
     .package-card:hover .package-content {
         transform: translateY(-30%);
     }
@@ -324,7 +321,6 @@
         filter: brightness(1.1) contrast(1.05);
     }
 
-    /* Media Type Icon (Video/Carousel) */
     .media-type-icon {
         position: absolute;
         top: 10px;
@@ -340,7 +336,6 @@
         backdrop-filter: blur(10px);
     }
 
-    /* Hover Overlay */
     .instagram-overlay-hover {
         position: absolute;
         top: 0;
@@ -364,7 +359,6 @@
         backdrop-filter: blur(5px);
     }
 
-    /* Instagram Stats */
     .instagram-stats {
         display: flex;
         gap: 2rem;
@@ -391,7 +385,6 @@
         font-weight: 600;
     }
 
-    /* Button Instagram */
     .btn-instagram {
         display: inline-flex;
         align-items: center;
@@ -413,7 +406,6 @@
         color: white;
     }
 
-    /* No Posts State */
     .no-posts {
         min-height: 300px;
         display: flex;
@@ -422,39 +414,6 @@
         justify-content: center;
     }
 
-    /* Responsive */
-    @media (max-width: 768px) {
-        .instagram-grid {
-            grid-template-columns: repeat(2, 1fr);
-            gap: 0.75rem;
-        }
-
-        .instagram-stats {
-            gap: 1rem;
-            font-size: 0.9rem;
-        }
-
-        .media-type-icon {
-            width: 30px;
-            height: 30px;
-        }
-
-        .media-type-icon svg {
-            width: 18px;
-            height: 18px;
-        }
-    }
-
-    @media (max-width: 480px) {
-        .instagram-grid {
-            grid-template-columns: 1fr;
-        }
-
-        .btn-instagram {
-            padding: 0.875rem 2rem;
-            font-size: 1rem;
-        }
-    }
     /* Testimonials */
     .testimonial-section {
         background: #f8f8f8;
@@ -474,7 +433,6 @@
         margin-bottom: 1rem;
     }
 
-    /* Testimonial Slider Container */
     .testimonials-slider-container {
         position: relative;
         max-width: 1200px;
@@ -569,7 +527,6 @@
         font-family: Georgia, serif;
     }
 
-    /* Slider Navigation Buttons */
     .slider-nav {
         position: absolute;
         top: 50%;
@@ -594,13 +551,8 @@
         transform: translateY(-50%) scale(1.1);
     }
 
-    .slider-nav.prev {
-        left: 0;
-    }
-
-    .slider-nav.next {
-        right: 0;
-    }
+    .slider-nav.prev { left: 0; }
+    .slider-nav.next { right: 0; }
 
     .slider-nav svg {
         width: 24px;
@@ -608,7 +560,6 @@
         fill: currentColor;
     }
 
-    /* Slider Dots */
     .slider-dots {
         display: flex;
         justify-content: center;
@@ -665,86 +616,72 @@
 
     /* Responsive */
     @media (max-width: 768px) {
-        .hero-section {
-            height: 70vh;
-        }
+        .hero-section { height: 70vh; }
+        .hero-title { font-size: 2.5rem; }
+        .hero-subtitle { font-size: 1rem; }
+        .package-grid { grid-template-columns: 1fr; gap: 1.5rem; }
+        .package-title { font-size: 1.3rem; }
+        .package-card:hover .package-content { transform: translateY(-20%); }
+        .gallery-preview-grid { grid-template-columns: 1fr; }
+        .blog-preview-grid { grid-template-columns: 1fr; }
+        .testimonial-section { padding: 3rem 1rem; }
+        .testimonials-slider-container { padding: 0 50px; }
+        .testimonial-card { min-width: 280px; padding: 1.5rem; }
+        .testimonial-avatar { width: 50px; height: 50px; }
+        .testimonial-review { font-size: 0.9rem; padding-left: 1rem; }
+        .slider-nav { width: 40px; height: 40px; }
+        .slider-nav svg { width: 20px; height: 20px; }
 
-        .hero-title {
-            font-size: 2.5rem;
-        }
+        .instagram-grid { grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
+        .instagram-stats { gap: 1rem; font-size: 0.9rem; }
+        .media-type-icon { width: 30px; height: 30px; }
+        .media-type-icon svg { width: 18px; height: 18px; }
+    }
 
-        .hero-subtitle {
-            font-size: 1rem;
-        }
-
-        .package-grid {
-            grid-template-columns: 1fr;
-            gap: 1.5rem;
-        }
-
-        .package-title {
-            font-size: 1.3rem;
-        }
-
-        .package-card:hover .package-content {
-            transform: translateY(-20%);
-        }
-
-        .gallery-preview-grid {
-            grid-template-columns: 1fr;
-        }
-
-        .blog-preview-grid {
-            grid-template-columns: 1fr;
-        }
-
-        .testimonial-section {
-            padding: 3rem 1rem;
-        }
-
-        .testimonials-slider-container {
-            padding: 0 50px;
-        }
-
-        .testimonial-card {
-            min-width: 280px;
-            padding: 1.5rem;
-        }
-
-        .testimonial-avatar {
-            width: 50px;
-            height: 50px;
-        }
-
-        .testimonial-review {
-            font-size: 0.9rem;
-            padding-left: 1rem;
-        }
-
-        .slider-nav {
-            width: 40px;
-            height: 40px;
-        }
-
-        .slider-nav svg {
-            width: 20px;
-            height: 20px;
-        }
+    @media (max-width: 480px) {
+        .instagram-grid { grid-template-columns: 1fr; }
+        .btn-instagram { padding: 0.875rem 2rem; font-size: 1rem; }
     }
 </style>
 @endpush
 
 @section('content')
+
+{{-- ===================== PRELOAD HERO PERTAMA ===================== --}}
+@if($heroSlides->isNotEmpty())
+@php
+    $firstSlide = $heroSlides->first();
+    $firstThumb = ImageHelper::thumb(
+        str_contains($firstSlide->image, 'storage/')
+            ? ltrim(str_replace('storage/', '', $firstSlide->image), '/')
+            : $firstSlide->image
+    );
+@endphp
+@push('preload')
+<link rel="preload" as="image" href="{{ asset('storage/' . $firstThumb) }}" fetchpriority="high">
+@endpush
+@endif
+
 <!-- Hero Section -->
 <section id="home" class="hero-section">
     @foreach($heroSlides as $index => $slide)
+    @php
+        $rawPath = str_contains($slide->image, 'storage/')
+            ? ltrim(str_replace('storage/', '', $slide->image), '/')
+            : $slide->image;
+        $thumbPath = ImageHelper::thumb($rawPath);
+    @endphp
     <div class="hero-slide {{ $index === 0 ? 'active' : '' }}">
-        @if(str_contains($slide->image, 'storage/'))
-            <img src="{{ asset($slide->image) }}" alt="Wedding Venue">
-        @else
-            <img src="{{ asset('storage/' . $slide->image) }}" alt="Wedding Venue" 
-                 onerror="this.onerror=null; this.src='{{ asset($slide->image) }}';">
-        @endif
+        <img
+            src="{{ asset('storage/' . $thumbPath) }}"
+            alt="Wedding Venue Bali"
+            width="1920"
+            height="1080"
+            loading="{{ $index === 0 ? 'eager' : 'lazy' }}"
+            decoding="async"
+            fetchpriority="{{ $index === 0 ? 'high' : 'low' }}"
+            onerror="this.onerror=null; this.src='{{ asset($slide->image) }}';"
+        >
     </div>
     @endforeach
 
@@ -774,17 +711,30 @@
 <section id="packages" class="section" style="background: #f8f8f8;">
     <div class="container">
         <h2 class="section-title">WEDDING PACKAGE</h2>
-        <p class="section-subtitle">
-            All packages can be customised to suit your needs
-        </p>
+        <p class="section-subtitle">All packages can be customised to suit your needs</p>
 
         <div class="package-grid">
             @foreach($packages->take(4) as $package)
+            @php
+                $pkgThumb = $package->image
+                    ? ImageHelper::thumb($package->image)
+                    : null;
+            @endphp
             <a href="{{ route('packages.public') }}" class="package-card">
-                @if($package->image)
-                    <img src="{{ asset('storage/' . $package->image) }}" alt="{{ $package->name }}">
+                @if($pkgThumb)
+                    <img
+                        src="{{ asset('storage/' . $pkgThumb) }}"
+                        alt="{{ $package->name }}"
+                        loading="lazy"
+                        decoding="async"
+                    >
                 @else
-                    <img src="https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=800&q=80" alt="{{ $package->name }}">
+                    <img
+                        src="https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=800&q=80"
+                        alt="{{ $package->name }}"
+                        loading="lazy"
+                        decoding="async"
+                    >
                 @endif
                 <div class="package-overlay">
                     <div class="package-content">
@@ -807,15 +757,19 @@
 <section id="gallery" class="section">
     <div class="container">
         <h2 class="section-title">GALLERY</h2>
-        <p class="section-subtitle">
-            Beautiful moments captured in paradise
-        </p>
-        
+        <p class="section-subtitle">Beautiful moments captured in paradise</p>
+
         @if($galleries->count() > 0)
         <div class="gallery-preview-grid">
             @foreach($galleries as $gallery)
+            @php $galThumb = ImageHelper::thumb($gallery->image); @endphp
             <div class="gallery-preview-item">
-                <img src="{{ asset('storage/' . $gallery->image) }}" alt="{{ $gallery->title }}" loading="lazy">
+                <img
+                    src="{{ asset('storage/' . $galThumb) }}"
+                    alt="{{ $gallery->title ?? 'Gallery' }}"
+                    loading="lazy"
+                    decoding="async"
+                >
             </div>
             @endforeach
         </div>
@@ -831,37 +785,29 @@
 <section id="instagram" class="section" style="background: #f8f8f8;">
     <div class="container">
         <h2 class="section-title">FOLLOW US ON INSTAGRAM</h2>
-        <p class="section-subtitle">
-            Stay connected and see our latest moments
-        </p>
+        <p class="section-subtitle">Stay connected and see our latest moments</p>
 
-        <!-- SnapWidget Container dengan Overlay -->
         <div class="instagram-feed-wrapper" style="position: relative; max-width: 1200px; margin: 2rem auto;">
             <div class="instagram-feed-container" style="background: white; border-radius: 12px; padding: 2rem; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
-                <!-- SnapWidget -->
-                <!-- SnapWidget -->
                 <script src="https://snapwidget.com/js/snapwidget.js"></script>
-                <iframe src="https://snapwidget.com/embed/1119589" 
-                        class="snapwidget-widget" 
-                        allowtransparency="true" 
-                        frameborder="0" 
-                        scrolling="no" 
-                        style="border:none; overflow:hidden;  width:100%; " 
-                        title="Posts from Instagram">
+                <iframe src="https://snapwidget.com/embed/1119589"
+                        class="snapwidget-widget"
+                        allowtransparency="true"
+                        frameborder="0"
+                        scrolling="no"
+                        style="border:none; overflow:hidden; width:100%;"
+                        title="Posts from Instagram"
+                        loading="lazy">
                 </iframe>
             </div>
-            
-            <!-- Transparent Overlay untuk Block Klik -->
             <div class="instagram-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 999; cursor: default;"></div>
         </div>
 
-        <!-- Instagram CTA -->
         <div style="text-align: center; margin-top: 2rem; position: relative; z-index: 1000;">
-            <a href="https://instagram.com/intimatebaliwedding" 
-               target="_blank" 
+            <a href="https://instagram.com/intimatebaliwedding"
+               target="_blank"
                rel="noopener"
-               class="btn-instagram"
-               style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 1rem 2rem; background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); color: white; text-decoration: none; border-radius: 30px; font-weight: 600; transition: all 0.3s; box-shadow: 0 4px 15px rgba(188, 24, 136, 0.3);">
+               class="btn-instagram">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
                 </svg>
@@ -871,20 +817,24 @@
     </div>
 </section>
 
-
 <!-- Blog Preview -->
 @if($blogs->count() > 0)
 <section class="section" style="background: #f8f8f8;">
     <div class="container">
         <h2 class="section-title">LATEST FROM OUR BLOG</h2>
-        <p class="section-subtitle">
-            Wedding tips, inspiration, and stories
-        </p>
-        
+        <p class="section-subtitle">Wedding tips, inspiration, and stories</p>
+
         <div class="blog-preview-grid">
             @foreach($blogs as $blog)
+            @php $blogThumb = ImageHelper::thumb($blog->image); @endphp
             <a href="{{ route('blogs.show', $blog->slug) }}" class="blog-preview-card" style="text-decoration: none;">
-                <img src="{{ asset('storage/' . $blog->image) }}" alt="{{ $blog->title }}" class="blog-preview-image">
+                <img
+                    src="{{ asset('storage/' . $blogThumb) }}"
+                    alt="{{ $blog->title }}"
+                    class="blog-preview-image"
+                    loading="lazy"
+                    decoding="async"
+                >
                 <div class="blog-preview-content">
                     <h3 class="blog-preview-title">{{ $blog->title }}</h3>
                     <p class="blog-preview-excerpt">{{ Str::limit($blog->excerpt ?? strip_tags($blog->content), 100) }}</p>
@@ -909,29 +859,28 @@
 
     @if(isset($googleReviews['success']) && $googleReviews['success'] && !empty($googleReviews['reviews']))
     <div class="testimonials-slider-container">
-        <!-- Previous Button -->
         <div class="slider-nav prev" onclick="moveSlider(-1)">
             <svg viewBox="0 0 24 24">
                 <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
             </svg>
         </div>
 
-        <!-- Slider Wrapper -->
         <div class="testimonials-slider-wrapper">
             <div class="testimonials-slider" id="testimonials-slider">
                 @foreach($googleReviews['reviews'] as $review)
                 <div class="testimonial-card">
                     <div class="testimonial-header-content">
                         @if(isset($review['author_photo']) && $review['author_photo'])
-                        <img src="{{ $review['author_photo'] }}" 
-                             alt="{{ $review['author_name'] }}" 
+                        <img src="{{ $review['author_photo'] }}"
+                             alt="{{ $review['author_name'] }}"
                              class="testimonial-avatar"
+                             loading="lazy"
                              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                         @endif
                         <div class="testimonial-avatar" style="background: #D4AF37; display: {{ isset($review['author_photo']) && $review['author_photo'] ? 'none' : 'flex' }}; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 1.5rem;">
                             {{ strtoupper(substr($review['author_name'], 0, 1)) }}
                         </div>
-                        
+
                         <div class="testimonial-info">
                             <h4>{{ $review['author_name'] }}</h4>
                             <div class="testimonial-time">{{ $review['relative_time'] }}</div>
@@ -950,7 +899,6 @@
             </div>
         </div>
 
-        <!-- Next Button -->
         <div class="slider-nav next" onclick="moveSlider(1)">
             <svg viewBox="0 0 24 24">
                 <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
@@ -958,10 +906,8 @@
         </div>
     </div>
 
-    <!-- Slider Dots -->
     <div class="slider-dots" id="slider-dots"></div>
-    
-    <!-- CTA Button -->
+
     <div class="testimonials-cta">
         <a href="{{ $googleReviews['place_url'] ?? route('gallery.public') }}" target="_blank" class="btn-google-maps">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
@@ -987,6 +933,7 @@
         <a href="{{ route('contact') }}" class="btn-primary">Contact Us Now</a>
     </div>
 </section>
+
 @endsection
 
 @push('scripts')
@@ -995,7 +942,7 @@
     document.addEventListener('DOMContentLoaded', function() {
         const slides = document.querySelectorAll('.hero-slide');
         let currentSlide = 0;
-        const slideInterval = 3000; 
+        const slideInterval = 3000;
 
         function nextSlide() {
             slides[currentSlide].classList.remove('active');
@@ -1003,12 +950,10 @@
             slides[currentSlide].classList.add('active');
         }
 
-        // Auto slide
         if (slides.length > 1) {
             setInterval(nextSlide, slideInterval);
         }
 
-        // Initialize Testimonial Slider
         initTestimonialSlider();
     });
 
@@ -1026,26 +971,17 @@
         testimonialCards = testimonialSlider.querySelectorAll('.testimonial-card');
         if (testimonialCards.length === 0) return;
 
-        // Calculate cards per view based on screen width
         updateCardsPerView();
-        
-        // Create dots
         createSliderDots();
-        
-        // Update slider position
         updateSliderPosition();
-        
-        // Start auto-slide
         startAutoSlide();
 
-        // Update on window resize
         window.addEventListener('resize', function() {
             updateCardsPerView();
             updateSliderPosition();
             createSliderDots();
         });
 
-        // Pause auto-slide on hover
         testimonialSlider.addEventListener('mouseenter', stopAutoSlide);
         testimonialSlider.addEventListener('mouseleave', startAutoSlide);
     }
@@ -1063,41 +999,29 @@
 
     function moveSlider(direction) {
         const maxSlides = Math.ceil(testimonialCards.length / cardsPerView) - 1;
-        
         currentSlideIndex += direction;
-        
-        if (currentSlideIndex < 0) {
-            currentSlideIndex = maxSlides;
-        } else if (currentSlideIndex > maxSlides) {
-            currentSlideIndex = 0;
-        }
-        
+        if (currentSlideIndex < 0) currentSlideIndex = maxSlides;
+        else if (currentSlideIndex > maxSlides) currentSlideIndex = 0;
         updateSliderPosition();
         updateDots();
-        
-        // Reset auto-slide
         stopAutoSlide();
         startAutoSlide();
     }
 
     function updateSliderPosition() {
         if (!testimonialSlider || !testimonialCards.length) return;
-        
         const cardWidth = testimonialCards[0].offsetWidth;
-        const gap = 32; // 2rem gap
+        const gap = 32;
         const moveAmount = (cardWidth + gap) * cardsPerView;
         const offset = -(currentSlideIndex * moveAmount);
-        
         testimonialSlider.style.transform = `translateX(${offset}px)`;
     }
 
     function createSliderDots() {
         const dotsContainer = document.getElementById('slider-dots');
         if (!dotsContainer || !testimonialCards.length) return;
-        
         dotsContainer.innerHTML = '';
         const totalDots = Math.ceil(testimonialCards.length / cardsPerView);
-        
         for (let i = 0; i < totalDots; i++) {
             const dot = document.createElement('div');
             dot.className = 'slider-dot' + (i === currentSlideIndex ? ' active' : '');
@@ -1109,11 +1033,7 @@
     function updateDots() {
         const dots = document.querySelectorAll('.slider-dot');
         dots.forEach((dot, index) => {
-            if (index === currentSlideIndex) {
-                dot.classList.add('active');
-            } else {
-                dot.classList.remove('active');
-            }
+            dot.classList.toggle('active', index === currentSlideIndex);
         });
     }
 
@@ -1121,37 +1041,25 @@
         currentSlideIndex = index;
         updateSliderPosition();
         updateDots();
-        
-        // Reset auto-slide
         stopAutoSlide();
         startAutoSlide();
     }
 
     function startAutoSlide() {
-        stopAutoSlide(); // Clear any existing interval
-        sliderInterval = setInterval(() => {
-            moveSlider(1);
-        }, 5000); // Auto-slide every 5 seconds
+        stopAutoSlide();
+        sliderInterval = setInterval(() => moveSlider(1), 5000);
     }
 
     function stopAutoSlide() {
-        if (sliderInterval) {
-            clearInterval(sliderInterval);
-        }
+        if (sliderInterval) clearInterval(sliderInterval);
     }
 
-    // Keyboard navigation
     document.addEventListener('keydown', function(e) {
         if (!testimonialSlider) return;
-        
-        if (e.key === 'ArrowLeft') {
-            moveSlider(-1);
-        } else if (e.key === 'ArrowRight') {
-            moveSlider(1);
-        }
+        if (e.key === 'ArrowLeft') moveSlider(-1);
+        else if (e.key === 'ArrowRight') moveSlider(1);
     });
 
-    // Touch swipe support for mobile
     let touchStartX = 0;
     let touchEndX = 0;
 
@@ -1162,19 +1070,9 @@
 
         testimonialSlider.addEventListener('touchend', function(e) {
             touchEndX = e.changedTouches[0].screenX;
-            handleSwipe();
+            if (touchEndX < touchStartX - 50) moveSlider(1);
+            if (touchEndX > touchStartX + 50) moveSlider(-1);
         }, false);
-    }
-
-    function handleSwipe() {
-        if (touchEndX < touchStartX - 50) {
-            // Swipe left
-            moveSlider(1);
-        }
-        if (touchEndX > touchStartX + 50) {
-            // Swipe right
-            moveSlider(-1);
-        }
     }
 </script>
 @endpush

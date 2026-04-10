@@ -28,6 +28,7 @@ Route::get('/packages/{package}/subpackage/{subpackage}', [PackageController::cl
 
 // Gallery with Google Maps Reviews Integration
 Route::get('/gallery', [GalleryController::class, 'index'])->name('gallery.public');
+Route::get('/gallery/{id}', [GalleryController::class, 'show'])->name('gallery.show');
 
 Route::get('/blog', [BlogController::class, 'index'])->name('blogs.public');
 Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blogs.show');
@@ -84,7 +85,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::get('/', [GalleryController::class, 'adminIndex'])->name('index');
             Route::get('/create', [GalleryController::class, 'create'])->name('create');
             Route::post('/', [GalleryController::class, 'store'])->name('store');
-            Route::get('/{gallery}', [GalleryController::class, 'show'])->name('show');
+            Route::get('/{gallery}', [GalleryController::class, 'adminShow'])->name('show');
             Route::get('/{gallery}/edit', [GalleryController::class, 'edit'])->name('edit');
             Route::put('/{gallery}', [GalleryController::class, 'update'])->name('update');
             Route::delete('/{gallery}', [GalleryController::class, 'destroy'])->name('destroy');
