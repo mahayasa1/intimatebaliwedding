@@ -5,325 +5,289 @@
 
 @push('styles')
 <style>
-    /* Hero Section with Background */
     .package-detail-hero {
         background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), 
                     url('https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=1920&q=80');
-        background-size: cover;
-        background-position: center;
-        height: 40vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        text-align: center;
-        margin-top: -80px;
-        padding-top: 80px;
+        background-size: cover; background-position: center;
+        height: 40vh; display: flex; align-items: center; justify-content: center;
+        color: white; text-align: center; margin-top: -80px; padding-top: 80px;
     }
 
     .package-detail-hero h1 {
         font-family: 'Playfair Display', serif;
-        font-size: 3rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 3px;
+        font-size: 3rem; font-weight: 700;
+        text-transform: uppercase; letter-spacing: 3px;
     }
 
-    /* Main Content Container */
     .package-detail-container {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 4rem 2rem;
-        background: white;
+        max-width: 1200px; margin: 0 auto; padding: 4rem 2rem; background: white;
     }
 
-    /* Package Image - REDUCED SIZE */
     .package-main-image {
-        width: 100%;
-        max-width: 600px;
-        height: auto;
-        max-height: 400px;
-        object-fit: cover;
-        margin: 0 auto 3rem;
-        display: block;
-        border-radius: 12px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        width: 100%; max-width: 600px; height: auto; max-height: 400px;
+        object-fit: cover; margin: 0 auto 3rem; display: block;
+        border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1);
     }
 
-    /* Package Header */
-    .package-header {
-        text-align: center;
-        margin-bottom: 2rem;
-    }
+    .package-header { text-align: center; margin-bottom: 2rem; }
 
     .package-header h2 {
         font-family: 'Playfair Display', serif;
-        font-size: 2rem;
-        color: #333;
-        margin-bottom: 1rem;
-        line-height: 1.4;
+        font-size: 2rem; color: #333; margin-bottom: 1rem; line-height: 1.4;
     }
 
-    /* Package Description */
     .package-description {
-        text-align: center;
-        color: #666;
-        line-height: 1.8;
-        margin-bottom: 3rem;
-        font-size: 1.05rem;
-        max-width: 800px;
-        margin-left: auto;
-        margin-right: auto;
+        text-align: center; color: #666; line-height: 1.8; margin-bottom: 3rem;
+        font-size: 1.05rem; max-width: 800px; margin-left: auto; margin-right: auto;
     }
 
-    /* Package Gallery Section */
-    .package-gallery-section {
-        margin: 4rem 0;
+    /* ===================== SUBPACKAGES SELECTOR ===================== */
+    .subpackages-section {
+        margin: 3.5rem 0 0;
+        padding: 3.5rem 0;
+        border-top: 1px solid #e8e8e8;
     }
 
-    .gallery-title {
+    .subpackages-section .section-title {
         font-family: 'Playfair Display', serif;
-        font-size: 1.8rem;
-        color: #333;
-        text-align: center;
-        margin-bottom: 2rem;
-        text-transform: uppercase;
-        letter-spacing: 2px;
+        font-size: 1.75rem; color: #1a1a1a; text-align: center;
+        margin-bottom: 0.4rem; text-transform: uppercase; letter-spacing: 2.5px;
     }
 
-    /* Grid Gallery */
-    .package-gallery {
+    .subpackages-section .section-subtitle {
+        text-align: center; color: #999; font-size: 0.9rem;
+        margin-bottom: 2.5rem; letter-spacing: 0.4px;
+    }
+
+    .subpackages-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
         gap: 1.5rem;
+        max-width: 1000px;
         margin: 0 auto;
-        max-width: 1200px;
     }
 
-    .gallery-item {
-        position: relative;
-        overflow: hidden;
-        border-radius: 12px;
-        cursor: pointer;
-        aspect-ratio: 4/3;
-        background: #f0f0f0;
-        transition: all 0.3s ease;
-    }
-
-    .gallery-item:hover {
-        transform: translateY(-8px);
-        box-shadow: 0 12px 30px rgba(0,0,0,0.2);
-    }
-
-    .gallery-item img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
+    /* Card subpackage — klikable menuju halaman detail */
+    .subpackage-card {
         display: block;
+        text-decoration: none;
+        background: white;
+        border: 2px solid #e8e8e8;
+        border-radius: 16px;
+        overflow: hidden;
+        transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        position: relative;
+    }
+
+    .subpackage-card::after {
+        content: '';
+        position: absolute; bottom: 0; left: 0; right: 0; height: 3px;
+        background: linear-gradient(90deg, #D4AF37, #AA8B2A);
+        transform: scaleX(0); transform-origin: left;
         transition: transform 0.4s ease;
     }
 
-    .gallery-item:hover img {
-        transform: scale(1.1);
+    .subpackage-card:hover {
+        transform: translateY(-7px);
+        box-shadow: 0 16px 40px rgba(212,175,55,0.18);
+        border-color: #D4AF37;
     }
 
-    /* Lightbox Modal */
+    .subpackage-card:hover::after { transform: scaleX(1); }
+
+    .subpackage-card-img-wrap {
+        overflow: hidden;
+        aspect-ratio: 4/3;
+        background: linear-gradient(135deg, #f5f0eb, #ede5d8);
+    }
+
+    .subpackage-card-img-wrap img {
+        width: 100%; height: 100%; object-fit: cover; display: block;
+        transition: transform 0.5s ease;
+    }
+
+    .subpackage-card:hover .subpackage-card-img-wrap img { transform: scale(1.07); }
+
+    .subpackage-card-placeholder {
+        width: 100%; aspect-ratio: 4/3;
+        background: linear-gradient(135deg, #f5f0eb, #ede5d8);
+        display: flex; align-items: center; justify-content: center;
+        color: #D4AF37; font-size: 3rem;
+    }
+
+    .subpackage-card-body { padding: 1.4rem 1.5rem 1.6rem; }
+
+    .subpackage-card-name {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.15rem; font-weight: 700;
+        color: #1a1a1a; margin-bottom: 0.5rem;
+    }
+
+    .subpackage-card-desc {
+        color: #777; font-size: 0.88rem;
+        line-height: 1.6;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        margin-bottom: 1rem;
+    }
+
+    .subpackage-card-cta {
+        display: inline-flex; align-items: center; gap: 0.4rem;
+        color: #AA8B2A; font-weight: 600; font-size: 0.88rem;
+        letter-spacing: 0.3px;
+        transition: gap 0.2s ease;
+    }
+
+    .subpackage-card:hover .subpackage-card-cta { gap: 0.7rem; }
+
+    /* Photo strip */
+    .subpackage-photo-strip {
+        display: flex; gap: 5px; padding: 0 1.5rem 1.3rem; flex-wrap: nowrap; overflow: hidden;
+    }
+
+    .subpackage-photo-strip img {
+        width: 48px; height: 48px; object-fit: cover;
+        border-radius: 6px; flex-shrink: 0;
+        border: 2px solid white;
+        box-shadow: 0 1px 4px rgba(0,0,0,.08);
+        transition: transform 0.2s ease;
+    }
+
+    .subpackage-photo-strip img:hover { transform: scale(1.1); }
+
+    .sub-photo-more {
+        width: 48px; height: 48px; border-radius: 6px;
+        background: rgba(212,175,55,0.12);
+        display: flex; align-items: center; justify-content: center;
+        color: #AA8B2A; font-weight: 700; font-size: 0.8rem;
+        flex-shrink: 0;
+    }
+
+    /* ===================== GALLERY ===================== */
+    .package-gallery-section { margin: 4rem 0; }
+
+    .gallery-title {
+        font-family: 'Playfair Display', serif; font-size: 1.8rem; color: #333;
+        text-align: center; margin-bottom: 2rem;
+        text-transform: uppercase; letter-spacing: 2px;
+    }
+
+    .package-gallery {
+        display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1.5rem; margin: 0 auto; max-width: 1200px;
+    }
+
+    .gallery-item {
+        position: relative; overflow: hidden; border-radius: 12px; cursor: pointer;
+        aspect-ratio: 4/3; background: #f0f0f0; transition: all 0.3s ease;
+    }
+
+    .gallery-item:hover { transform: translateY(-8px); box-shadow: 0 12px 30px rgba(0,0,0,0.2); }
+    .gallery-item img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.4s ease; }
+    .gallery-item:hover img { transform: scale(1.1); }
+
+    /* ===================== LIGHTBOX ===================== */
     .lightbox {
-        display: none;
-        position: fixed;
-        z-index: 9999;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.95);
-        align-items: center;
-        justify-content: center;
+        display: none; position: fixed; z-index: 9999;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.95); align-items: center; justify-content: center;
     }
 
-    .lightbox.active {
-        display: flex;
-    }
-
-    .lightbox-content {
-        max-width: 90%;
-        max-height: 90%;
-        position: relative;
-    }
-
-    .lightbox-content img {
-        max-width: 100%;
-        max-height: 90vh;
-        object-fit: contain;
-    }
+    .lightbox.active { display: flex; }
+    .lightbox-content { max-width: 90%; max-height: 90%; position: relative; }
+    .lightbox-content img { max-width: 100%; max-height: 90vh; object-fit: contain; }
 
     .lightbox-close {
-        position: absolute;
-        top: 20px;
-        right: 40px;
-        font-size: 40px;
-        color: white;
-        cursor: pointer;
-        z-index: 10000;
-        transition: all 0.3s ease;
-        background: rgba(0,0,0,0.5);
-        width: 50px;
-        height: 50px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 50%;
+        position: absolute; top: 20px; right: 40px; font-size: 40px; color: white;
+        cursor: pointer; z-index: 10000; transition: all 0.3s ease;
+        background: rgba(0,0,0,0.5); width: 50px; height: 50px;
+        display: flex; align-items: center; justify-content: center; border-radius: 50%;
     }
 
-    .lightbox-close:hover {
-        background: rgba(255,255,255,0.2);
-        transform: rotate(90deg);
-    }
+    .lightbox-close:hover { background: rgba(255,255,255,0.2); transform: rotate(90deg); }
 
     .lightbox-nav {
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
-        font-size: 50px;
-        color: white;
-        cursor: pointer;
-        background: rgba(0,0,0,0.5);
-        width: 60px;
-        height: 60px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 50%;
-        transition: all 0.3s ease;
-        user-select: none;
+        position: absolute; top: 50%; transform: translateY(-50%);
+        font-size: 50px; color: white; cursor: pointer;
+        background: rgba(0,0,0,0.5); width: 60px; height: 60px;
+        display: flex; align-items: center; justify-content: center;
+        border-radius: 50%; transition: all 0.3s ease; user-select: none;
     }
 
-    .lightbox-nav:hover {
-        background: rgba(255,255,255,0.2);
-    }
-
+    .lightbox-nav:hover { background: rgba(255,255,255,0.2); }
     .lightbox-prev { left: 40px; }
     .lightbox-next { right: 40px; }
 
     .lightbox-counter {
-        position: absolute;
-        bottom: 20px;
-        left: 50%;
-        transform: translateX(-50%);
-        color: white;
-        font-size: 16px;
-        background: rgba(0,0,0,0.7);
-        padding: 10px 20px;
-        border-radius: 20px;
+        position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+        color: white; font-size: 16px; background: rgba(0,0,0,0.7);
+        padding: 10px 20px; border-radius: 20px;
     }
 
-    /* Enquiry Button */
+    /* ===================== CTA ===================== */
     .enquiry-btn {
         display: inline-block;
         background: linear-gradient(135deg, #D4AF37 0%, #AA8B2A 100%);
-        color: white;
-        padding: 1rem 3rem;
-        border-radius: 30px;
-        text-decoration: none;
-        font-weight: 600;
-        transition: all 0.3s ease;
-        margin: 2rem 0;
-        text-align: center;
+        color: white; padding: 1rem 3rem; border-radius: 30px;
+        text-decoration: none; font-weight: 600; transition: all 0.3s ease;
+        margin: 2rem 0; text-align: center;
         box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
     }
 
     .enquiry-btn:hover {
         background: linear-gradient(135deg, #AA8B2A 0%, #D4AF37 100%);
         transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(212, 175, 55, 0.5);
-        color: white;
+        box-shadow: 0 6px 20px rgba(212, 175, 55, 0.5); color: white;
     }
 
-    /* Other Packages Section */
+    /* ===================== OTHER PACKAGES ===================== */
     .other-packages-section {
-        background: #f8f8f8;
-        padding: 4rem 2rem;
-        margin-top: 2rem;
+        background: #f8f8f8; padding: 4rem 2rem; margin-top: 2rem;
     }
 
     .other-packages-section h3 {
-        font-family: 'Playfair Display', serif;
-        font-size: 2rem;
-        color: #333;
-        text-align: center;
-        margin-bottom: 3rem;
-        text-transform: uppercase;
-        letter-spacing: 2px;
+        font-family: 'Playfair Display', serif; font-size: 2rem; color: #333;
+        text-align: center; margin-bottom: 3rem;
+        text-transform: uppercase; letter-spacing: 2px;
     }
 
     .other-packages-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-        gap: 2rem;
-        max-width: 1200px;
-        margin: 0 auto;
+        display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 2rem; max-width: 1200px; margin: 0 auto;
     }
 
     .other-package-card {
-        background: white;
-        border-radius: 12px;
-        overflow: hidden;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        transition: all 0.3s ease;
-        text-decoration: none;
-        display: block;
+        background: white; border-radius: 12px; overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1); transition: all 0.3s ease;
+        text-decoration: none; display: block;
     }
 
-    .other-package-card:hover {
-        transform: translateY(-8px);
-        box-shadow: 0 12px 30px rgba(0,0,0,0.2);
-    }
+    .other-package-card:hover { transform: translateY(-8px); box-shadow: 0 12px 30px rgba(0,0,0,0.2); }
+    .other-package-image { width: 100%; aspect-ratio: 4/3; object-fit: cover; }
 
-    .other-package-image {
-        width: 100%;
-        aspect-ratio: 4/3;
-        object-fit: cover;
-    }
-
-    .other-package-content {
-        padding: 1.5rem;
-        text-align: center;
-    }
+    .other-package-content { padding: 1.5rem; text-align: center; }
 
     .other-package-title {
-        font-family: 'Playfair Display', serif;
-        font-size: 1.2rem;
-        color: #333;
-        margin-bottom: 0.5rem;
+        font-family: 'Playfair Display', serif; font-size: 1.2rem; color: #333; margin-bottom: 0.5rem;
     }
 
-    .other-package-description {
-        color: #666;
-        font-size: 0.9rem;
-        line-height: 1.5;
-    }
+    .other-package-description { color: #666; font-size: 0.9rem; line-height: 1.5; }
 
-    /* Responsive */
-    @media (max-width: 1024px) {
-        .package-gallery {
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 1.25rem;
-        }
-    }
-
+    /* ===================== RESPONSIVE ===================== */
     @media (max-width: 768px) {
         .package-detail-hero { height: 30vh; }
         .package-detail-hero h1 { font-size: 2rem; }
         .package-detail-container { padding: 2rem 1rem; }
         .package-main-image { max-width: 100%; max-height: 300px; margin-bottom: 2rem; }
         .package-header h2 { font-size: 1.5rem; }
+        .subpackages-grid { grid-template-columns: 1fr; }
         .package-gallery { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; }
-        .other-packages-grid { grid-template-columns: 1fr; gap: 1.5rem; }
+        .other-packages-grid { grid-template-columns: 1fr; }
         .lightbox-nav { width: 50px; height: 50px; font-size: 30px; }
-        .lightbox-prev { left: 10px; }
-        .lightbox-next { right: 10px; }
+        .lightbox-prev { left: 10px; } .lightbox-next { right: 10px; }
         .lightbox-close { top: 10px; right: 10px; width: 40px; height: 40px; font-size: 30px; }
-        .enquiry-btn { padding: 0.875rem 2.5rem; font-size: 0.95rem; }
     }
 
     @media (max-width: 480px) {
@@ -343,37 +307,75 @@
 
 <!-- Package Detail Content -->
 <section class="package-detail-container">
-    <!-- Main Package Image (pakai thumbnail) -->
     @if($package->image)
     <img src="{{ asset('storage/' . ImageHelper::thumb($package->image)) }}"
-         alt="{{ $package->name }}"
-         class="package-main-image">
+         alt="{{ $package->name }}" class="package-main-image">
     @endif
 
-    <!-- Package Header -->
     <div class="package-header">
         <h2>{{ $package->name }}</h2>
     </div>
 
-    <!-- Package Description -->
     @if($package->description)
     <div class="package-description">
         {!! nl2br(e($package->description)) !!}
     </div>
     @endif
 
-    <!-- Package Gallery Photos -->
+    {{-- ============ SUBPACKAGES SECTION ============ --}}
+    @if($package->subpackages && $package->subpackages->count() > 0)
+    <div class="subpackages-section">
+        <h3 class="section-title">What's Available</h3>
+        <p class="section-subtitle">Choose the option that best fits your dream wedding</p>
+
+        <div class="subpackages-grid">
+            @foreach($package->subpackages as $sub)
+            <a href="{{ route('subpackages.show', [$package->id, $sub->id]) }}" class="subpackage-card">
+                {{-- Main image --}}
+                <div class="subpackage-card-img-wrap">
+                    @if($sub->image)
+                    <img src="{{ asset('storage/' . ImageHelper::thumb($sub->image)) }}" alt="{{ $sub->name }}">
+                    @else
+                    <div class="subpackage-card-placeholder"><i class="fas fa-gem"></i></div>
+                    @endif
+                </div>
+
+                <div class="subpackage-card-body">
+                    <div class="subpackage-card-name">{{ $sub->name }}</div>
+                    @if($sub->description)
+                    <div class="subpackage-card-desc">{{ $sub->description }}</div>
+                    @endif
+                    <span class="subpackage-card-cta">
+                        View Details <i class="fas fa-arrow-right"></i>
+                    </span>
+                </div>
+
+                {{-- Mini photo strip --}}
+                @if(is_array($sub->photo) && count($sub->photo) > 0)
+                <div class="subpackage-photo-strip">
+                    @foreach(array_slice($sub->photo, 0, 4) as $sPhoto)
+                    <img src="{{ asset('storage/' . ImageHelper::thumb($sPhoto)) }}" alt="">
+                    @endforeach
+                    @if(count($sub->photo) > 4)
+                    <div class="sub-photo-more">+{{ count($sub->photo) - 4 }}</div>
+                    @endif
+                </div>
+                @endif
+            </a>
+            @endforeach
+        </div>
+    </div>
+    @endif
+
+    {{-- ============ GALLERY ============ --}}
     @if(is_array($package->photo) && count($package->photo) > 0)
     <div class="package-gallery-section">
         <h3 class="gallery-title">Gallery</h3>
-
         <div class="package-gallery" id="packageGallery">
             @foreach($package->photo as $index => $photoPath)
             <div class="gallery-item" onclick="openLightbox({{ $index }})">
-                {{-- Grid pakai thumbnail (kecil & cepat) --}}
                 <img src="{{ asset('storage/' . ImageHelper::thumb($photoPath)) }}"
-                     alt="{{ $package->name }} - Photo {{ $index + 1 }}"
-                     loading="lazy">
+                     alt="{{ $package->name }} - Photo {{ $index + 1 }}" loading="lazy">
             </div>
             @endforeach
         </div>
@@ -392,7 +394,6 @@
     <span class="lightbox-close" onclick="closeLightbox()">&times;</span>
     <span class="lightbox-prev" onclick="changeImage(-1)">&#10094;</span>
     <div class="lightbox-content">
-        {{-- Lightbox load foto ORIGINAL (full size) --}}
         <img id="lightbox-img" src="" alt="">
     </div>
     <span class="lightbox-next" onclick="changeImage(1)">&#10095;</span>
@@ -406,20 +407,16 @@
 @if($otherPackages && $otherPackages->count() > 0)
 <section class="other-packages-section">
     <h3>Other Packages</h3>
-
     <div class="other-packages-grid">
         @foreach($otherPackages as $otherPackage)
         <a href="{{ route('packages.show', $otherPackage->id) }}" class="other-package-card">
             @if($otherPackage->image)
             <img src="{{ asset('storage/' . ImageHelper::thumb($otherPackage->image)) }}"
-                 alt="{{ $otherPackage->name }}"
-                 class="other-package-image">
+                 alt="{{ $otherPackage->name }}" class="other-package-image">
             @else
             <img src="https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=400&q=80"
-                 alt="{{ $otherPackage->name }}"
-                 class="other-package-image">
+                 alt="{{ $otherPackage->name }}" class="other-package-image">
             @endif
-
             <div class="other-package-content">
                 <h4 class="other-package-title">{{ $otherPackage->name }}</h4>
                 @if($otherPackage->description)
@@ -434,17 +431,14 @@
 
 @if(is_array($package->photo) && count($package->photo) > 0)
 <script>
-// Path foto ORIGINAL untuk lightbox (bukan thumbnail)
 const galleryPhotos = @json($package->photo);
 let currentImageIndex = 0;
 
 function openLightbox(index) {
     currentImageIndex = index;
-    const lightbox = document.getElementById('lightbox');
-    const img      = document.getElementById('lightbox-img');
-
+    const img = document.getElementById('lightbox-img');
     img.src = '{{ asset("storage") }}/' + galleryPhotos[currentImageIndex];
-    lightbox.classList.add('active');
+    document.getElementById('lightbox').classList.add('active');
     updateCounter();
     document.body.style.overflow = 'hidden';
 }
@@ -460,7 +454,6 @@ function changeImage(direction) {
     currentImageIndex += direction;
     if (currentImageIndex < 0) currentImageIndex = galleryPhotos.length - 1;
     else if (currentImageIndex >= galleryPhotos.length) currentImageIndex = 0;
-
     document.getElementById('lightbox-img').src = '{{ asset("storage") }}/' + galleryPhotos[currentImageIndex];
     updateCounter();
 }
@@ -469,18 +462,16 @@ function updateCounter() {
     document.getElementById('current-index').textContent = currentImageIndex + 1;
 }
 
-document.addEventListener('keydown', function (e) {
-    const lightbox = document.getElementById('lightbox');
-    if (lightbox.classList.contains('active')) {
-        if (e.key === 'ArrowLeft')  changeImage(-1);
+document.addEventListener('keydown', function(e) {
+    const lb = document.getElementById('lightbox');
+    if (lb.classList.contains('active')) {
+        if (e.key === 'ArrowLeft') changeImage(-1);
         if (e.key === 'ArrowRight') changeImage(1);
-        if (e.key === 'Escape')     closeLightbox();
+        if (e.key === 'Escape') closeLightbox();
     }
 });
 
-document.querySelectorAll('.gallery-item img').forEach(img => {
-    img.addEventListener('contextmenu', e => e.preventDefault());
-});
+document.querySelectorAll('.gallery-item img').forEach(img => img.addEventListener('contextmenu', e => e.preventDefault()));
 </script>
 @endif
 @endsection

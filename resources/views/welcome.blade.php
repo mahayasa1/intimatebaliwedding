@@ -750,7 +750,7 @@
 
     <!-- Hero Overlay -->
     <div class="hero-overlay">
-        <h1 class="hero-title">WEDDING VENUE</h1>
+        <h1 class="hero-title">INTIMATE WEDDING IN BALI</h1>
         <p class="hero-subtitle">Creating Timeless Memories Amidst Nature's Splendor</p>
     </div>
 </section>

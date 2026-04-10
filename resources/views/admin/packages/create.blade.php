@@ -7,10 +7,7 @@
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Work+Sans:wght@400;500;600&display=swap');
 
-    .form-container {
-        max-width: 900px;
-        margin: 0 auto;
-    }
+    .form-container { max-width: 900px; margin: 0 auto; }
 
     .form-card {
         background: white;
@@ -34,9 +31,7 @@
         border-bottom: 2px solid #f0f0f0;
     }
 
-    .form-group {
-        margin-bottom: 1.5rem;
-    }
+    .form-group { margin-bottom: 1.5rem; }
 
     .form-label {
         font-family: 'Work Sans', sans-serif;
@@ -48,10 +43,7 @@
         letter-spacing: 0.3px;
     }
 
-    .form-label .required {
-        color: #e74c3c;
-        margin-left: 0.25rem;
-    }
+    .form-label .required { color: #e74c3c; margin-left: 0.25rem; }
 
     .form-control {
         font-family: 'Work Sans', sans-serif;
@@ -62,6 +54,7 @@
         font-size: 0.95rem;
         transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         background: white;
+        box-sizing: border-box;
     }
 
     .form-control:focus {
@@ -71,18 +64,9 @@
         transform: translateY(-2px);
     }
 
-    .form-control.error {
-        border-color: #e74c3c;
-        background: #fff5f5;
-    }
+    .form-control.error { border-color: #e74c3c; background: #fff5f5; }
+    textarea.form-control { min-height: 140px; resize: vertical; line-height: 1.6; }
 
-    textarea.form-control {
-        min-height: 140px;
-        resize: vertical;
-        line-height: 1.6;
-    }
-
-    /* Image Upload Styling */
     .image-upload-wrapper {
         position: relative;
         border: 2px dashed #e0e0e0;
@@ -93,137 +77,136 @@
         background: #fafafa;
     }
 
-    .image-upload-wrapper:hover {
-        border-color: #8B7355;
-        background: #f5f5f5;
-    }
+    .image-upload-wrapper:hover { border-color: #8B7355; background: #f5f5f5; }
 
     .image-upload-wrapper input[type="file"] {
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        top: 0;
-        left: 0;
-        opacity: 0;
-        cursor: pointer;
+        position: absolute; width: 100%; height: 100%;
+        top: 0; left: 0; opacity: 0; cursor: pointer;
     }
 
-    .upload-icon {
-        font-size: 3rem;
-        color: #8B7355;
-        margin-bottom: 1rem;
-    }
+    .upload-icon { font-size: 3rem; color: #8B7355; margin-bottom: 1rem; }
+    .upload-text { color: #666; font-size: 0.95rem; }
+    .upload-text strong { color: #8B7355; }
 
-    .upload-text {
-        color: #666;
-        font-size: 0.95rem;
-    }
-
-    .upload-text strong {
-        color: #8B7355;
-    }
-
-    .image-preview {
-        margin-top: 1rem;
-        display: none;
-        position: relative;
-    }
-
-    .image-preview img {
-        max-width: 100%;
-        max-height: 300px;
-        border-radius: 8px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
+    .image-preview { margin-top: 1rem; display: none; position: relative; }
+    .image-preview img { max-width: 100%; max-height: 300px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
 
     .remove-image {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        background: #e74c3c;
-        color: white;
-        border: none;
-        border-radius: 50%;
-        width: 32px;
-        height: 32px;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        position: absolute; top: 10px; right: 10px;
+        background: #e74c3c; color: white; border: none; border-radius: 50%;
+        width: 32px; height: 32px; cursor: pointer;
+        display: flex; align-items: center; justify-content: center;
         transition: all 0.3s ease;
     }
 
-    .remove-image:hover {
-        background: #c0392b;
-        transform: scale(1.1);
-    }
+    .remove-image:hover { background: #c0392b; transform: scale(1.1); }
 
-    /* Multiple Photos Grid */
     .photos-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-        gap: 1rem;
-        margin-top: 1rem;
+        gap: 1rem; margin-top: 1rem;
     }
 
     .photo-preview-item {
-        position: relative;
-        aspect-ratio: 1;
-        border-radius: 8px;
-        overflow: hidden;
+        position: relative; aspect-ratio: 1;
+        border-radius: 8px; overflow: hidden;
         box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
 
-    .photo-preview-item img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
+    .photo-preview-item img { width: 100%; height: 100%; object-fit: cover; }
 
     .remove-photo {
-        position: absolute;
-        top: 5px;
-        right: 5px;
-        background: #e74c3c;
-        color: white;
-        border: none;
-        border-radius: 50%;
-        width: 28px;
-        height: 28px;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 0.8rem;
-        transition: all 0.3s ease;
+        position: absolute; top: 5px; right: 5px;
+        background: #e74c3c; color: white; border: none; border-radius: 50%;
+        width: 28px; height: 28px; cursor: pointer;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 0.8rem; transition: all 0.3s ease;
     }
 
-    .remove-photo:hover {
-        background: #c0392b;
-        transform: scale(1.1);
-    }
+    .remove-photo:hover { background: #c0392b; transform: scale(1.1); }
 
     .error-message {
         font-family: 'Work Sans', sans-serif;
-        color: #e74c3c;
-        font-size: 0.85rem;
-        margin-top: 0.5rem;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-
-    .error-message::before {
-        content: '⚠️';
+        color: #e74c3c; font-size: 0.85rem; margin-top: 0.5rem;
+        display: flex; align-items: center; gap: 0.5rem;
     }
 
     .form-help {
         font-family: 'Work Sans', sans-serif;
-        color: #999;
-        font-size: 0.85rem;
-        margin-top: 0.5rem;
-        font-style: italic;
+        color: #999; font-size: 0.85rem; margin-top: 0.5rem; font-style: italic;
     }
+
+    /* Subpackage Styles */
+    .subpackage-item {
+        background: #f8f9fa;
+        border: 1px solid #e0e0e0;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        position: relative;
+        transition: all 0.3s ease;
+    }
+
+    .subpackage-item:hover { border-color: #8B7355; }
+
+    .subpackage-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+
+    .subpackage-number {
+        font-family: 'Work Sans', sans-serif;
+        font-weight: 700;
+        color: #8B7355;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .btn-remove-sub {
+        background: #e74c3c;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 0.4rem 0.8rem;
+        cursor: pointer;
+        font-size: 0.8rem;
+        font-family: 'Work Sans', sans-serif;
+        transition: all 0.3s ease;
+    }
+
+    .btn-remove-sub:hover { background: #c0392b; transform: scale(1.05); }
+
+    .subpackage-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+
+    .subpackage-grid .full-width { grid-column: 1 / -1; }
+
+    .btn-add-sub {
+        font-family: 'Work Sans', sans-serif;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        background: white;
+        color: #8B7355;
+        border: 2px dashed #8B7355;
+        border-radius: 12px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        width: 100%;
+        justify-content: center;
+        margin-top: 0.5rem;
+    }
+
+    .btn-add-sub:hover { background: #f5f0eb; }
 
     /* Action Buttons */
     .action-section {
@@ -234,11 +217,7 @@
         border: 1px solid #e8e8e8;
     }
 
-    .action-buttons {
-        display: flex;
-        gap: 1rem;
-        flex-wrap: wrap;
-    }
+    .action-buttons { display: flex; gap: 1rem; flex-wrap: wrap; }
 
     .btn {
         font-family: 'Work Sans', sans-serif;
@@ -261,10 +240,7 @@
         box-shadow: 0 2px 8px rgba(149, 165, 166, 0.2);
     }
 
-    .btn-secondary:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(149, 165, 166, 0.3);
-    }
+    .btn-secondary:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(149, 165, 166, 0.3); }
 
     .btn-primary {
         background: linear-gradient(135deg, #8B7355 0%, #6B5644 100%);
@@ -272,29 +248,14 @@
         box-shadow: 0 2px 8px rgba(139, 115, 85, 0.2);
     }
 
-    .btn-primary:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(139, 115, 85, 0.3);
-    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(139, 115, 85, 0.3); }
 
-    /* Responsive */
     @media (max-width: 768px) {
-        .form-card {
-            padding: 1.5rem;
-        }
-
-        .action-buttons {
-            flex-direction: column;
-        }
-
-        .btn {
-            width: 100%;
-            justify-content: center;
-        }
-
-        .photos-grid {
-            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-        }
+        .form-card { padding: 1.5rem; }
+        .action-buttons { flex-direction: column; }
+        .btn { width: 100%; justify-content: center; }
+        .photos-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); }
+        .subpackage-grid { grid-template-columns: 1fr; }
     }
 </style>
 @endpush
@@ -306,98 +267,75 @@
 
         <!-- Package Information -->
         <div class="form-card">
-            <h3 class="section-title">
-                Package Information
-            </h3>
+            <h3 class="section-title">Package Information</h3>
             
             <div class="form-group">
-                <label for="name" class="form-label">
-                    Package Name <span class="required">*</span>
-                </label>
-                <input 
-                    type="text" 
-                    id="name" 
-                    name="name" 
+                <label for="name" class="form-label">Package Name <span class="required">*</span></label>
+                <input type="text" id="name" name="name"
                     class="form-control @error('name') error @enderror"
-                    value="{{ old('name') }}"
-                    required
-                    placeholder="e.g., Beach Wedding Package"
-                >
+                    value="{{ old('name') }}" required
+                    placeholder="e.g., Beach Wedding Package">
                 @error('name')
                 <div class="error-message">{{ $message }}</div>
                 @enderror
             </div>
 
             <div class="form-group">
-                <label for="image" class="form-label">
-                    Main Package Image <span class="required">*</span>
-                </label>
+                <label for="image" class="form-label">Main Package Image <span class="required">*</span></label>
                 <div class="image-upload-wrapper">
-                    <input 
-                        type="file" 
-                        id="image" 
-                        name="image" 
-                        accept="image/*"
-                        required
-                        onchange="previewImage(event)"
-                    >
-                    <div class="upload-icon">
-                        <i class="fas fa-cloud-upload-alt"></i>
-                    </div>
+                    <input type="file" id="image" name="image" accept="image/*" required onchange="previewImage(event)">
+                    <div class="upload-icon"><i class="fas fa-cloud-upload-alt"></i></div>
                     <div class="upload-text">
                         <strong>Click to upload</strong> or drag and drop<br>
                         <small>PNG, JPG, WEBP (max. 20MB)</small>
                     </div>
                 </div>
                 <div class="image-preview" id="imagePreview">
-                    <button type="button" class="remove-image" onclick="removeImage()">
-                        <i class="fas fa-times"></i>
-                    </button>
+                    <button type="button" class="remove-image" onclick="removeImage()"><i class="fas fa-times"></i></button>
                     <img id="preview" src="" alt="Preview">
                 </div>
                 @error('image')
                 <div class="error-message">{{ $message }}</div>
                 @enderror
-                <div class="form-help">Upload a high-quality main image for this package</div>
             </div>
 
             <div class="form-group">
                 <label for="description" class="form-label">Description</label>
-                <textarea 
-                    id="description" 
-                    name="description" 
+                <textarea id="description" name="description"
                     class="form-control @error('description') error @enderror"
-                    placeholder="Describe the package and what it includes..."
-                >{{ old('description') }}</textarea>
+                    placeholder="Describe the package and what it includes...">{{ old('description') }}</textarea>
                 @error('description')
                 <div class="error-message">{{ $message }}</div>
                 @enderror
-                <div class="form-help">Provide details about what's included in this package</div>
             </div>
+        </div>
+
+        <!-- Subpackages -->
+        <div class="form-card">
+            <h3 class="section-title">
+                <i class="fas fa-list-ul" style="color:#8B7355;font-size:1.2rem;"></i>
+                Sub-packages / Options
+            </h3>
+            <div class="form-help" style="margin-bottom:1.5rem;">Tambahkan pilihan atau tier yang tersedia dalam package ini (opsional)</div>
+
+            <div id="subpackageList">
+                {{-- Subpackage items akan diisi oleh JS --}}
+            </div>
+
+            <button type="button" class="btn-add-sub" onclick="addSubpackage()">
+                <i class="fas fa-plus"></i> Add Sub-package
+            </button>
         </div>
 
         <!-- Gallery Photos -->
         <div class="form-card">
-            <h3 class="section-title">
-                Package Gallery Photos
-            </h3>
+            <h3 class="section-title">Package Gallery Photos</h3>
 
             <div class="form-group">
-                <label for="photos" class="form-label">
-                    Additional Photos
-                </label>
+                <label for="photos" class="form-label">Additional Photos</label>
                 <div class="image-upload-wrapper">
-                    <input 
-                        type="file" 
-                        id="photos" 
-                        name="photos[]" 
-                        accept="image/*"
-                        multiple
-                        onchange="previewMultipleImages(event)"
-                    >
-                    <div class="upload-icon">
-                        <i class="fas fa-images"></i>
-                    </div>
+                    <input type="file" id="photos" name="photos[]" accept="image/*" multiple onchange="previewMultipleImages(event)">
+                    <div class="upload-icon"><i class="fas fa-images"></i></div>
                     <div class="upload-text">
                         <strong>Click to upload</strong> or drag and drop<br>
                         <small>PNG, JPG, WEBP (max. 20MB each) - Multiple files allowed</small>
@@ -406,7 +344,6 @@
                 @error('photos.*')
                 <div class="error-message">{{ $message }}</div>
                 @enderror
-                <div class="form-help">Upload multiple photos to showcase this package</div>
             </div>
 
             <div id="photosGrid" class="photos-grid" style="display: none;"></div>
@@ -415,102 +352,182 @@
         <!-- Actions -->
         <div class="action-section">
             <div class="action-buttons">
-                <a href="{{ route('admin.packages.index') }}" class="btn btn-secondary">
-                    ← Cancel
-                </a>
-                <button type="submit" class="btn btn-primary">
-                    Create Package
-                </button>
+                <a href="{{ route('admin.packages.index') }}" class="btn btn-secondary">← Cancel</a>
+                <button type="submit" class="btn btn-primary">Create Package</button>
             </div>
         </div>
     </form>
 </div>
 
 <script>
-// Preview main image
+// ==================== MAIN IMAGE ====================
 function previewImage(event) {
     const file = event.target.files[0];
     if (file) {
         const reader = new FileReader();
-        reader.onload = function(e) {
+        reader.onload = e => {
             document.getElementById('preview').src = e.target.result;
             document.getElementById('imagePreview').style.display = 'block';
-        }
+        };
         reader.readAsDataURL(file);
     }
 }
 
-// Remove main image
 function removeImage() {
     document.getElementById('image').value = '';
     document.getElementById('imagePreview').style.display = 'none';
     document.getElementById('preview').src = '';
 }
 
-// Resize image sebelum preview & upload
+// ==================== SUBPACKAGES ====================
+let subIndex = 0;
+
+function addSubpackage(data = null) {
+    const list = document.getElementById('subpackageList');
+    const idx = subIndex++;
+    const name = data ? (data.name || '') : '';
+    const desc = data ? (data.description || '') : '';
+
+    const div = document.createElement('div');
+    div.className = 'subpackage-item';
+    div.id = `sub_${idx}`;
+    div.innerHTML = `
+        <div class="subpackage-header">
+            <span class="subpackage-number">Sub-package #${list.children.length + 1}</span>
+            <button type="button" class="btn-remove-sub" onclick="removeSubpackage('sub_${idx}')">
+                <i class="fas fa-trash"></i> Remove
+            </button>
+        </div>
+        <div class="subpackage-grid">
+            <div class="form-group full-width">
+                <label class="form-label">Name <span class="required">*</span></label>
+                <input type="text" name="subpackages[${idx}][name]" class="form-control"
+                    value="${name}" placeholder="e.g., Basic, Standard, Premium">
+            </div>
+            <div class="form-group full-width">
+                <label class="form-label">Description</label>
+                <textarea name="subpackages[${idx}][description]" class="form-control"
+                    style="min-height:100px;" placeholder="Describe what's included...">${desc}</textarea>
+            </div>
+            <div class="form-group full-width">
+                <label class="form-label">Main Image</label>
+                <div class="image-upload-wrapper" style="padding:1.25rem;">
+                    <input type="file" name="subpackages[${idx}][image]" accept="image/*"
+                        onchange="previewSubImage(event, 'sub_img_preview_${idx}')">
+                    <div style="font-size:1.5rem;color:#8B7355;margin-bottom:0.5rem;"><i class="fas fa-cloud-upload-alt"></i></div>
+                    <div class="upload-text"><strong>Click to upload</strong> main image<br><small>PNG, JPG, WEBP (max. 20MB)</small></div>
+                </div>
+                <div id="sub_img_preview_${idx}" style="display:none;margin-top:0.75rem;">
+                    <img style="max-width:200px;max-height:150px;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.1);" src="" alt="preview">
+                </div>
+            </div>
+            <div class="form-group full-width">
+                <label class="form-label">Additional Photos</label>
+                <div class="image-upload-wrapper" style="padding:1.25rem;">
+                    <input type="file" name="subpackages[${idx}][photos][]" accept="image/*" multiple
+                        onchange="previewSubPhotos(event, 'sub_photos_grid_${idx}')">
+                    <div style="font-size:1.5rem;color:#8B7355;margin-bottom:0.5rem;"><i class="fas fa-images"></i></div>
+                    <div class="upload-text"><strong>Click to upload</strong> multiple photos<br><small>PNG, JPG, WEBP (max. 20MB each)</small></div>
+                </div>
+                <div id="sub_photos_grid_${idx}" class="photos-grid" style="display:none;margin-top:0.75rem;"></div>
+            </div>
+        </div>
+    `;
+    list.appendChild(div);
+    renumberSubpackages();
+}
+
+function removeSubpackage(id) {
+    document.getElementById(id)?.remove();
+    renumberSubpackages();
+}
+
+function renumberSubpackages() {
+    document.querySelectorAll('#subpackageList .subpackage-number').forEach((el, i) => {
+        el.textContent = `Sub-package #${i + 1}`;
+    });
+}
+
+// ==================== SUBPACKAGE IMAGE PREVIEW ====================
+function previewSubImage(event, previewId) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const container = document.getElementById(previewId);
+    const reader = new FileReader();
+    reader.onload = e => {
+        container.style.display = 'block';
+        container.querySelector('img').src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+}
+
+function previewSubPhotos(event, gridId) {
+    const files = Array.from(event.target.files);
+    const grid = document.getElementById(gridId);
+    grid.innerHTML = '';
+    if (files.length === 0) { grid.style.display = 'none'; return; }
+    grid.style.display = 'grid';
+    files.forEach((file, i) => {
+        const reader = new FileReader();
+        reader.onload = e => {
+            const div = document.createElement('div');
+            div.className = 'photo-preview-item';
+            div.innerHTML = `<img src="${e.target.result}" alt="Photo ${i + 1}" style="width:100%;height:100%;object-fit:cover;">`;
+            grid.appendChild(div);
+        };
+        reader.readAsDataURL(file);
+    });
+}
+
+// ==================== GALLERY PHOTOS ====================
+let photoFiles = [];
+
 async function resizeImage(file, maxWidth = 1920) {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
         const img = new Image();
         const url = URL.createObjectURL(file);
         img.onload = () => {
             URL.revokeObjectURL(url);
-            if (img.width <= maxWidth) {
-                resolve(file); // tidak perlu resize
-                return;
-            }
+            if (img.width <= maxWidth) { resolve(file); return; }
             const canvas = document.createElement('canvas');
             const ratio = maxWidth / img.width;
             canvas.width = maxWidth;
             canvas.height = img.height * ratio;
             canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
-            canvas.toBlob((blob) => {
-                resolve(new File([blob], file.name, { type: 'image/jpeg' }));
-            }, 'image/jpeg', 0.85);
+            canvas.toBlob(blob => resolve(new File([blob], file.name, { type: 'image/jpeg' })), 'image/jpeg', 0.85);
         };
         img.src = url;
     });
 }
 
-// Preview multiple photos (dengan resize otomatis)
-let photoFiles = [];
-
 async function previewMultipleImages(event) {
     const files = Array.from(event.target.files);
-
-    // Resize semua file dulu
     const resized = await Promise.all(files.map(f => resizeImage(f)));
     photoFiles = [...photoFiles, ...resized];
 
-    // Update file input dengan file yang sudah di-resize
-    const dataTransfer = new DataTransfer();
-    photoFiles.forEach(file => dataTransfer.items.add(file));
-    document.getElementById('photos').files = dataTransfer.files;
-
+    const dt = new DataTransfer();
+    photoFiles.forEach(f => dt.items.add(f));
+    document.getElementById('photos').files = dt.files;
     displayPhotos();
 }
 
 function displayPhotos() {
     const grid = document.getElementById('photosGrid');
     grid.innerHTML = '';
-    
     if (photoFiles.length > 0) {
         grid.style.display = 'grid';
-        
         photoFiles.forEach((file, index) => {
             const reader = new FileReader();
-            
-            reader.onload = function(e) {
+            reader.onload = e => {
                 const div = document.createElement('div');
                 div.className = 'photo-preview-item';
                 div.innerHTML = `
                     <img src="${e.target.result}" alt="Photo ${index + 1}">
                     <button type="button" class="remove-photo" onclick="removePhoto(${index})">
                         <i class="fas fa-times"></i>
-                    </button>
-                `;
+                    </button>`;
                 grid.appendChild(div);
-            }
-            
+            };
             reader.readAsDataURL(file);
         });
     } else {
@@ -520,15 +537,16 @@ function displayPhotos() {
 
 function removePhoto(index) {
     photoFiles.splice(index, 1);
-    
-    // Update file input
-    const dataTransfer = new DataTransfer();
-    photoFiles.forEach(file => {
-        dataTransfer.items.add(file);
-    });
-    document.getElementById('photos').files = dataTransfer.files;
-    
+    const dt = new DataTransfer();
+    photoFiles.forEach(f => dt.items.add(f));
+    document.getElementById('photos').files = dt.files;
     displayPhotos();
 }
+
+// Restore old values if validation failed
+@if(old('subpackages'))
+    const oldSubs = @json(old('subpackages'));
+    Object.values(oldSubs).forEach(sub => addSubpackage(sub));
+@endif
 </script>
 @endsection

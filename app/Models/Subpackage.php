@@ -6,39 +6,34 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Package extends Model
+class Subpackage extends Model
 {
     use HasFactory, HasUuids;
 
     protected $fillable = [
+        'package_id',
         'name',
-        'description',
         'image',
         'photo',
+        'description',
     ];
 
     protected $casts = [
         'photo' => 'array',
     ];
 
-    public function subpackages()
+    public function package()
     {
-        return $this->hasMany(Subpackage::class);
+        return $this->belongsTo(Package::class);
     }
 
-    // Accessor to ensure photo is always an array
     public function getPhotoAttribute($value)
     {
-        if (is_null($value)) {
-            return [];
-        }
-        if (is_string($value)) {
-            return json_decode($value, true) ?? [];
-        }
+        if (is_null($value)) return [];
+        if (is_string($value)) return json_decode($value, true) ?? [];
         return $value;
     }
 
-    // Mutator to ensure photo is saved as JSON
     public function setPhotoAttribute($value)
     {
         if (is_array($value)) {

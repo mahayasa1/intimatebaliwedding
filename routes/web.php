@@ -24,6 +24,7 @@ Route::get('/about', function () {
 
 Route::get('/packages', [PackageController::class, 'index'])->name('packages.public');
 Route::get('/packages/{id}', [PackageController::class, 'show'])->name('packages.show');
+Route::get('/packages/{package}/subpackage/{subpackage}', [PackageController::class, 'showSubpackage'])->name('subpackages.show');
 
 // Gallery with Google Maps Reviews Integration
 Route::get('/gallery', [GalleryController::class, 'index'])->name('gallery.public');
