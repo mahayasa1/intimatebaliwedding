@@ -97,21 +97,43 @@
         width: 100% !important;
         height: auto;
         display: block;
-        margin: 2rem auto;
-        border-radius: 8px;
-        box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+        margin: 2.5rem auto;
+        border-radius: 4px;        /* radius kecil saja */
+        box-shadow: none;          /* hapus shadow "kertas" */
+        background: transparent;
     }
-
-    /* Headings inside content (rare but supported) */
+ 
+    /* ── Heading dari teks PDF ── */
     .blog-detail-content h2 {
-        font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 600;
-        color: #1a1a1a; margin-top: 3.5rem; margin-bottom: 1.5rem;
-        padding-bottom: 0.5rem; border-bottom: 2px solid #f0f0f0;
+        font-family: 'Playfair Display', serif;
+        font-size: 1.85rem;
+        font-weight: 700;
+        color: #1a1a1a;
+        margin-top: 3rem;
+        margin-bottom: 1rem;
+        line-height: 1.3;
     }
-
+ 
     .blog-detail-content h3 {
-        font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 600;
-        color: #2a2a2a; margin-top: 2.5rem; margin-bottom: 1rem;
+        font-family: 'Playfair Display', serif;
+        font-size: 1.4rem;
+        font-weight: 600;
+        color: #2a2a2a;
+        margin-top: 2rem;
+        margin-bottom: 0.75rem;
+    }
+ 
+    .blog-detail-content ul {
+        margin: 1rem 0 1.5rem 1.5rem;
+        list-style: disc;
+    }
+ 
+    .blog-detail-content li {
+        font-family: 'Lora', serif;
+        font-size: 1.05rem;
+        line-height: 1.8;
+        color: #333;
+        margin-bottom: 0.5rem;
     }
 
     /* Download PDF link */

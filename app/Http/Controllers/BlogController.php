@@ -11,11 +11,9 @@ use Smalot\PdfParser\Parser;
 
 class BlogController extends Controller
 {
-    /*
-    |--------------------------------------------------------------------------
-    | PUBLIC
-    |--------------------------------------------------------------------------
-    */
+    // =========================================================================
+    // PUBLIC
+    // =========================================================================
 
     public function index()
     {
@@ -23,7 +21,6 @@ class BlogController extends Controller
                      ->whereNotNull('published_at')
                      ->orderBy('published_at', 'desc')
                      ->paginate(12);
-
         return view('blogs.index', compact('blogs'));
     }
 
@@ -33,15 +30,12 @@ class BlogController extends Controller
                     ->where('is_published', true)
                     ->whereNotNull('published_at')
                     ->firstOrFail();
-
         return view('blogs.show', compact('blog'));
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | ADMIN — LISTING & DETAIL
-    |--------------------------------------------------------------------------
-    */
+    // =========================================================================
+    // ADMIN
+    // =========================================================================
 
     public function adminIndex()
     {
@@ -53,12 +47,6 @@ class BlogController extends Controller
     {
         return view('admin.blogs.show', compact('blog'));
     }
-
-    /*
-    |--------------------------------------------------------------------------
-    | ADMIN — CREATE
-    |--------------------------------------------------------------------------
-    */
 
     public function create()
     {
@@ -88,6 +76,8 @@ class BlogController extends Controller
             $validated['pdf']     = $result['pdf_path'];
             $validated['content'] = $result['content_html'];
 
+            // Auto-fill excerpt from plain text (for SEO / listing preview only)
+            // Text is NOT shown in the blog body — only used for excerpt
             if (empty($validated['excerpt']) && !empty($result['plain_text'])) {
                 $validated['excerpt'] = Str::limit(strip_tags($result['plain_text']), 200);
             }
@@ -102,12 +92,6 @@ class BlogController extends Controller
         return redirect()->route('admin.blogs.index')
                          ->with('success', 'Blog post created successfully.');
     }
-
-    /*
-    |--------------------------------------------------------------------------
-    | ADMIN — EDIT / UPDATE
-    |--------------------------------------------------------------------------
-    */
 
     public function edit(Blog $blog)
     {
@@ -152,12 +136,6 @@ class BlogController extends Controller
                          ->with('success', 'Blog post updated successfully.');
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | ADMIN — DELETE
-    |--------------------------------------------------------------------------
-    */
-
     public function destroy(Blog $blog)
     {
         if ($blog->image) Storage::disk('public')->delete($blog->image);
@@ -169,40 +147,35 @@ class BlogController extends Controller
                          ->with('success', 'Blog post deleted successfully.');
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | PRIVATE — PDF PROCESSING
-    |--------------------------------------------------------------------------
-    |
-    | Rendering tries tools in this priority order:
-    |
-    |   Windows:
-    |     1. gswin64c  (Ghostscript 64-bit — install from ghostscript.com)
-    |     2. gswin32c  (Ghostscript 32-bit fallback)
-    |     3. spatie/pdf-to-image (requires Imagick)
-    |
-    |   Linux / Mac:
-    |     1. pdftoppm  (poppler-utils — fastest)
-    |     2. gs        (Ghostscript)
-    |     3. spatie/pdf-to-image (requires Imagick)
-    |
-    |   Text extraction always uses smalot/pdfparser (pure PHP, no system deps).
-    |
-    */
+    // =========================================================================
+    // PDF PROCESSING
+    // =========================================================================
+    //
+    // Alur:
+    //   1. Upload & simpan PDF
+    //   2. Extract plain text → dipakai untuk auto-fill excerpt saja (tidak ditampilkan di blog)
+    //   3. Render setiap halaman PDF → PNG via Ghostscript
+    //   4. Auto-crop white margin tiap halaman → simpan sebagai WebP
+    //   5. content HTML = HANYA deretan <img> halaman (tidak ada teks)
+    //
+    // Hasilnya: blog body hanya menampilkan gambar halaman PDF,
+    // persis seperti membaca PDF tapi di dalam website.
+    // =========================================================================
 
     private function processPdf($file, string $slug): array
     {
-        // 1. Store PDF — normalise to forward slashes (Windows compat)
+        // 1. Simpan PDF
         $pdfName  = time() . '_' . Str::random(6) . '.pdf';
         $pdfPath  = $file->storeAs('blogs/pdf', $pdfName, 'public');
         $fullPath = $this->normPath(storage_path('app/public/' . $pdfPath));
 
         Log::info('[PDF] Stored: ' . $fullPath);
 
-        // 2. Extract plain text
+        // 2. Extract text — untuk excerpt saja, TIDAK masuk ke content HTML
         $plainText = $this->extractText($fullPath);
+        Log::info('[PDF] Text extracted: ' . strlen($plainText) . ' chars (for excerpt only)');
 
-        // 3. Prepare image output directory
+        // 3. Siapkan folder output gambar
         $imageDir    = $this->normPath(storage_path('app/public/blogs/pdf-images/' . $slug));
         $imageRelDir = 'blogs/pdf-images/' . $slug;
 
@@ -210,267 +183,288 @@ class BlogController extends Controller
             mkdir($imageDir, 0755, true);
         }
 
-        // 4. Render pages to JPEG
-        $pageFiles = $this->renderPages($fullPath, $imageDir);
+        // 4. Render halaman PDF → gambar (crop white margin → WebP)
+        $pageUrls = $this->renderPages($fullPath, $imageDir, $imageRelDir);
+        Log::info('[PDF] Page images: ' . count($pageUrls));
 
-        // 5. Build HTML
-        $textHtml  = $this->buildTextHtml($plainText);
-        $imageHtml = '';
-
-        foreach ($pageFiles as $i => $filename) {
-            $url = '/storage/' . $imageRelDir . '/' . $filename;
-            $imageHtml .= '<img src="' . $url . '" '
-                        . 'alt="Halaman ' . ($i + 1) . '" '
-                        . 'style="width:100%;margin:24px 0;border-radius:8px;'
-                        . 'box-shadow:0 2px 16px rgba(0,0,0,0.10);">' . "\n";
+        // 5. content HTML = HANYA gambar halaman, tanpa teks apapun
+        $contentHtml = '';
+        foreach ($pageUrls as $url) {
+            $contentHtml .= '<img src="' . htmlspecialchars($url) . '" '
+                          . 'alt="" loading="lazy" '
+                          . 'style="width:100%;height:auto;display:block;margin:1.5rem 0;">'
+                          . "\n";
         }
-
-        $contentHtml = $textHtml . $imageHtml;
 
         if (trim($contentHtml) === '') {
             $contentHtml = '<p><em>Konten tidak dapat diekstrak dari PDF ini. '
                          . 'Gunakan tombol Download PDF untuk membaca.</em></p>';
         }
 
-        Log::info('[PDF] Done — text: ' . strlen($plainText) . ' chars, pages: ' . count($pageFiles));
-
         return [
             'pdf_path'     => $pdfPath,
             'content_html' => $contentHtml,
-            'plain_text'   => $plainText,
+            'plain_text'   => $plainText, // hanya untuk excerpt
         ];
     }
 
-    // ── Text extraction (pure PHP, always works) ────────────────────────────
+    // -------------------------------------------------------------------------
+    // Text extraction (untuk excerpt saja)
+    // -------------------------------------------------------------------------
 
     private function extractText(string $fullPath): string
     {
+        // Coba smalot dulu
         try {
             $text = (new Parser())->parseFile($fullPath)->getText();
-            Log::info('[PDF] Text extracted: ' . strlen($text) . ' chars');
-            return $text;
+            if (strlen(trim($text)) > 10) {
+                return $text;
+            }
         } catch (\Throwable $e) {
-            Log::warning('[PDF] Text extraction failed: ' . $e->getMessage());
-            return '';
+            Log::warning('[PDF] smalot failed: ' . $e->getMessage());
         }
+
+        // Fallback: pdftotext
+        if ($bin = $this->findBin('pdftotext')) {
+            $tmp = sys_get_temp_dir() . '/pdftext_' . uniqid() . '.txt';
+            shell_exec(sprintf(
+                '%s %s %s 2>&1',
+                escapeshellarg($bin),
+                escapeshellarg($fullPath),
+                escapeshellarg($tmp)
+            ));
+            if (file_exists($tmp)) {
+                $text = (string) file_get_contents($tmp);
+                @unlink($tmp);
+                if (strlen(trim($text)) > 10) {
+                    return $text;
+                }
+            }
+        }
+
+        return '';
     }
 
-    // ── Page rendering — tries tools in priority order ──────────────────────
+    // -------------------------------------------------------------------------
+    // Render PDF halaman → gambar (Ghostscript + auto-crop + WebP)
+    // -------------------------------------------------------------------------
 
-    private function renderPages(string $pdfPath, string $imageDir): array
+    private function renderPages(string $pdfPath, string $imageDir, string $imageRelDir): array
     {
-        $isWindows = PHP_OS_FAMILY === 'Windows';
+        $bin = $this->findGsBin();
 
-        if ($isWindows) {
-            // Windows priority: gswin64c → gswin32c → spatie
-            foreach (['gswin64c', 'gswin32c'] as $bin) {
-                if ($path = $this->findBin($bin)) {
-                    $files = $this->renderViaGhostscript($path, $pdfPath, $imageDir);
-                    if ($files) {
-                        Log::info('[PDF] Rendered via ' . $bin . ' (' . count($files) . ' pages)');
-                        return $files;
-                    }
+        if (!$bin) {
+            Log::warning('[PDF] Ghostscript not found. Install dari https://ghostscript.com');
+            return [];
+        }
+
+        // Render semua halaman ke PNG resolusi tinggi
+        $pattern = $imageDir . '/raw-%d.png';
+
+        if (PHP_OS_FAMILY === 'Windows') {
+            $patternArg = str_replace('/', '\\', $pattern);
+            $command = sprintf(
+                '%s -dBATCH -dNOPAUSE -dSAFER -sDEVICE=png16m -r200 '
+                . '-dTextAlphaBits=4 -dGraphicsAlphaBits=4 '
+                . '"-sOutputFile=%s" %s 2>&1',
+                escapeshellarg($bin),
+                $patternArg,
+                escapeshellarg($pdfPath)
+            );
+        } else {
+            $command = sprintf(
+                '%s -dBATCH -dNOPAUSE -dSAFER -sDEVICE=png16m -r200 '
+                . '-dTextAlphaBits=4 -dGraphicsAlphaBits=4 '
+                . '-sOutputFile=%s %s 2>&1',
+                escapeshellarg($bin),
+                escapeshellarg($pattern),
+                escapeshellarg($pdfPath)
+            );
+        }
+
+        $out = shell_exec($command);
+        Log::info('[PDF] GS render: ' . $out);
+
+        // Kumpulkan raw PNG
+        $rawFiles = glob($imageDir . '/raw-*.png') ?: [];
+        if (empty($rawFiles)) {
+            Log::warning('[PDF] Tidak ada PNG dihasilkan.');
+            return [];
+        }
+        natsort($rawFiles);
+
+        $urls = [];
+
+        // GD tersedia → crop + save WebP
+        if (extension_loaded('gd')) {
+            foreach (array_values($rawFiles) as $i => $rawFile) {
+                $pageNum  = $i + 1;
+                $destFile = $imageDir . '/page-' . $pageNum . '.webp';
+                $destUrl  = '/storage/' . $imageRelDir . '/page-' . $pageNum . '.webp';
+
+                $cropped = $this->autoCrop($rawFile);
+
+                if ($cropped) {
+                    imagewebp($cropped, $destFile, 88);
+                    imagedestroy($cropped);
+                } else {
+                    // GD gagal crop, simpan PNG langsung sebagai WebP via copy
+                    copy($rawFile, $destFile);
                 }
+
+                @unlink($rawFile); // hapus raw PNG
+                $urls[] = $destUrl;
             }
         } else {
-            // Linux / Mac priority: pdftoppm → gs
-            if ($path = $this->findBin('pdftoppm')) {
-                $files = $this->renderViaPdftoppm($path, $pdfPath, $imageDir);
-                if ($files) {
-                    Log::info('[PDF] Rendered via pdftoppm (' . count($files) . ' pages)');
-                    return $files;
-                }
-            }
-
-            if ($path = $this->findBin('gs') ?? $this->findBin('ghostscript')) {
-                $files = $this->renderViaGhostscript($path, $pdfPath, $imageDir);
-                if ($files) {
-                    Log::info('[PDF] Rendered via gs (' . count($files) . ' pages)');
-                    return $files;
-                }
+            // GD tidak ada → pakai PNG langsung
+            Log::warning('[PDF] GD extension tidak tersedia, menggunakan PNG mentah.');
+            foreach (array_values($rawFiles) as $i => $rawFile) {
+                $pageNum  = $i + 1;
+                $destFile = $imageDir . '/page-' . $pageNum . '.png';
+                $destUrl  = '/storage/' . $imageRelDir . '/page-' . $pageNum . '.png';
+                rename($rawFile, $destFile);
+                $urls[] = $destUrl;
             }
         }
 
-        // Final fallback: spatie/pdf-to-image (requires Imagick)
-        $files = $this->renderViaSpatie($pdfPath, $imageDir);
-        if ($files) {
-            Log::info('[PDF] Rendered via spatie (' . count($files) . ' pages)');
-            return $files;
-        }
-
-        Log::warning('[PDF] All rendering strategies failed. '
-            . ($isWindows
-                ? 'Install Ghostscript: https://ghostscript.com/releases/gsdnld.html'
-                : 'Run: sudo apt-get install poppler-utils'));
-
-        return [];
+        return $urls;
     }
 
-    // ── Renderer: pdftoppm ──────────────────────────────────────────────────
-
-    private function renderViaPdftoppm(string $bin, string $pdfPath, string $imageDir): array
-    {
-        $prefix  = $imageDir . '/page';
-        $command = sprintf(
-            '%s -jpeg -r 150 %s %s 2>&1',
-            escapeshellarg($bin),
-            escapeshellarg($pdfPath),
-            escapeshellarg($prefix)
-        );
-
-        $out = shell_exec($command);
-        Log::debug('[PDF] pdftoppm: ' . $out);
-
-        return $this->collectJpegs($imageDir);
-    }
-
-    // ── Renderer: Ghostscript (gswin64c / gswin32c / gs) ───────────────────
-
-    private function renderViaGhostscript(string $bin, string $pdfPath, string $imageDir): array
-    {
-        // Output pattern: /path/page-%d.jpg  (Ghostscript fills %d with page number)
-        $pattern = $imageDir . '/page-%d.jpg';
-
-        $command = sprintf(
-            '%s -dBATCH -dNOPAUSE -dSAFER -sDEVICE=jpeg -r150 -dJPEGQ=90 -sOutputFile=%s %s 2>&1',
-            escapeshellarg($bin),
-            escapeshellarg($pattern),
-            escapeshellarg($pdfPath)
-        );
-
-        $out = shell_exec($command);
-        Log::debug('[PDF] Ghostscript: ' . $out);
-
-        return $this->collectJpegs($imageDir);
-    }
-
-    // ── Renderer: spatie/pdf-to-image (Imagick fallback) ───────────────────
-
-    private function renderViaSpatie(string $pdfPath, string $imageDir): array
-    {
-        if (!class_exists(\Spatie\PdfToImage\Pdf::class)) {
-            Log::warning('[PDF] spatie/pdf-to-image not installed.');
-            return [];
-        }
-
-        if (!extension_loaded('imagick')) {
-            Log::warning('[PDF] Imagick extension not loaded — spatie cannot render pages.');
-            return [];
-        }
-
-        try {
-            $pdf       = new \Spatie\PdfToImage\Pdf($pdfPath);
-            $pageCount = $pdf->getNumberOfPages();
-
-            for ($i = 1; $i <= $pageCount; $i++) {
-                $pdf->setPage($i)
-                    ->setOutputFormat('jpg')
-                    ->saveImage($imageDir . '/page-' . $i . '.jpg');
-            }
-
-            return $this->collectJpegs($imageDir);
-        } catch (\Throwable $e) {
-            Log::warning('[PDF] spatie failed: ' . $e->getMessage());
-            return [];
-        }
-    }
-
-    // ── Helpers ─────────────────────────────────────────────────────────────
+    // -------------------------------------------------------------------------
+    // Auto-crop white/near-white margins via GD
+    // -------------------------------------------------------------------------
 
     /**
-     * Collect JPEG files from a directory, sorted in natural page order.
-     * Returns array of basenames: ['page-1.jpg', 'page-2.jpg', ...]
+     * Hapus margin putih dari PNG — hasilnya hanya konten (teks/gambar).
+     * Threshold 245: pixel yang ketiga channel-nya >= 245 dianggap "putih".
      */
-    private function collectJpegs(string $dir): array
+    private function autoCrop(string $filePath)
     {
-        $files = glob($dir . '/*.jpg') ?: [];
+        $src = @imagecreatefrompng($filePath);
+        if (!$src) return null;
 
-        if (empty($files)) {
-            return [];
+        $w = imagesx($src);
+        $h = imagesy($src);
+        $t = 245; // threshold warna putih
+
+        $top = $bottom = $left = $right = null;
+
+        // Temukan batas konten (bukan putih)
+        for ($y = 0; $y < $h && $top === null; $y++) {
+            if (!$this->isRowWhite($src, $y, $w, $t)) $top = $y;
+        }
+        for ($y = $h - 1; $y >= 0 && $bottom === null; $y--) {
+            if (!$this->isRowWhite($src, $y, $w, $t)) $bottom = $y;
+        }
+        for ($x = 0; $x < $w && $left === null; $x++) {
+            if (!$this->isColWhite($src, $x, $h, $t)) $left = $x;
+        }
+        for ($x = $w - 1; $x >= 0 && $right === null; $x--) {
+            if (!$this->isColWhite($src, $x, $h, $t)) $right = $x;
         }
 
-        natsort($files);
+        // Semua putih (halaman kosong) → kembalikan null
+        if ($top === null || $bottom === null || $left === null || $right === null) {
+            imagedestroy($src);
+            return null;
+        }
 
-        return array_values(array_map('basename', $files));
+        // Tambah padding 16px supaya konten tidak mepet tepi
+        $pad    = 16;
+        $top    = max(0, $top    - $pad);
+        $bottom = min($h - 1, $bottom + $pad);
+        $left   = max(0, $left   - $pad);
+        $right  = min($w - 1, $right  + $pad);
+
+        $cw = $right  - $left + 1;
+        $ch = $bottom - $top  + 1;
+
+        if ($cw <= 0 || $ch <= 0) {
+            imagedestroy($src);
+            return null;
+        }
+
+        $dst   = imagecreatetruecolor($cw, $ch);
+        $white = imagecolorallocate($dst, 255, 255, 255);
+        imagefilledrectangle($dst, 0, 0, $cw - 1, $ch - 1, $white);
+        imagecopy($dst, $src, 0, 0, $left, $top, $cw, $ch);
+        imagedestroy($src);
+
+        return $dst;
     }
 
-    /**
-     * Find a system binary. Works on Windows (where.exe) and Linux/Mac (which).
-     */
+    private function isRowWhite($img, int $y, int $w, int $t): bool
+    {
+        for ($x = 0; $x < $w; $x += 4) {
+            $c = imagecolorat($img, $x, $y);
+            if ((($c >> 16) & 0xFF) < $t
+             || (($c >>  8) & 0xFF) < $t
+             || ( $c        & 0xFF) < $t) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private function isColWhite($img, int $x, int $h, int $t): bool
+    {
+        for ($y = 0; $y < $h; $y += 4) {
+            $c = imagecolorat($img, $x, $y);
+            if ((($c >> 16) & 0xFF) < $t
+             || (($c >>  8) & 0xFF) < $t
+             || ( $c        & 0xFF) < $t) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    // =========================================================================
+    // HELPERS
+    // =========================================================================
+
+    private function findGsBin(): ?string
+    {
+        foreach (['gswin64c', 'gswin32c', 'gs', 'ghostscript'] as $name) {
+            if ($bin = $this->findBin($name)) return $bin;
+        }
+        return null;
+    }
+
     private function findBin(string $name): ?string
     {
         if (PHP_OS_FAMILY === 'Windows') {
-            $result = trim((string) shell_exec('where ' . escapeshellarg($name) . ' 2>NUL'));
-            // `where` may return multiple lines — take first valid one
-            foreach (explode("\n", $result) as $line) {
+            $out = trim((string) shell_exec('where ' . escapeshellarg($name) . ' 2>NUL'));
+            foreach (explode("\n", $out) as $line) {
                 $line = trim($line);
-                if ($line && file_exists($line)) {
-                    return $line;
-                }
+                if ($line && file_exists($line)) return $line;
             }
             return null;
         }
 
-        // Linux / Mac
-        $result = trim((string) shell_exec('which ' . escapeshellarg($name) . ' 2>/dev/null'));
-        if ($result && file_exists($result)) {
-            return $result;
-        }
+        $out = trim((string) shell_exec('which ' . escapeshellarg($name) . ' 2>/dev/null'));
+        if ($out && file_exists($out)) return $out;
 
-        // Hard-coded common paths
         foreach (['/usr/bin/', '/usr/local/bin/', '/opt/homebrew/bin/'] as $dir) {
-            $path = $dir . $name;
-            if (file_exists($path) && is_executable($path)) {
-                return $path;
-            }
+            $p = $dir . $name;
+            if (file_exists($p) && is_executable($p)) return $p;
         }
 
         return null;
     }
 
-    /**
-     * Build HTML <p> tags from plain text.
-     */
-    private function buildTextHtml(string $text): string
-    {
-        if (trim($text) === '') {
-            return '';
-        }
-
-        $html = '';
-        foreach (preg_split('/\n{2,}/', trim($text)) as $para) {
-            $para = trim($para);
-            if ($para !== '') {
-                $html .= '<p>' . nl2br(htmlspecialchars($para)) . '</p>' . "\n";
-            }
-        }
-
-        return $html;
-    }
-
-    /**
-     * Normalise all backslashes to forward slashes (Windows path compat).
-     */
     private function normPath(string $path): string
     {
         return str_replace('\\', '/', $path);
     }
 
-    /**
-     * Delete all rendered JPEG page images for a blog slug.
-     */
     private function deletePdfImages(string $slug): void
     {
         $dir = storage_path('app/public/blogs/pdf-images/' . $slug);
-
-        if (!is_dir($dir)) {
-            return;
+        if (!is_dir($dir)) return;
+        foreach (glob($dir . '/*') ?: [] as $f) {
+            if (is_file($f)) @unlink($f);
         }
-
-        foreach (glob($dir . '/*.jpg') ?: [] as $file) {
-            @unlink($file);
-        }
-
         @rmdir($dir);
     }
 }

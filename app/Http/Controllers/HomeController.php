@@ -60,6 +60,8 @@ class HomeController extends Controller
                 (object)['image' => 'assets/background/home_1.jpg'],
                 (object)['image' => 'assets/background/home_2.jpg'],
                 (object)['image' => 'assets/background/home_3.jpg'],
+                (object)['image' => 'assets/background/home_4.jpg'],
+                (object)['image' => 'assets/background/home_5.jpg'],
             ]);
         }
 
