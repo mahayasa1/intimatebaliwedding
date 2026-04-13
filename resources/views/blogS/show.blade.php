@@ -6,521 +6,259 @@
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Lora:wght@400;500;600&display=swap');
 
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
+    body { background: #fafafa; }
 
-    body {
-        background: #fafafa;
-    }
-
-    /* Hero Section */
+    /* Hero */
     .page-hero {
-        background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), 
+        background: linear-gradient(rgba(0,0,0,0.48), rgba(0,0,0,0.48)),
                     url('https://images.unsplash.com/photo-1522413452208-996ff3f3e740?w=1920&q=80');
-        background-size: cover;
-        background-position: center;
-        height: 20vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        text-align: center;
-        margin-top: -80px;
-        margin-bottom: 3rem;
+        background-size: cover; background-position: center;
+        height: 20vh; display: flex; align-items: center;
+        justify-content: center; margin-top: -80px; margin-bottom: 3rem;
     }
 
-    .page-hero h1 {
-        font-family: 'Playfair Display', serif;
-        font-size: 3.5rem;
-        font-weight: 400;
-        color: white;
-        letter-spacing: 12px;
-        text-transform: uppercase;
-        text-shadow: 0 2px 10px rgba(0,0,0,0.3);
-    }
-
-    /* Back Button */
-    .back-button-section {
-        max-width: 900px;
-        margin: 0 1rem auto 1rem;
-        padding: 0 2rem;
-    }
+    /* Back */
+    .back-section { max-width: 900px; margin: 0 auto; padding: 0 2rem; }
 
     .btn-back {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        color: #666;
-        text-decoration: none;
-        font-family: 'Lora', serif;
-        font-size: 0.95rem;
-        font-weight: 500;
-        transition: all 0.3s ease;
-        padding: 0.5rem 0;
+        display: inline-flex; align-items: center; gap: 0.5rem;
+        color: #666; text-decoration: none; font-family: 'Lora', serif;
+        font-size: 0.95rem; font-weight: 500; transition: all 0.3s;
     }
 
-    .btn-back:hover {
-        color: #8B7355;
-        transform: translateX(-4px);
-    }
+    .btn-back:hover { color: #8B7355; transform: translateX(-4px); }
 
-    /* Blog Container */
+    /* Blog container */
     .blog-detail-container {
-        max-width: 900px;
-        margin: 0 auto;
-        padding: 0 2rem 6rem;
-        background: white;
-        box-shadow: 0 2px 20px rgba(0,0,0,0.05);
-        border-radius: 12px;
+        max-width: 900px; margin: 0 auto; padding: 0 2rem 6rem;
+        background: white; box-shadow: 0 2px 20px rgba(0,0,0,0.05); border-radius: 12px;
     }
 
-    /* Blog Header */
-    .blog-header {
-        padding: 3rem 3rem 2rem;
-        text-align: center;
-        border-bottom: 2px solid #f0f0f0;
-        margin-bottom: 3rem;
-    }
+    /* Header */
+    .blog-header { padding: 3rem 3rem 2rem; text-align: center; border-bottom: 2px solid #f0f0f0; margin-bottom: 3rem; }
 
-    /* Blog Title */
     .blog-detail-title {
-        font-family: 'Playfair Display', serif;
-        font-size: 2.8rem;
-        font-weight: 600;
-        color: #1a1a1a;
-        line-height: 1.3;
-        margin-bottom: 1.5rem;
-        letter-spacing: 0.5px;
+        font-family: 'Playfair Display', serif; font-size: 2.8rem; font-weight: 600;
+        color: #1a1a1a; line-height: 1.3; margin-bottom: 1.5rem;
     }
 
-    /* Meta Info */
-    .blog-meta-info {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 1.5rem;
-        flex-wrap: wrap;
-    }
+    .blog-meta-info { display: flex; align-items: center; justify-content: center; gap: 1.5rem; flex-wrap: wrap; }
 
-    .meta-item {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        font-family: 'Lora', serif;
-        font-size: 0.9rem;
-        color: #666;
-    }
+    .meta-item { display: flex; align-items: center; gap: 0.5rem; font-family: 'Lora', serif; font-size: 0.9rem; color: #666; }
 
-    .meta-icon {
-        width: 16px;
-        height: 16px;
-        color: #8B7355;
-    }
+    .meta-icon { width: 16px; height: 16px; color: #8B7355; }
+    .meta-divider { width: 1px; height: 16px; background: #ddd; }
 
-    .meta-divider {
-        width: 1px;
-        height: 16px;
-        background: #ddd;
-    }
+    /* Featured image */
+    .featured-image-wrapper { width: 100%; margin: 0 0 3rem; overflow: hidden; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
 
-    /* Featured Image */
-    .featured-image-wrapper {
-        width: 100%;
-        margin: 0 0 3rem 0;
-        overflow: hidden;
-        border-radius: 8px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-    }
+    .featured-image { width: 100%; height: auto; max-height: 500px; object-fit: cover; display: block; transition: transform 0.5s; }
+    .featured-image-wrapper:hover .featured-image { transform: scale(1.02); }
 
-    .featured-image {
-        width: 100%;
-        height: auto;
-        max-height: 500px;
-        object-fit: cover;
-        object-position: center;
-        display: block;
-        transition: transform 0.5s ease;
-    }
-
-    .featured-image-wrapper:hover .featured-image {
-        transform: scale(1.02);
-    }
-
-    /* Blog Content */
-    .blog-content-wrapper {
-        padding: 0 3rem 3rem;
-    }
+    /* Content wrapper */
+    .blog-content-wrapper { padding: 0 3rem 3rem; }
 
     /* Excerpt */
     .blog-excerpt {
-        font-family: 'Lora', serif;
-        font-size: 1.2rem;
-        line-height: 1.8;
-        color: #555;
-        font-style: italic;
-        margin-bottom: 3rem;
-        padding: 2rem;
-        background: #f8f9fa;
-        border-left: 4px solid #8B7355;
-        border-radius: 4px;
+        font-family: 'Lora', serif; font-size: 1.2rem; line-height: 1.8;
+        color: #555; font-style: italic; margin-bottom: 3rem; padding: 2rem;
+        background: #f8f9fa; border-left: 4px solid #8B7355; border-radius: 4px;
     }
 
-    /* Content */
+    /*
+    |--------------------------------------------------------------------------
+    | PDF-generated content styles
+    |
+    | The content field contains:
+    |   <p>paragraph text</p>
+    |   <p>more text</p>
+    |   <img src="/storage/blogs/pdf-images/..." style="width:100%...">
+    |
+    | These rules ensure text and images render beautifully as an article.
+    |--------------------------------------------------------------------------
+    */
     .blog-detail-content {
-        font-family: 'Lora', serif;
-        font-size: 1.05rem;
-        line-height: 1.9;
-        color: #333;
+        font-family: 'Lora', serif; font-size: 1.05rem;
+        line-height: 1.9; color: #333;
     }
 
     .blog-detail-content p {
-        margin-bottom: 1.8rem;
-        text-align: justify;
+        margin-bottom: 1.8rem; text-align: justify;
     }
 
+    /* Drop-cap on very first paragraph */
     .blog-detail-content p:first-of-type::first-letter {
-        font-size: 3.5rem;
-        font-family: 'Playfair Display', serif;
-        font-weight: 700;
-        float: left;
-        line-height: 1;
-        margin: 0.1rem 0.5rem 0 0;
-        color: #8B7355;
+        font-size: 3.5rem; font-family: 'Playfair Display', serif; font-weight: 700;
+        float: left; line-height: 1; margin: 0.1rem 0.5rem 0 0; color: #8B7355;
     }
 
+    /* Page images from PDF */
+    .blog-detail-content img {
+        width: 100% !important;
+        height: auto;
+        display: block;
+        margin: 2rem auto;
+        border-radius: 8px;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+    }
+
+    /* Headings inside content (rare but supported) */
     .blog-detail-content h2 {
-        font-family: 'Playfair Display', serif;
-        font-size: 2rem;
-        font-weight: 600;
-        color: #1a1a1a;
-        margin-top: 3.5rem;
-        margin-bottom: 1.5rem;
-        padding-bottom: 0.5rem;
-        border-bottom: 2px solid #f0f0f0;
+        font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 600;
+        color: #1a1a1a; margin-top: 3.5rem; margin-bottom: 1.5rem;
+        padding-bottom: 0.5rem; border-bottom: 2px solid #f0f0f0;
     }
 
     .blog-detail-content h3 {
-        font-family: 'Playfair Display', serif;
-        font-size: 1.5rem;
-        font-weight: 600;
-        color: #2a2a2a;
-        margin-top: 2.5rem;
-        margin-bottom: 1rem;
+        font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 600;
+        color: #2a2a2a; margin-top: 2.5rem; margin-bottom: 1rem;
     }
 
-    .blog-detail-content ul,
-    .blog-detail-content ol {
-        margin: 2rem 0;
-        padding-left: 2.5rem;
+    /* Download PDF link */
+    .pdf-download-bar {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 1rem 1.25rem; background: #f0ebe4;
+        border-radius: 10px; border: 1px solid #d4b896; margin-bottom: 2.5rem; gap: 1rem; flex-wrap: wrap;
     }
 
-    .blog-detail-content li {
-        margin-bottom: 1rem;
-        line-height: 1.8;
+    .pdf-download-bar span {
+        font-family: 'Lora', serif; font-size: 0.9rem; color: #6B5644;
+        display: flex; align-items: center; gap: 0.5rem;
     }
 
-    .blog-detail-content blockquote {
-        border-left: 4px solid #8B7355;
-        padding: 1.5rem 2rem;
-        margin: 2.5rem 0;
-        background: #f9f9f9;
-        font-style: italic;
-        color: #555;
-        font-size: 1.1rem;
-        border-radius: 4px;
+    .btn-download-pdf {
+        display: inline-flex; align-items: center; gap: 0.5rem;
+        background: linear-gradient(135deg, #8B7355, #6B5644); color: white;
+        padding: 0.6rem 1.25rem; border-radius: 8px; text-decoration: none;
+        font-family: 'Lora', serif; font-size: 0.88rem; font-weight: 600;
+        transition: all 0.3s; white-space: nowrap;
     }
 
-    .blog-detail-content img {
-        max-width: 100%;
-        height: auto;
-        border-radius: 8px;
-        margin: 2rem 0;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    }
+    .btn-download-pdf:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(139,115,85,0.3); }
 
     /* Divider */
-    .content-divider {
-        margin: 3rem 0;
-        border: none;
-        height: 1px;
-        background: linear-gradient(to right, transparent, #ddd, transparent);
-    }
+    .content-divider { margin: 3rem 0; border: none; height: 1px; background: linear-gradient(to right, transparent, #ddd, transparent); }
 
-    /* Author Section */
+    /* Author */
     .author-section {
-        margin-top: 4rem;
-        padding: 2.5rem;
-        background: #f8f9fa;
-        border-radius: 8px;
-        display: flex;
-        align-items: center;
-        gap: 2rem;
+        margin-top: 4rem; padding: 2.5rem; background: #f8f9fa;
+        border-radius: 8px; display: flex; align-items: center; gap: 2rem;
     }
 
     .author-avatar {
-        width: 90px;
-        height: 90px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, #8B7355 0%, #6B5644 100%);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-family: 'Playfair Display', serif;
-        font-size: 2.5rem;
-        font-weight: 600;
-        flex-shrink: 0;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        width: 90px; height: 90px; border-radius: 50%;
+        background: linear-gradient(135deg, #8B7355, #6B5644);
+        display: flex; align-items: center; justify-content: center; color: white;
+        font-family: 'Playfair Display', serif; font-size: 2.5rem; font-weight: 600;
+        flex-shrink: 0; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }
 
-    .author-details {
-        flex: 1;
-    }
+    .author-label { font-family: 'Lora', serif; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; color: #8B7355; font-weight: 600; margin-bottom: 0.5rem; }
+    .author-name  { font-family: 'Playfair Display', serif; font-size: 1.6rem; font-weight: 600; color: #1a1a1a; margin-bottom: 0.25rem; }
+    .author-bio   { font-family: 'Lora', serif; font-size: 0.95rem; color: #666; line-height: 1.6; }
 
-    .author-label {
-        font-family: 'Lora', serif;
-        font-size: 0.8rem;
-        text-transform: uppercase;
-        letter-spacing: 2px;
-        color: #8B7355;
-        font-weight: 600;
-        margin-bottom: 0.5rem;
-    }
-
-    .author-name {
-        font-family: 'Playfair Display', serif;
-        font-size: 1.6rem;
-        font-weight: 600;
-        color: #1a1a1a;
-        margin-bottom: 0.25rem;
-    }
-
-    .author-bio {
-        font-family: 'Lora', serif;
-        font-size: 0.95rem;
-        color: #666;
-        line-height: 1.6;
-    }
-
-    /* Share Section */
-    .share-section {
-        margin-top: 3rem;
-        padding-top: 2rem;
-        border-top: 1px solid #e8e8e8;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 1rem;
-    }
-
-    .share-label {
-        font-family: 'Lora', serif;
-        font-size: 0.95rem;
-        color: #666;
-        font-weight: 500;
-    }
-
-    .share-buttons {
-        display: flex;
-        gap: 0.75rem;
-    }
-
-    .share-btn {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        background: #f5f5f5;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        text-decoration: none;
-        color: #666;
-        transition: all 0.3s ease;
-        border: 2px solid transparent;
-    }
-
-    .share-btn:hover {
-        background: #8B7355;
-        color: white;
-        border-color: #8B7355;
-        transform: translateY(-3px);
-        box-shadow: 0 4px 12px rgba(139, 115, 85, 0.3);
-    }
-
-    /* Responsive */
     @media (max-width: 768px) {
-        .page-hero {
-            height: 35vh;
-            min-height: 250px;
-            background-attachment: scroll;
-        }
-
-        .page-hero h1 {
-            font-size: 2rem;
-            letter-spacing: 6px;
-        }
-
-        .blog-detail-container {
-            border-radius: 0;
-            box-shadow: none;
-        }
-
-        .blog-header {
-            padding: 2rem 1.5rem 1.5rem;
-        }
-
-        .blog-detail-title {
-            font-size: 1.8rem;
-        }
-
-        .blog-content-wrapper {
-            padding: 0 1.5rem 2rem;
-        }
-
-        .blog-detail-content {
-            font-size: 1rem;
-        }
-
-        .blog-detail-content p:first-of-type::first-letter {
-            font-size: 3rem;
-        }
-
-        .featured-image {
-            max-height: 350px;
-        }
-
-        .author-section {
-            flex-direction: column;
-            text-align: center;
-            padding: 2rem 1.5rem;
-        }
-
-        .share-section {
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        .blog-meta-info {
-            flex-direction: column;
-            gap: 0.75rem;
-        }
-
-        .meta-divider {
-            display: none;
-        }
-    }
-
-    @media (max-width: 480px) {
-        .page-hero h1 {
-            font-size: 1.5rem;
-            letter-spacing: 4px;
-        }
-
-        .blog-detail-title {
-            font-size: 1.5rem;
-        }
-
-        .blog-detail-content {
-            font-size: 0.95rem;
-        }
-
-        .blog-excerpt {
-            font-size: 1.05rem;
-            padding: 1.5rem;
-        }
-
-        .featured-image {
-            max-height: 250px;
-        }
+        .page-hero { height: 35vh; }
+        .blog-header { padding: 2rem 1.5rem 1.5rem; }
+        .blog-detail-title { font-size: 1.8rem; }
+        .blog-content-wrapper { padding: 0 1.5rem 2rem; }
+        .author-section { flex-direction: column; text-align: center; padding: 2rem 1.5rem; }
+        .pdf-download-bar { flex-direction: column; align-items: flex-start; }
+        .blog-detail-container { border-radius: 0; box-shadow: none; }
     }
 </style>
 @endpush
 
 @section('content')
-<!-- Page Hero -->
-<div class="page-hero">
+<div class="page-hero"></div>
+
+<div class="back-section">
+    <a href="{{ route('blogs.public') }}" class="btn-back">← Back to Blog</a>
 </div>
 
-<!-- Back Button -->
-<div class="back-button-section">
-    <a href="{{ route('blogs.public') }}" class="btn-back">
-        ← Back to Blog
-    </a>
-</div>
-
-<!-- Blog Detail Container -->
 <div class="blog-detail-container">
-    <!-- Blog Header -->
+    {{-- Header --}}
     <div class="blog-header">
-        <!-- Blog Title -->
         <h1 class="blog-detail-title">{{ $blog->title }}</h1>
-
-        <!-- Meta Info -->
         <div class="blog-meta-info">
             @if($blog->author)
             <div class="meta-item">
                 <svg class="meta-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                 </svg>
-                <span>{{ $blog->author }}</span>
+                {{ $blog->author }}
             </div>
+            @if($blog->published_at) <span class="meta-divider"></span> @endif
             @endif
-            
-            @if($blog->author && $blog->published_at)
-            <span class="meta-divider"></span>
-            @endif
-            
+
             @if($blog->published_at)
             <div class="meta-item">
                 <svg class="meta-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                 </svg>
-                <span>{{ $blog->published_at->format('F d, Y') }}</span>
+                {{ $blog->published_at->format('F d, Y') }}
             </div>
             @endif
         </div>
     </div>
 
-    <!-- Featured Image -->
+    {{-- Featured image --}}
     @if($blog->image)
     <div class="featured-image-wrapper">
-        <img src="{{ asset('storage/' . $blog->image) }}" 
-             alt="{{ $blog->title }}" 
-             class="featured-image">
+        <img src="{{ asset('storage/' . $blog->image) }}" alt="{{ $blog->title }}" class="featured-image">
     </div>
     @endif
 
-    <!-- Blog Content -->
     <div class="blog-content-wrapper">
+        {{-- Excerpt --}}
         @if($blog->excerpt)
-        <div class="blog-excerpt">
-            {{ $blog->excerpt }}
+        <div class="blog-excerpt">{{ $blog->excerpt }}</div>
+        @endif
+
+        {{-- PDF download bar (shown only if PDF exists) --}}
+        @if($blog->pdf)
+        <div class="pdf-download-bar">
+            <span>
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/>
+                    <path d="M14 2v6h6"/>
+                </svg>
+                Article sourced from PDF
+            </span>
+            <a href="{{ asset('storage/' . $blog->pdf) }}" download class="btn-download-pdf">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="7 10 12 15 17 10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                Download PDF
+            </a>
         </div>
         @endif
 
+        {{--
+            Main content — rendered as raw HTML.
+            Contains <p> paragraphs + <img> page images generated by processPdf().
+        --}}
         <div class="blog-detail-content">
-            {!! nl2br(e($blog->content)) !!}
+            {!! $blog->content !!}
         </div>
 
         <hr class="content-divider">
 
-        <!-- Author Section -->
+        {{-- Author --}}
         @if($blog->author)
         <div class="author-section">
-            <div class="author-avatar">
-                {{ strtoupper(substr($blog->author, 0, 1)) }}
-            </div>
-            <div class="author-details">
+            <div class="author-avatar">{{ strtoupper(substr($blog->author, 0, 1)) }}</div>
+            <div>
                 <div class="author-label">Written by</div>
                 <div class="author-name">{{ $blog->author }}</div>
                 <div class="author-bio">Wedding Specialist & Content Creator</div>
             </div>
         </div>
         @endif
-        </div>
     </div>
 </div>
 @endsection

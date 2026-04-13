@@ -265,7 +265,7 @@
                 <div class="contact-icon">📍</div>
                 <div class="contact-details">
                     <h4>Our Office</h4>
-                    <p>Jl. Puri Dewata No. 98,<br>Sidakarya, Denpasar, Bali</p>
+                    <p>Jl. Anggrek No.27, <br> Kota Denpasar, Bali</p>
                 </div>
             </div>
 
@@ -281,7 +281,7 @@
                 <div class="contact-icon">📱</div>
                 <div class="contact-details">
                     <h4>Phone / WhatsApp</h4>
-                    <a href="tel:+6282145678901">+62 821 4567 8901</a>
+                    <a href="tel:+6287861775445">+62 878-6177-5445</a>
                 </div>
             </div>
         </div>
@@ -343,7 +343,7 @@
                     </div>
                     <div class="form-group">
                         <label for="guest_count">Guest Count (Approx.)</label>
-                        <input type="number" id="guest_count" name="guest_count" value="{{ old('guest_count') }}" placeholder="e.g. 50" min="1">
+                        <input type="number" id="guest_count" name="guest_count" value="{{ old('guest_count') }}" placeholder="e.g. 2" min="1">
                     </div>
                 </div>
 
@@ -360,7 +360,7 @@
     <!-- Map -->
     <div class="map-container">
         <iframe
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3943.9420480960516!2d115.22811858456305!3d-8.697053657340675!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2dd241042d75b901%3A0xf63a36a1e45364d9!2sJl.%20Puri%20Dewata%20No.98%2C%20Sidakarya%2C%20Denpasar%20Selatan%2C%20Kota%20Denpasar%2C%20Bali%2080224!5e0!3m2!1sid!2sid!4v1772613900681!5m2!1sid!2sid"
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15777.54422603834!2d115.2241908960825!3d-8.65478399261499!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2dd2409b54344ba7%3A0x7323c96f2c696381!2sJl.%20Anggrek%20No.27%2C%20Dangin%20Puri%20Kangin%2C%20Kec.%20Denpasar%20Utara%2C%20Kota%20Denpasar%2C%20Bali%2080236!5e0!3m2!1sid!2sid!4v1775898931395!5m2!1sid!2sid"
             loading="lazy"
             referrerpolicy="no-referrer-when-downgrade"
             title="Our Office Location">

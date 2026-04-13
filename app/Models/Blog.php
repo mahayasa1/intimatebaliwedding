@@ -16,6 +16,7 @@ class Blog extends Model
         'title',
         'slug',
         'image',
+        'pdf',
         'excerpt',
         'content',
         'author',

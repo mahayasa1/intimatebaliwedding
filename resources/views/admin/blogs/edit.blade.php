@@ -7,414 +7,301 @@
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Work+Sans:wght@400;500;600&display=swap');
 
-    .form-container {
-        max-width: 1000px;
-        margin: 0 auto;
-    }
+    .form-container { max-width: 1000px; margin: 0 auto; }
 
     .form-card {
-        background: white;
-        padding: 2.5rem;
-        border-radius: 16px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.06);
-        border: 1px solid #e8e8e8;
+        background: white; padding: 2.5rem; border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.06); border: 1px solid #e8e8e8;
         margin-bottom: 2rem;
     }
 
     .section-title {
-        font-family: 'Playfair Display', serif;
-        font-size: 1.5rem;
-        font-weight: 700;
-        color: #1a1a1a;
-        margin-bottom: 1.5rem;
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        padding-bottom: 1rem;
-        border-bottom: 2px solid #f0f0f0;
+        font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 700;
+        color: #1a1a1a; margin-bottom: 1.5rem; display: flex; align-items: center;
+        gap: 0.75rem; padding-bottom: 1rem; border-bottom: 2px solid #f0f0f0;
     }
 
     .section-icon {
-        width: 40px;
-        height: 40px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: linear-gradient(135deg, #8B7355 0%, #6B5644 100%);
-        color: white;
-        border-radius: 10px;
-        font-size: 1.25rem;
+        width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
+        background: linear-gradient(135deg, #8B7355, #6B5644);
+        color: white; border-radius: 10px; font-size: 1.2rem;
     }
 
     .form-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-        gap: 1.5rem;
-        margin-bottom: 2rem;
+        display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem; margin-bottom: 0;
     }
 
-    .form-group {
-        margin-bottom: 1.5rem;
-    }
+    .form-group { margin-bottom: 1.5rem; }
 
     .form-label {
-        font-family: 'Work Sans', sans-serif;
-        display: block;
-        color: #333;
-        font-weight: 600;
-        margin-bottom: 0.75rem;
-        font-size: 0.9rem;
-        letter-spacing: 0.3px;
+        font-family: 'Work Sans', sans-serif; display: block; color: #333;
+        font-weight: 600; margin-bottom: 0.75rem; font-size: 0.9rem; letter-spacing: 0.3px;
     }
 
-    .form-label .required {
-        color: #e74c3c;
-        margin-left: 0.25rem;
-    }
+    .form-label .required { color: #e74c3c; margin-left: 0.25rem; }
 
     .form-control {
-        font-family: 'Work Sans', sans-serif;
-        width: 100%;
-        padding: 0.875rem 1.25rem;
-        border: 2px solid #e0e0e0;
-        border-radius: 12px;
-        font-size: 0.95rem;
-        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        background: white;
+        font-family: 'Work Sans', sans-serif; width: 100%; padding: 0.875rem 1.25rem;
+        border: 2px solid #e0e0e0; border-radius: 12px; font-size: 0.95rem;
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); background: white;
     }
 
     .form-control:focus {
-        outline: none;
-        border-color: #8B7355;
-        box-shadow: 0 0 0 4px rgba(139, 115, 85, 0.1);
-        transform: translateY(-2px);
+        outline: none; border-color: #8B7355;
+        box-shadow: 0 0 0 4px rgba(139, 115, 85, 0.1); transform: translateY(-2px);
     }
 
-    .form-control.error {
-        border-color: #e74c3c;
-        background: #fff5f5;
-    }
-
-    textarea.form-control {
-        min-height: 140px;
-        resize: vertical;
-        line-height: 1.6;
-    }
-
-    textarea.form-control.large {
-        min-height: 300px;
-    }
+    textarea.form-control { min-height: 140px; resize: vertical; line-height: 1.6; }
 
     .error-message {
-        font-family: 'Work Sans', sans-serif;
-        color: #e74c3c;
-        font-size: 0.85rem;
-        margin-top: 0.5rem;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
+        font-family: 'Work Sans', sans-serif; color: #e74c3c; font-size: 0.85rem;
+        margin-top: 0.5rem; display: flex; align-items: center; gap: 0.5rem;
     }
 
-    .error-message::before {
-        content: '⚠️';
-    }
+    .error-message::before { content: '⚠️'; }
 
     .form-help {
-        font-family: 'Work Sans', sans-serif;
-        color: #999;
-        font-size: 0.85rem;
-        margin-top: 0.5rem;
-        font-style: italic;
+        font-family: 'Work Sans', sans-serif; color: #999;
+        font-size: 0.85rem; margin-top: 0.5rem; font-style: italic;
     }
 
-    /* Current Image */
-    .current-image {
-        margin-bottom: 1.5rem;
-        padding: 1.5rem;
-        background: #f8f9fa;
-        border-radius: 12px;
-        border: 1px solid #e8e8e8;
+    /* Current PDF box */
+    .current-pdf-box {
+        display: flex; align-items: center; gap: 1rem; padding: 1rem 1.25rem;
+        background: #f0ebe4; border-radius: 10px; border: 1px solid #d4b896; margin-bottom: 1rem;
     }
 
-    .current-image-label {
-        font-weight: 600;
-        color: #666;
-        margin-bottom: 1rem;
-        display: block;
+    .current-pdf-box svg { color: #8B7355; flex-shrink: 0; }
+
+    .current-pdf-info { flex: 1; }
+
+    .current-pdf-info span {
+        display: block; font-family: 'Work Sans', sans-serif;
+        font-size: 0.8rem; color: #999; margin-bottom: 0.2rem;
     }
 
-    .current-image-wrapper {
-        max-width: 400px;
-        border-radius: 12px;
-        overflow: hidden;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    .current-pdf-info a {
+        font-family: 'Work Sans', sans-serif; font-weight: 600;
+        color: #8B7355; text-decoration: none; font-size: 0.92rem; transition: color 0.2s;
     }
 
-    .current-image-wrapper img {
-        width: 100%;
-        height: auto;
-        display: block;
+    .current-pdf-info a:hover { color: #6B5644; text-decoration: underline; }
+
+    /* Current image box */
+    .current-image-box {
+        margin-bottom: 1rem; padding: 1.25rem;
+        background: #f8f9fa; border-radius: 12px; border: 1px solid #e8e8e8;
     }
 
-    /* Image Upload */
-    .image-upload-wrapper {
-        position: relative;
+    .current-image-label { font-family: 'Work Sans', sans-serif; font-weight: 600; color: #666; font-size: 0.82rem; display: block; margin-bottom: 0.75rem; }
+
+    .current-image-box img { max-width: 340px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); display: block; }
+
+    /* Upload areas */
+    .upload-area {
+        border: 2px dashed #e0e0e0; border-radius: 12px; padding: 1.75rem 2rem;
+        text-align: center; cursor: pointer; transition: all 0.3s ease;
+        background: #fafafa; display: block;
     }
 
-    .image-upload-area {
-        border: 2px dashed #e0e0e0;
-        border-radius: 12px;
-        padding: 2rem;
-        text-align: center;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        background: #fafafa;
+    .upload-area:hover { border-color: #8B7355; background: #f5f5f5; }
+
+    .upload-area.pdf-area { border-color: #c5a47e; background: #fdf8f3; }
+    .upload-area.pdf-area:hover { border-color: #8B7355; background: #f5ede0; }
+
+    .upload-icon { font-size: 2.25rem; margin-bottom: 0.6rem; opacity: 0.5; }
+    .upload-text { color: #555; font-size: 0.92rem; font-family: 'Work Sans', sans-serif; margin-bottom: 0.2rem; }
+    .upload-hint { color: #aaa; font-size: 0.82rem; font-family: 'Work Sans', sans-serif; }
+
+    .image-preview { display: none; margin-top: 1rem; border-radius: 10px; overflow: hidden; max-width: 340px; margin-left: auto; margin-right: auto; }
+    .image-preview img { width: 100%; height: auto; display: block; }
+    .image-preview.show { display: block; }
+
+    .pdf-selected {
+        display: none; margin-top: 0.75rem; padding: 0.65rem 1rem;
+        background: #f0ebe4; border-radius: 8px; border: 1px solid #d4b896;
+        font-family: 'Work Sans', sans-serif; font-size: 0.88rem; color: #6B5644;
+        align-items: center; gap: 0.5rem;
     }
 
-    .image-upload-area:hover {
-        border-color: #8B7355;
-        background: #f5f5f5;
-    }
-
-    .upload-icon {
-        font-size: 3rem;
-        margin-bottom: 1rem;
-        opacity: 0.3;
-    }
-
-    .upload-text {
-        color: #666;
-        font-size: 0.95rem;
-        margin-bottom: 0.5rem;
-    }
-
-    .upload-hint {
-        color: #999;
-        font-size: 0.85rem;
-    }
-
-    .image-preview {
-        display: none;
-        margin-top: 1rem;
-        border-radius: 12px;
-        overflow: hidden;
-        max-width: 400px;
-        margin-left: auto;
-        margin-right: auto;
-    }
-
-    .image-preview img {
-        width: 100%;
-        height: auto;
-        display: block;
-    }
-
-    .image-preview.show {
-        display: block;
-    }
+    .pdf-selected.show { display: flex; }
 
     /* Checkbox */
     .checkbox-wrapper {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        padding: 1rem;
-        background: #f8f9fa;
-        border-radius: 12px;
-        border: 1px solid #e8e8e8;
-        cursor: pointer;
-        transition: all 0.3s ease;
+        display: flex; align-items: center; gap: 0.75rem; padding: 1rem;
+        background: #f8f9fa; border-radius: 12px; border: 1px solid #e8e8e8;
+        cursor: pointer; transition: background 0.2s;
     }
 
-    .checkbox-wrapper:hover {
-        background: #f0f0f0;
-    }
+    .checkbox-wrapper:hover { background: #f0f0f0; }
+    .checkbox-wrapper input[type="checkbox"] { width: 20px; height: 20px; cursor: pointer; }
+    .checkbox-label { font-family: 'Work Sans', sans-serif; color: #333; font-weight: 500; cursor: pointer; }
 
-    .checkbox-wrapper input[type="checkbox"] {
-        width: 20px;
-        height: 20px;
-        cursor: pointer;
-    }
-
-    .checkbox-label {
-        font-family: 'Work Sans', sans-serif;
-        color: #333;
-        font-weight: 500;
-        cursor: pointer;
-    }
-
-    /* Action Buttons */
+    /* Actions */
     .action-section {
-        background: white;
-        padding: 2rem;
-        border-radius: 16px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.06);
-        border: 1px solid #e8e8e8;
+        background: white; padding: 2rem; border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.06); border: 1px solid #e8e8e8;
     }
 
-    .action-buttons {
-        display: flex;
-        gap: 1rem;
-        flex-wrap: wrap;
-    }
+    .action-buttons { display: flex; gap: 1rem; flex-wrap: wrap; }
 
     .btn {
-        font-family: 'Work Sans', sans-serif;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        padding: 0.875rem 1.75rem;
-        border-radius: 12px;
-        text-decoration: none;
-        font-weight: 600;
-        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        border: none;
-        cursor: pointer;
-        font-size: 0.95rem;
+        font-family: 'Work Sans', sans-serif; display: inline-flex; align-items: center;
+        gap: 0.5rem; padding: 0.875rem 1.75rem; border-radius: 12px; text-decoration: none;
+        font-weight: 600; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        border: none; cursor: pointer; font-size: 0.95rem;
     }
 
-    .btn-secondary {
-        background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
-        color: white;
-        box-shadow: 0 2px 8px rgba(149, 165, 166, 0.2);
-    }
+    .btn-secondary { background: linear-gradient(135deg, #95a5a6, #7f8c8d); color: white; }
+    .btn-secondary:hover { transform: translateY(-2px); }
+    .btn-primary { background: linear-gradient(135deg, #8B7355, #6B5644); color: white; }
+    .btn-primary:hover { transform: translateY(-2px); }
+    .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
 
-    .btn-secondary:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(149, 165, 166, 0.3);
-    }
-
-    .btn-primary {
-        background: linear-gradient(135deg, #8B7355 0%, #6B5644 100%);
-        color: white;
-        box-shadow: 0 2px 8px rgba(139, 115, 85, 0.2);
-    }
-
-    .btn-primary:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(139, 115, 85, 0.3);
-    }
-
-    /* Responsive */
     @media (max-width: 768px) {
-        .form-card {
-            padding: 1.5rem;
-        }
-
-        .form-grid {
-            grid-template-columns: 1fr;
-        }
-
-        .action-buttons {
-            flex-direction: column;
-        }
-
-        .btn {
-            width: 100%;
-            justify-content: center;
-        }
+        .form-card { padding: 1.5rem; }
+        .form-grid { grid-template-columns: 1fr; }
+        .action-buttons { flex-direction: column; }
+        .btn { width: 100%; justify-content: center; }
     }
 </style>
 @endpush
 
 @section('content')
 <div class="form-container">
-    <form action="{{ route('admin.blogs.update', $blog) }}" method="POST" enctype="multipart/form-data">
+    <form action="{{ route('admin.blogs.update', $blog) }}" method="POST" enctype="multipart/form-data" id="blogForm">
         @csrf
         @method('PUT')
 
-        <!-- Blog Information -->
+        {{-- ──────────────────────────────
+             CARD 1: Blog Information
+        ────────────────────────────── --}}
         <div class="form-card">
             <h3 class="section-title">
                 <span class="section-icon">📝</span>
                 Blog Post Information
             </h3>
-            
+
+            {{-- Post Title --}}
             <div class="form-group">
                 <label for="title" class="form-label">
                     Post Title <span class="required">*</span>
                 </label>
-                <input 
-                    type="text" 
-                    id="title" 
-                    name="title" 
+                <input
+                    type="text"
+                    id="title"
+                    name="title"
                     class="form-control @error('title') error @enderror"
                     value="{{ old('title', $blog->title) }}"
                     required
                     placeholder="e.g., Best Time for Bali Wedding"
                 >
                 @error('title')
-                <div class="error-message">{{ $message }}</div>
+                    <div class="error-message">{{ $message }}</div>
                 @enderror
                 <div class="form-help">The slug will be automatically generated from the title</div>
             </div>
 
+            {{-- Author + Publish Date --}}
             <div class="form-grid">
-                <div class="form-group">
+                <div class="form-group" style="margin-bottom:0">
                     <label for="author" class="form-label">Author</label>
-                    <input 
-                        type="text" 
-                        id="author" 
-                        name="author" 
+                    <input
+                        type="text"
+                        id="author"
+                        name="author"
                         class="form-control @error('author') error @enderror"
                         value="{{ old('author', $blog->author) }}"
                         placeholder="e.g., Wedding Planner Team"
                     >
                     @error('author')
-                    <div class="error-message">{{ $message }}</div>
+                        <div class="error-message">{{ $message }}</div>
                     @enderror
                 </div>
 
-                <div class="form-group">
+                <div class="form-group" style="margin-bottom:0">
                     <label for="published_at" class="form-label">Publish Date</label>
-                    <input 
-                        type="date" 
-                        id="published_at" 
-                        name="published_at" 
+                    <input
+                        type="date"
+                        id="published_at"
+                        name="published_at"
                         class="form-control @error('published_at') error @enderror"
                         value="{{ old('published_at', $blog->published_at ? $blog->published_at->format('Y-m-d') : '') }}"
                     >
                     @error('published_at')
-                    <div class="error-message">{{ $message }}</div>
+                        <div class="error-message">{{ $message }}</div>
                     @enderror
                 </div>
             </div>
 
-            <div class="form-group">
+            {{-- Excerpt --}}
+            <div class="form-group" style="margin-top:1.5rem">
                 <label for="excerpt" class="form-label">Excerpt</label>
-                <textarea 
-                    id="excerpt" 
-                    name="excerpt" 
+                <textarea
+                    id="excerpt"
+                    name="excerpt"
                     class="form-control @error('excerpt') error @enderror"
                     placeholder="Brief summary of the blog post..."
                 >{{ old('excerpt', $blog->excerpt) }}</textarea>
                 @error('excerpt')
-                <div class="error-message">{{ $message }}</div>
+                    <div class="error-message">{{ $message }}</div>
                 @enderror
-                <div class="form-help">Optional short description that appears in blog listings</div>
+                <div class="form-help">Optional short description shown in blog listings</div>
             </div>
 
+            {{-- PDF (replace) --}}
             <div class="form-group">
-                <label for="content" class="form-label">
-                    Content <span class="required">*</span>
+                <label class="form-label">
+                    {{ $blog->pdf ? 'Replace PDF (Optional)' : 'Upload PDF' }}
                 </label>
-                <textarea 
-                    id="content" 
-                    name="content" 
-                    class="form-control large @error('content') error @enderror"
-                    required
-                    placeholder="Write your blog post content here..."
-                >{{ old('content', $blog->content) }}</textarea>
-                @error('content')
-                <div class="error-message">{{ $message }}</div>
+
+                {{-- Show current PDF link if exists --}}
+                @if($blog->pdf)
+                <div class="current-pdf-box">
+                    <svg width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/>
+                        <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/>
+                    </svg>
+                    <div class="current-pdf-info">
+                        <span>Current PDF</span>
+                        <a href="{{ asset('storage/' . $blog->pdf) }}" target="_blank">
+                            {{ basename($blog->pdf) }} — View ↗
+                        </a>
+                    </div>
+                </div>
+                @endif
+
+                <div class="upload-area pdf-area" id="pdfArea" onclick="document.getElementById('pdf').click()">
+                    <div class="upload-icon"><i class="fas fa-file-pdf"></i></div>
+                    <div class="upload-text">Upload new PDF to replace</div>
+                    <div class="upload-hint">
+                        {{ $blog->pdf ? 'Leave empty to keep current PDF' : 'PDF only · Max 50 MB' }}
+                    </div>
+                </div>
+                <input
+                    type="file"
+                    id="pdf"
+                    name="pdf"
+                    accept="application/pdf"
+                    style="display:none;"
+                >
+                <div class="pdf-selected" id="pdfSelected">
+                    <i class="fas fa-check-circle"></i>
+                    <span id="pdfName"></span>
+                </div>
+                @error('pdf')
+                    <div class="error-message">{{ $message }}</div>
                 @enderror
+                <div class="form-help">Uploading a new PDF will replace the existing content</div>
             </div>
 
-            <div class="form-group">
+            {{-- Publish checkbox --}}
+            <div class="form-group" style="margin-bottom:0">
                 <label class="checkbox-wrapper">
-                    <input 
-                        type="checkbox" 
-                        name="is_published" 
+                    <input
+                        type="checkbox"
+                        name="is_published"
                         value="1"
                         {{ old('is_published', $blog->is_published) ? 'checked' : '' }}
                     >
@@ -423,60 +310,58 @@
             </div>
         </div>
 
-        <!-- Featured Image -->
+        {{-- ──────────────────────────────
+             CARD 2: Featured Image
+        ────────────────────────────── --}}
         <div class="form-card">
             <h3 class="section-title">
                 <span class="section-icon">🖼️</span>
                 Featured Image
             </h3>
 
+            {{-- Current image --}}
             @if($blog->image)
-            <div class="current-image">
-                <span class="current-image-label">Current Image:</span>
-                <div class="current-image-wrapper">
-                    <img src="{{ asset('storage/' . $blog->image) }}" alt="{{ $blog->title }}">
-                </div>
+            <div class="current-image-box">
+                <span class="current-image-label">Current image:</span>
+                <img src="{{ asset('storage/' . $blog->image) }}" alt="{{ $blog->title }}">
             </div>
             @endif
 
-            <div class="form-group">
-                <label for="image" class="form-label">
+            <div class="form-group" style="margin-bottom:0">
+                <label class="form-label">
                     {{ $blog->image ? 'Replace Image (Optional)' : 'Upload Image' }}
                 </label>
-                <div class="image-upload-wrapper">
-                    <label for="image" class="image-upload-area" id="upload-area">
-                        <div class="upload-icon">📸</div>
-                        <div class="upload-text">Click to upload or drag and drop</div>
-                        <div class="upload-hint">JPG, PNG, WEBP (Max 2MB)</div>
-                    </label>
-                    <input 
-                        type="file" 
-                        id="image" 
-                        name="image" 
-                        class="@error('image') error @enderror"
-                        accept="image/jpeg,image/png,image/jpg,image/webp"
-                        style="display: none;"
-                    >
-                    <div class="image-preview" id="image-preview">
-                        <img src="" alt="Preview" id="preview-img">
-                    </div>
+                <div class="upload-area" id="imageArea" onclick="document.getElementById('image').click()">
+                    <div class="upload-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+                    <div class="upload-text">Click to upload or drag and drop</div>
+                    <div class="upload-hint">JPG, PNG, WEBP · Max 20 MB</div>
+                </div>
+                <input
+                    type="file"
+                    id="image"
+                    name="image"
+                    class="@error('image') error @enderror"
+                    accept="image/jpeg,image/png,image/jpg,image/webp"
+                    style="display:none;"
+                >
+                <div class="image-preview" id="imagePreview">
+                    <img src="" alt="Preview" id="previewImg">
                 </div>
                 @error('image')
-                <div class="error-message">{{ $message }}</div>
+                    <div class="error-message">{{ $message }}</div>
                 @enderror
                 <div class="form-help">
-                    {{ $blog->image ? 'Leave empty to keep current image. ' : '' }}This image will be shown at the top of the blog post
+                    {{ $blog->image ? 'Leave empty to keep current image.' : '' }}
+                    This image will be shown at the top of the blog post.
                 </div>
             </div>
         </div>
 
-        <!-- Actions -->
+        {{-- Actions --}}
         <div class="action-section">
             <div class="action-buttons">
-                <a href="{{ route('admin.blogs.index') }}" class="btn btn-secondary">
-                    ← Cancel
-                </a>
-                <button type="submit" class="btn btn-primary">
+                <a href="{{ route('admin.blogs.index') }}" class="btn btn-secondary">← Cancel</a>
+                <button type="submit" class="btn btn-primary" id="submitBtn">
                     💾 Update Blog Post
                 </button>
             </div>
@@ -487,45 +372,53 @@
 
 @push('scripts')
 <script>
-    // Image Upload Preview
-    const imageInput = document.getElementById('image');
-    const uploadArea = document.getElementById('upload-area');
-    const imagePreview = document.getElementById('image-preview');
-    const previewImg = document.getElementById('preview-img');
+    /* ── Image preview ── */
+    const imageInput   = document.getElementById('image');
+    const imageArea    = document.getElementById('imageArea');
+    const imagePreview = document.getElementById('imagePreview');
+    const previewImg   = document.getElementById('previewImg');
 
-    imageInput.addEventListener('change', function(e) {
+    imageInput.addEventListener('change', function (e) {
         const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                previewImg.src = e.target.result;
-                imagePreview.classList.add('show');
-            }
-            reader.readAsDataURL(file);
-        }
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = e => { previewImg.src = e.target.result; imagePreview.classList.add('show'); };
+        reader.readAsDataURL(file);
     });
 
-    // Drag and Drop
-    uploadArea.addEventListener('dragover', function(e) {
-        e.preventDefault();
-        uploadArea.classList.add('dragover');
-    });
-
-    uploadArea.addEventListener('dragleave', function(e) {
-        e.preventDefault();
-        uploadArea.classList.remove('dragover');
-    });
-
-    uploadArea.addEventListener('drop', function(e) {
-        e.preventDefault();
-        uploadArea.classList.remove('dragover');
-        
+    imageArea.addEventListener('dragover', e => { e.preventDefault(); imageArea.style.borderColor = '#8B7355'; });
+    imageArea.addEventListener('dragleave', () => { imageArea.style.borderColor = ''; });
+    imageArea.addEventListener('drop', function (e) {
+        e.preventDefault(); imageArea.style.borderColor = '';
         const files = e.dataTransfer.files;
-        if (files.length > 0) {
-            imageInput.files = files;
-            const event = new Event('change');
-            imageInput.dispatchEvent(event);
-        }
+        if (files.length) { imageInput.files = files; imageInput.dispatchEvent(new Event('change')); }
+    });
+
+    /* ── PDF preview ── */
+    const pdfInput    = document.getElementById('pdf');
+    const pdfArea     = document.getElementById('pdfArea');
+    const pdfSelected = document.getElementById('pdfSelected');
+    const pdfName     = document.getElementById('pdfName');
+
+    pdfInput.addEventListener('change', function (e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        pdfName.textContent = file.name;
+        pdfSelected.classList.add('show');
+    });
+
+    pdfArea.addEventListener('dragover', e => { e.preventDefault(); });
+    pdfArea.addEventListener('drop', function (e) {
+        e.preventDefault();
+        const files = e.dataTransfer.files;
+        if (files.length) { pdfInput.files = files; pdfInput.dispatchEvent(new Event('change')); }
+    });
+
+    /* ── Submit guard ── */
+    document.getElementById('blogForm').addEventListener('submit', function () {
+        const btn = document.getElementById('submitBtn');
+        btn.disabled = true;
+        btn.innerHTML = '⏳ Saving...';
     });
 </script>
 @endpush

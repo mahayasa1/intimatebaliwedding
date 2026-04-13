@@ -186,8 +186,7 @@
                 <div class="contact-info-item">
                     <div class="contact-icon">📍</div>
                     <div class="contact-text">
-                        Jl. Puri Dewata No. 98<br>
-                        Sidakarya, Denpasar, Bali
+                        Jl. Anggrek No.27, <br> Kota Denpasar, Bali
                     </div>
                 </div>
             </div>
