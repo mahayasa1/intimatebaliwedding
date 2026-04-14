@@ -325,7 +325,7 @@
             <span class="card-title-icon">📝</span>
             Content
         </h3>
-        <div class="content-display">{{ $blog->content }}</div>
+        <div class="content-display">{!! $blog->content !!}</div>
     </div>
 
     <!-- Actions -->
