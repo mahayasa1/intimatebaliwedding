@@ -5,27 +5,23 @@
 
 @push('styles')
 <style>
-    /* Hero Section */
+    /* ===== HERO ===== */
     .hero-section {
         position: relative;
         height: 100vh;
+        min-height: 480px;
         overflow: hidden;
         margin-top: -80px;
     }
 
     .hero-slide {
         position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
+        inset: 0;
         opacity: 0;
         transition: opacity 1s ease-in-out;
     }
 
-    .hero-slide.active {
-        opacity: 1;
-    }
+    .hero-slide.active { opacity: 1; }
 
     .hero-slide img {
         width: 100%;
@@ -37,11 +33,8 @@
 
     .hero-overlay {
         position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.5));
+        inset: 0;
+        background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.55));
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -49,24 +42,26 @@
         color: white;
         text-align: center;
         z-index: 10;
-        padding: 2rem;
+        padding: 1.5rem;
     }
 
     .hero-title {
         font-family: 'Playfair Display', serif;
-        font-size: 4rem;
+        font-size: clamp(1.8rem, 6vw, 4rem);
         font-weight: 700;
-        margin-bottom: 1rem;
+        margin-bottom: 0.75rem;
         letter-spacing: 2px;
-        animation: fadeInUp 1s ease-out;
+        animation: fadeInUp 1s ease-out both;
+        line-height: 1.2;
     }
 
     .hero-subtitle {
-        font-size: 1.2rem;
+        font-size: clamp(0.9rem, 2.5vw, 1.2rem);
         margin-bottom: 2rem;
         letter-spacing: 1px;
         font-weight: 300;
         animation: fadeInUp 1s ease-out 0.2s both;
+        max-width: 560px;
     }
 
     .hero-cta {
@@ -74,21 +69,15 @@
     }
 
     @keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(30px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
+        from { opacity: 0; transform: translateY(30px); }
+        to   { opacity: 1; transform: translateY(0); }
     }
 
-    /* Package Cards - Slide Up Effect */
+    /* ===== PACKAGE CARDS ===== */
     .package-grid {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
-        gap: 2rem;
+        gap: 1.25rem;
         max-width: 1400px;
         margin: 0 auto;
     }
@@ -96,17 +85,17 @@
     .package-card {
         position: relative;
         overflow: hidden;
-        aspect-ratio: 1/1;
+        aspect-ratio: 1 / 1;
         cursor: pointer;
         text-decoration: none;
         display: block;
         border-radius: 12px;
         box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        transition: all 0.3s ease;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
 
     .package-card:hover {
-        transform: translateY(-8px);
+        transform: translateY(-6px);
         box-shadow: 0 8px 25px rgba(0,0,0,0.2);
     }
 
@@ -117,24 +106,18 @@
         transition: transform 0.5s ease;
     }
 
-    .package-card:hover img {
-        transform: scale(1.05);
-    }
+    .package-card:hover img { transform: scale(1.05); }
 
     .package-overlay {
         position: absolute;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        height: 100%;
-        padding: 2rem;
-        background: linear-gradient(to top, rgba(0, 0, 0) 0%, transparent 50%);
+        inset: 0;
+        padding: 1.5rem;
+        background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 55%);
         color: white;
         display: flex;
         flex-direction: column;
         justify-content: flex-end;
         transition: background 0.3s ease;
-        pointer-events: none;
         text-align: center;
     }
 
@@ -145,65 +128,62 @@
         left: 0;
         right: 0;
         height: 0;
-        background: rgba(0, 0, 0, 0.327);
-        transition: height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        background: rgba(0,0,0,0.32);
+        transition: height 0.5s cubic-bezier(0.4,0,0.2,1);
         z-index: 1;
     }
 
-    .package-card:hover .package-overlay::before {
-        height: 100%;
-    }
+    .package-card:hover .package-overlay::before { height: 100%; }
 
     .package-content {
         position: relative;
         z-index: 2;
-        transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: transform 0.5s cubic-bezier(0.4,0,0.2,1);
     }
 
-    .package-card:hover .package-content {
-        transform: translateY(-30%);
-    }
+    .package-card:hover .package-content { transform: translateY(-28%); }
 
     .package-type {
-        font-size: 0.75rem;
+        font-size: 0.7rem;
         color: #D4AF37;
         text-transform: uppercase;
         letter-spacing: 2px;
-        margin-bottom: 0.5rem;
+        margin-bottom: 0.4rem;
         font-weight: 600;
     }
 
     .package-title {
         font-family: 'Playfair Display', serif;
-        font-size: 1.6rem;
+        font-size: clamp(1rem, 2.5vw, 1.6rem);
         font-weight: 600;
-        margin-bottom: 0.5rem;
+        margin-bottom: 0.4rem;
         text-transform: uppercase;
         letter-spacing: 1px;
+        line-height: 1.2;
     }
 
     .package-card p {
-        font-size: 0.9rem;
+        font-size: 0.85rem;
         line-height: 1.5;
-        margin: 0.8rem 0;
+        margin: 0.6rem 0 0;
         max-height: 0;
         opacity: 0;
         overflow: hidden;
-        transform: translateY(20px);
-        transition: all 0.5s ease 0.2s;
+        transform: translateY(16px);
+        transition: all 0.5s ease 0.15s;
     }
 
     .package-card:hover p {
-        max-height: 100px;
+        max-height: 80px;
         opacity: 1;
         transform: translateY(0);
     }
 
-    /* Gallery Preview */
+    /* ===== GALLERY PREVIEW ===== */
     .gallery-preview-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-        gap: 2rem;
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 1.25rem;
         max-width: 1200px;
         margin: 2rem auto;
     }
@@ -213,9 +193,9 @@
         overflow: hidden;
         border-radius: 8px;
         cursor: pointer;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        transition: all 0.3s;
-        aspect-ratio: 4/3;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        aspect-ratio: 4 / 3;
     }
 
     .gallery-preview-item:hover {
@@ -227,18 +207,16 @@
         width: 100%;
         height: 100%;
         object-fit: cover;
-        transition: transform 0.3s;
+        transition: transform 0.3s ease;
     }
 
-    .gallery-preview-item:hover img {
-        transform: scale(1.1);
-    }
+    .gallery-preview-item:hover img { transform: scale(1.08); }
 
-    /* Blog Preview */
+    /* ===== BLOG PREVIEW ===== */
     .blog-preview-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 2rem;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
         max-width: 1200px;
         margin: 2rem auto;
     }
@@ -247,9 +225,11 @@
         background: white;
         border-radius: 8px;
         overflow: hidden;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        transition: all 0.3s;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
         cursor: pointer;
+        text-decoration: none;
+        display: block;
     }
 
     .blog-preview-card:hover {
@@ -261,36 +241,32 @@
         width: 100%;
         height: 200px;
         object-fit: cover;
+        display: block;
     }
 
-    .blog-preview-content {
-        padding: 1.5rem;
-    }
+    .blog-preview-content { padding: 1.25rem; }
 
     .blog-preview-title {
         font-family: 'Playfair Display', serif;
-        font-size: 1.3rem;
+        font-size: clamp(1rem, 2.5vw, 1.3rem);
         color: #333;
-        margin-bottom: 0.5rem;
+        margin: 0 0 0.5rem;
     }
 
     .blog-preview-excerpt {
         color: #666;
-        font-size: 0.9rem;
+        font-size: 0.88rem;
         line-height: 1.6;
-        margin-bottom: 1rem;
+        margin-bottom: 0.75rem;
     }
 
-    .blog-preview-date {
-        color: #D4AF37;
-        font-size: 0.85rem;
-    }
+    .blog-preview-date { color: #D4AF37; font-size: 0.82rem; }
 
-    /* Instagram Section */
+    /* ===== INSTAGRAM ===== */
     .instagram-grid {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
-        gap: 1rem;
+        gap: 0.75rem;
     }
 
     .instagram-post-item {
@@ -298,14 +274,14 @@
         display: block;
         overflow: hidden;
         border-radius: 8px;
-        aspect-ratio: 1/1;
+        aspect-ratio: 1 / 1;
         text-decoration: none;
         background: #f0f0f0;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: transform 0.3s cubic-bezier(0.4,0,0.2,1), box-shadow 0.3s;
     }
 
     .instagram-post-item:hover {
-        transform: translateY(-5px);
+        transform: translateY(-4px);
         box-shadow: 0 8px 25px rgba(0,0,0,0.2);
     }
 
@@ -313,226 +289,190 @@
         width: 100%;
         height: 100%;
         object-fit: cover;
-        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: transform 0.4s ease, filter 0.4s ease;
     }
 
     .instagram-post-item:hover img {
-        transform: scale(1.1);
-        filter: brightness(1.1) contrast(1.05);
+        transform: scale(1.08);
+        filter: brightness(1.08) contrast(1.04);
     }
 
     .media-type-icon {
         position: absolute;
-        top: 10px;
-        right: 10px;
-        background: rgba(0, 0, 0, 0.6);
+        top: 8px;
+        right: 8px;
+        background: rgba(0,0,0,0.55);
         border-radius: 50%;
-        width: 35px;
-        height: 35px;
+        width: 32px;
+        height: 32px;
         display: flex;
         align-items: center;
         justify-content: center;
         z-index: 2;
-        backdrop-filter: blur(10px);
+        backdrop-filter: blur(8px);
     }
 
     .instagram-overlay-hover {
         position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(0, 0, 0, 0);
-        transition: all 0.3s ease;
+        inset: 0;
+        background: rgba(0,0,0,0);
+        transition: background 0.3s ease, opacity 0.3s ease;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
         color: white;
         opacity: 0;
-        gap: 1rem;
+        gap: 0.75rem;
     }
 
     .instagram-post-item:hover .instagram-overlay-hover {
         opacity: 1;
-        background: rgba(0, 0, 0, 0.7);
-        backdrop-filter: blur(5px);
+        background: rgba(0,0,0,0.68);
+        backdrop-filter: blur(4px);
     }
 
     .instagram-stats {
         display: flex;
-        gap: 2rem;
-        font-size: 1rem;
+        gap: 1.5rem;
+        font-size: 0.95rem;
         font-weight: 600;
     }
 
-    .stat-item {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-
-    .view-on-instagram {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 0.5rem;
-    }
-
-    .view-on-instagram p {
-        margin: 0;
-        font-size: 0.9rem;
-        font-weight: 600;
-    }
+    .stat-item { display: flex; align-items: center; gap: 0.4rem; }
 
     .btn-instagram {
         display: inline-flex;
         align-items: center;
-        gap: 0.75rem;
-        padding: 1rem 2.5rem;
+        gap: 0.6rem;
+        padding: 0.875rem 2.25rem;
         background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
         color: white;
         text-decoration: none;
         border-radius: 30px;
         font-weight: 600;
-        font-size: 1.1rem;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(188, 24, 136, 0.3);
+        font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        box-shadow: 0 4px 15px rgba(188,24,136,0.3);
     }
 
     .btn-instagram:hover {
         transform: translateY(-3px) scale(1.02);
-        box-shadow: 0 8px 25px rgba(188, 24, 136, 0.5);
+        box-shadow: 0 8px 25px rgba(188,24,136,0.5);
         color: white;
     }
 
-    .no-posts {
-        min-height: 300px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-    }
-
-    /* Testimonials */
+    /* ===== TESTIMONIALS ===== */
     .testimonial-section {
         background: #f8f8f8;
-        padding: 5rem 2rem;
+        padding: 5rem 1.5rem;
         overflow: hidden;
     }
 
     .testimonials-header {
         text-align: center;
-        margin-bottom: 3rem;
+        margin-bottom: 2.5rem;
     }
 
     .testimonials-header h2 {
         font-family: 'Playfair Display', serif;
         color: #D4AF37;
-        font-size: 2.5rem;
-        margin-bottom: 1rem;
+        font-size: clamp(1.6rem, 4vw, 2.5rem);
+        margin-bottom: 0.75rem;
     }
 
     .testimonials-slider-container {
         position: relative;
         max-width: 1200px;
         margin: 0 auto;
-        padding: 0 60px;
+        padding: 0 52px;
     }
 
-    .testimonials-slider-wrapper {
-        overflow: hidden;
-        position: relative;
-    }
+    .testimonials-slider-wrapper { overflow: hidden; }
 
     .testimonials-slider {
         display: flex;
-        gap: 2rem;
+        gap: 1.5rem;
         transition: transform 0.5s ease-in-out;
     }
 
     .testimonial-card {
         background: white;
         border-radius: 12px;
-        padding: 2.5rem;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-        position: relative;
-        min-width: 350px;
+        padding: 2rem;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        min-width: 320px;
         flex-shrink: 0;
-        transition: all 0.3s;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
         border-left: 4px solid #D4AF37;
     }
 
     .testimonial-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+        transform: translateY(-4px);
+        box-shadow: 0 8px 30px rgba(0,0,0,0.13);
     }
 
     .testimonial-header-content {
         display: flex;
         align-items: center;
-        gap: 1rem;
-        margin-bottom: 1.5rem;
+        gap: 0.875rem;
+        margin-bottom: 1.25rem;
     }
 
     .testimonial-avatar {
-        width: 60px;
-        height: 60px;
+        width: 54px;
+        height: 54px;
         border-radius: 50%;
         object-fit: cover;
         border: 3px solid #D4AF37;
         flex-shrink: 0;
     }
 
-    .testimonial-info {
-        flex: 1;
-    }
+    .testimonial-info { flex: 1; }
 
     .testimonial-info h4 {
         font-family: 'Playfair Display', serif;
-        font-size: 1.1rem;
-        margin: 0 0 0.3rem 0;
+        font-size: 1.05rem;
+        margin: 0 0 0.2rem;
         color: #333;
     }
 
-    .testimonial-time {
-        font-size: 0.8rem;
-        color: #999;
-    }
+    .testimonial-time { font-size: 0.78rem; color: #999; }
 
     .testimonial-rating {
         color: #D4AF37;
-        font-size: 1.3rem;
-        margin-bottom: 1rem;
+        font-size: 1.2rem;
+        margin-bottom: 0.875rem;
         letter-spacing: 2px;
     }
 
     .testimonial-review {
         color: #555;
         line-height: 1.8;
-        font-size: 1rem;
+        font-size: 0.95rem;
         font-style: italic;
         position: relative;
-        padding-left: 1.5rem;
+        padding-left: 1.25rem;
     }
 
-    .testimonial-review:before {
+    .testimonial-review::before {
         content: '"';
         position: absolute;
         left: 0;
-        top: -10px;
-        font-size: 3rem;
+        top: -8px;
+        font-size: 2.5rem;
         color: #D4AF37;
         opacity: 0.3;
         font-family: Georgia, serif;
+        line-height: 1;
     }
 
     .slider-nav {
         position: absolute;
         top: 50%;
         transform: translateY(-50%);
-        width: 50px;
-        height: 50px;
+        width: 44px;
+        height: 44px;
         background: white;
         border: 2px solid #D4AF37;
         border-radius: 50%;
@@ -540,107 +480,138 @@
         align-items: center;
         justify-content: center;
         cursor: pointer;
-        transition: all 0.3s;
+        transition: background 0.3s ease, transform 0.3s ease, color 0.3s ease;
         z-index: 10;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
     }
 
     .slider-nav:hover {
         background: #D4AF37;
         color: white;
-        transform: translateY(-50%) scale(1.1);
+        transform: translateY(-50%) scale(1.08);
     }
 
     .slider-nav.prev { left: 0; }
     .slider-nav.next { right: 0; }
-
-    .slider-nav svg {
-        width: 24px;
-        height: 24px;
-        fill: currentColor;
-    }
+    .slider-nav svg { width: 22px; height: 22px; fill: currentColor; }
 
     .slider-dots {
         display: flex;
         justify-content: center;
-        gap: 0.5rem;
-        margin-top: 3rem;
+        gap: 0.4rem;
+        margin-top: 2.5rem;
     }
 
     .slider-dot {
-        width: 12px;
-        height: 12px;
+        width: 10px;
+        height: 10px;
         border-radius: 50%;
         background: #ddd;
         cursor: pointer;
-        transition: all 0.3s;
+        transition: all 0.3s ease;
     }
 
     .slider-dot.active {
         background: #D4AF37;
-        width: 30px;
-        border-radius: 6px;
+        width: 28px;
+        border-radius: 5px;
     }
 
-    .testimonials-cta {
-        text-align: center;
-        margin-top: 3rem;
-    }
+    .testimonials-cta { text-align: center; margin-top: 2.5rem; }
 
     .btn-google-maps {
         display: inline-flex;
         align-items: center;
         gap: 0.5rem;
-        padding: 1rem 2rem;
+        padding: 0.875rem 1.75rem;
         background: #4285f4;
         color: white;
         text-decoration: none;
         border-radius: 30px;
         font-weight: 600;
-        transition: all 0.3s;
-        box-shadow: 0 4px 15px rgba(66, 133, 244, 0.3);
+        font-size: clamp(0.85rem, 2.5vw, 1rem);
+        transition: background 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+        box-shadow: 0 4px 15px rgba(66,133,244,0.3);
     }
 
     .btn-google-maps:hover {
         background: #3367d6;
         transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(66, 133, 244, 0.4);
+        box-shadow: 0 6px 20px rgba(66,133,244,0.4);
         color: white;
     }
 
-    .no-reviews {
-        text-align: center;
-        padding: 3rem;
-        color: #999;
-    }
+    .no-reviews { text-align: center; padding: 3rem; color: #999; }
 
-    /* Responsive */
-    @media (max-width: 768px) {
-        .hero-section { height: 70vh; }
-        .hero-title { font-size: 2.5rem; }
-        .hero-subtitle { font-size: 1rem; }
-        .package-grid { grid-template-columns: 1fr; gap: 1.5rem; }
-        .package-title { font-size: 1.3rem; }
-        .package-card:hover .package-content { transform: translateY(-20%); }
-        .gallery-preview-grid { grid-template-columns: 1fr; }
-        .blog-preview-grid { grid-template-columns: 1fr; }
-        .testimonial-section { padding: 3rem 1rem; }
-        .testimonials-slider-container { padding: 0 50px; }
+    /* ===== RESPONSIVE ===== */
+
+    /* Tablet: ≤ 992px */
+    @media (max-width: 992px) {
+        .hero-section { height: 80vh; }
+        .package-grid { gap: 1rem; }
+        .gallery-preview-grid { grid-template-columns: repeat(2, 1fr); }
+        .testimonials-slider-container { padding: 0 48px; }
         .testimonial-card { min-width: 280px; padding: 1.5rem; }
-        .testimonial-avatar { width: 50px; height: 50px; }
-        .testimonial-review { font-size: 0.9rem; padding-left: 1rem; }
-        .slider-nav { width: 40px; height: 40px; }
-        .slider-nav svg { width: 20px; height: 20px; }
-
-        .instagram-grid { grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
-        .instagram-stats { gap: 1rem; font-size: 0.9rem; }
-        .media-type-icon { width: 30px; height: 30px; }
-        .media-type-icon svg { width: 18px; height: 18px; }
     }
 
+    /* Mobile: ≤ 768px */
+    @media (max-width: 768px) {
+        .hero-section { height: 70vh; min-height: 420px; }
+
+        /* Package: single column */
+        .package-grid { grid-template-columns: 1fr; gap: 1rem; }
+        .package-card { aspect-ratio: 16 / 10; }
+        .package-card:hover .package-content { transform: translateY(-18%); }
+        .package-card p { font-size: 0.82rem; }
+
+        /* Gallery: single column */
+        .gallery-preview-grid { grid-template-columns: 1fr; gap: 1rem; }
+
+        /* Blog: single column */
+        .blog-preview-grid { grid-template-columns: 1fr; gap: 1rem; }
+        .blog-preview-image { height: 180px; }
+
+        /* Instagram: 2 columns */
+        .instagram-grid { grid-template-columns: repeat(2, 1fr); gap: 0.6rem; }
+        .instagram-stats { gap: 0.75rem; font-size: 0.85rem; }
+        .media-type-icon { width: 28px; height: 28px; }
+
+        /* Testimonials */
+        .testimonial-section { padding: 3rem 1rem; }
+        .testimonials-slider-container { padding: 0 44px; }
+        .testimonial-card { min-width: 260px; padding: 1.25rem; }
+        .testimonial-avatar { width: 46px; height: 46px; }
+        .testimonial-review { font-size: 0.88rem; padding-left: 1rem; }
+        .slider-nav { width: 38px; height: 38px; }
+        .slider-nav svg { width: 18px; height: 18px; }
+
+        /* Snapwidget */
+        .instagram-feed-container { padding: 1rem !important; }
+    }
+
+    /* Small mobile: ≤ 480px */
     @media (max-width: 480px) {
-        .instagram-grid { grid-template-columns: 1fr; }
-        .btn-instagram { padding: 0.875rem 2rem; font-size: 1rem; }
+        .hero-section { height: 60vh; min-height: 360px; }
+        .hero-overlay { padding: 1rem; }
+
+        /* Package: full aspect on small screens */
+        .package-card { aspect-ratio: 4 / 3; }
+
+        /* Instagram: single column */
+        .instagram-grid { grid-template-columns: 1fr; gap: 0.5rem; }
+        .btn-instagram { padding: 0.8rem 1.75rem; width: 100%; justify-content: center; }
+        .btn-google-maps { width: 100%; justify-content: center; }
+
+        /* Testimonials */
+        .testimonials-slider-container { padding: 0 36px; }
+        .testimonial-card { min-width: 230px; }
+        .slider-nav { width: 32px; height: 32px; }
+    }
+
+    /* Very small: ≤ 360px */
+    @media (max-width: 360px) {
+        .testimonials-slider-container { padding: 0 28px; }
+        .testimonial-card { min-width: 200px; }
     }
 </style>
 @endpush
@@ -685,7 +656,6 @@
     </div>
     @endforeach
 
-    <!-- Hero Overlay -->
     <div class="hero-overlay">
         <h1 class="hero-title">INTIMATE WEDDING IN BALI</h1>
         <p class="hero-subtitle">Creating Timeless Memories Amidst Nature's Splendor</p>
@@ -697,8 +667,8 @@
     <div class="container">
         <h2 class="section-title">INTIMATE BALI WEDDING</h2>
         <p class="section-subtitle">
-            Intimate Bali Wedding is a specialized wedding service company dedicated to wedding affairs, meticulously, and resourcefully wedding. We 
-            GUARANTEE THAT YOU ARE IN GOOD HANDS FROM BEGINNING TO END. PROFESSIONAL AND FLEXIBLE. We have worked on various 
+            Intimate Bali Wedding is a specialized wedding service company dedicated to wedding affairs, meticulously, and resourcefully wedding. We
+            GUARANTEE THAT YOU ARE IN GOOD HANDS FROM BEGINNING TO END. PROFESSIONAL AND FLEXIBLE. We have worked on various
             projects around the world. Let us handle it!
         </p>
         <div style="text-align: center;">
@@ -715,26 +685,12 @@
 
         <div class="package-grid">
             @foreach($packages->take(4) as $package)
-            @php
-                $pkgThumb = $package->image
-                    ? ImageHelper::thumb($package->image)
-                    : null;
-            @endphp
+            @php $pkgThumb = $package->image ? ImageHelper::thumb($package->image) : null; @endphp
             <a href="{{ route('packages.public') }}" class="package-card">
                 @if($pkgThumb)
-                    <img
-                        src="{{ asset('storage/' . $pkgThumb) }}"
-                        alt="{{ $package->name }}"
-                        loading="lazy"
-                        decoding="async"
-                    >
+                    <img src="{{ asset('storage/' . $pkgThumb) }}" alt="{{ $package->name }}" loading="lazy" decoding="async">
                 @else
-                    <img
-                        src="https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=800&q=80"
-                        alt="{{ $package->name }}"
-                        loading="lazy"
-                        decoding="async"
-                    >
+                    <img src="https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=800&q=80" alt="{{ $package->name }}" loading="lazy" decoding="async">
                 @endif
                 <div class="package-overlay">
                     <div class="package-content">
@@ -747,7 +703,7 @@
             @endforeach
         </div>
 
-        <div style="text-align: center; margin-top: 3rem;">
+        <div style="text-align: center; margin-top: 2.5rem;">
             <a href="{{ route('packages.public') }}" class="btn-primary">View All Packages</a>
         </div>
     </div>
@@ -788,7 +744,7 @@
         <p class="section-subtitle">Stay connected and see our latest moments</p>
 
         <div class="instagram-feed-wrapper" style="position: relative; max-width: 1200px; margin: 2rem auto;">
-            <div class="instagram-feed-container" style="background: white; border-radius: 12px; padding: 2rem; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
+            <div class="instagram-feed-container" style="background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
                 <script src="https://snapwidget.com/js/snapwidget.js"></script>
                 <iframe src="https://snapwidget.com/embed/1119589"
                         class="snapwidget-widget"
@@ -803,12 +759,12 @@
             <div class="instagram-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 999; cursor: default;"></div>
         </div>
 
-        <div style="text-align: center; margin-top: 2rem; position: relative; z-index: 1000;">
+        <div style="text-align: center; margin-top: 2rem; position: relative; z-index: 1000; padding: 0 1rem;">
             <a href="https://instagram.com/intimatebaliwedding"
                target="_blank"
                rel="noopener"
                class="btn-instagram">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" style="flex-shrink:0;">
                     <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
                 </svg>
                 Follow @intimatebaliwedding
@@ -827,7 +783,7 @@
         <div class="blog-preview-grid">
             @foreach($blogs as $blog)
             @php $blogThumb = ImageHelper::thumb($blog->image); @endphp
-            <a href="{{ route('blogs.show', $blog->slug) }}" class="blog-preview-card" style="text-decoration: none;">
+            <a href="{{ route('blogs.show', $blog->slug) }}" class="blog-preview-card">
                 <img
                     src="{{ asset('storage/' . $blogThumb) }}"
                     alt="{{ $blog->title }}"
@@ -851,7 +807,7 @@
 </section>
 @endif
 
-<!-- Testimonials Section (Google Maps Reviews) -->
+<!-- Testimonials Section -->
 <section id="testimonials" class="testimonial-section">
     <div class="testimonials-header">
         <h2>What Our Couples Say</h2>
@@ -859,10 +815,8 @@
 
     @if(isset($googleReviews['success']) && $googleReviews['success'] && !empty($googleReviews['reviews']))
     <div class="testimonials-slider-container">
-        <div class="slider-nav prev" onclick="moveSlider(-1)">
-            <svg viewBox="0 0 24 24">
-                <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
-            </svg>
+        <div class="slider-nav prev" onclick="moveSlider(-1)" aria-label="Previous">
+            <svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
         </div>
 
         <div class="testimonials-slider-wrapper">
@@ -877,10 +831,9 @@
                              loading="lazy"
                              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                         @endif
-                        <div class="testimonial-avatar" style="background: #D4AF37; display: {{ isset($review['author_photo']) && $review['author_photo'] ? 'none' : 'flex' }}; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 1.5rem;">
+                        <div class="testimonial-avatar" style="background:#D4AF37; display:{{ isset($review['author_photo']) && $review['author_photo'] ? 'none' : 'flex' }}; align-items:center; justify-content:center; color:white; font-weight:bold; font-size:1.3rem;">
                             {{ strtoupper(substr($review['author_name'], 0, 1)) }}
                         </div>
-
                         <div class="testimonial-info">
                             <h4>{{ $review['author_name'] }}</h4>
                             <div class="testimonial-time">{{ $review['relative_time'] }}</div>
@@ -891,18 +844,14 @@
                         {{ str_repeat('★', $review['rating']) }}{{ str_repeat('☆', 5 - $review['rating']) }}
                     </div>
 
-                    <div class="testimonial-review">
-                        {{ $review['text'] }}
-                    </div>
+                    <div class="testimonial-review">{{ $review['text'] }}</div>
                 </div>
                 @endforeach
             </div>
         </div>
 
-        <div class="slider-nav next" onclick="moveSlider(1)">
-            <svg viewBox="0 0 24 24">
-                <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
-            </svg>
+        <div class="slider-nav next" onclick="moveSlider(1)" aria-label="Next">
+            <svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
         </div>
     </div>
 
@@ -910,7 +859,7 @@
 
     <div class="testimonials-cta">
         <a href="{{ $googleReviews['place_url'] ?? route('gallery.public') }}" target="_blank" class="btn-google-maps">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="flex-shrink:0;">
                 <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
             </svg>
             See All Reviews on Google Maps
@@ -938,115 +887,88 @@
 
 @push('scripts')
 <script>
-    // Hero Image Slider with Fade Effect
-    document.addEventListener('DOMContentLoaded', function() {
-        const slides = document.querySelectorAll('.hero-slide');
-        let currentSlide = 0;
-        const slideInterval = 3000;
+document.addEventListener('DOMContentLoaded', function () {
 
-        function nextSlide() {
-            slides[currentSlide].classList.remove('active');
-            currentSlide = (currentSlide + 1) % slides.length;
-            slides[currentSlide].classList.add('active');
-        }
+    /* ---- Hero Slider ---- */
+    const slides = document.querySelectorAll('.hero-slide');
+    let currentSlide = 0;
 
-        if (slides.length > 1) {
-            setInterval(nextSlide, slideInterval);
-        }
+    function nextHeroSlide() {
+        slides[currentSlide].classList.remove('active');
+        currentSlide = (currentSlide + 1) % slides.length;
+        slides[currentSlide].classList.add('active');
+    }
 
-        initTestimonialSlider();
-    });
+    if (slides.length > 1) setInterval(nextHeroSlide, 4000);
 
-    // Testimonial Slider
+    /* ---- Testimonial Slider ---- */
+    const testimonialSlider = document.getElementById('testimonials-slider');
+    if (!testimonialSlider) return;
+
+    const testimonialCards = testimonialSlider.querySelectorAll('.testimonial-card');
+    if (!testimonialCards.length) return;
+
     let currentSlideIndex = 0;
-    let testimonialSlider;
-    let testimonialCards;
-    let sliderInterval;
     let cardsPerView = 3;
+    let sliderInterval;
 
-    function initTestimonialSlider() {
-        testimonialSlider = document.getElementById('testimonials-slider');
-        if (!testimonialSlider) return;
-
-        testimonialCards = testimonialSlider.querySelectorAll('.testimonial-card');
-        if (testimonialCards.length === 0) return;
-
-        updateCardsPerView();
-        createSliderDots();
-        updateSliderPosition();
-        startAutoSlide();
-
-        window.addEventListener('resize', function() {
-            updateCardsPerView();
-            updateSliderPosition();
-            createSliderDots();
-        });
-
-        testimonialSlider.addEventListener('mouseenter', stopAutoSlide);
-        testimonialSlider.addEventListener('mouseleave', startAutoSlide);
+    function getCardsPerView() {
+        const w = window.innerWidth;
+        if (w < 640)  return 1;
+        if (w < 1024) return 2;
+        return 3;
     }
 
-    function updateCardsPerView() {
-        const width = window.innerWidth;
-        if (width < 768) {
-            cardsPerView = 1;
-        } else if (width < 1200) {
-            cardsPerView = 2;
-        } else {
-            cardsPerView = 3;
-        }
-    }
-
-    function moveSlider(direction) {
-        const maxSlides = Math.ceil(testimonialCards.length / cardsPerView) - 1;
-        currentSlideIndex += direction;
-        if (currentSlideIndex < 0) currentSlideIndex = maxSlides;
-        else if (currentSlideIndex > maxSlides) currentSlideIndex = 0;
-        updateSliderPosition();
-        updateDots();
-        stopAutoSlide();
-        startAutoSlide();
-    }
+    function updateCardsPerView() { cardsPerView = getCardsPerView(); }
 
     function updateSliderPosition() {
-        if (!testimonialSlider || !testimonialCards.length) return;
-        const cardWidth = testimonialCards[0].offsetWidth;
-        const gap = 32;
-        const moveAmount = (cardWidth + gap) * cardsPerView;
-        const offset = -(currentSlideIndex * moveAmount);
-        testimonialSlider.style.transform = `translateX(${offset}px)`;
+        const card    = testimonialCards[0];
+        const gap     = parseInt(getComputedStyle(testimonialSlider).gap) || 24;
+        const moveAmt = (card.offsetWidth + gap) * cardsPerView;
+        testimonialSlider.style.transform = `translateX(${-(currentSlideIndex * moveAmt)}px)`;
     }
 
-    function createSliderDots() {
-        const dotsContainer = document.getElementById('slider-dots');
-        if (!dotsContainer || !testimonialCards.length) return;
-        dotsContainer.innerHTML = '';
-        const totalDots = Math.ceil(testimonialCards.length / cardsPerView);
-        for (let i = 0; i < totalDots; i++) {
+    function maxSlideIndex() {
+        return Math.max(0, Math.ceil(testimonialCards.length / cardsPerView) - 1);
+    }
+
+    function createDots() {
+        const container = document.getElementById('slider-dots');
+        if (!container) return;
+        container.innerHTML = '';
+        const total = Math.ceil(testimonialCards.length / cardsPerView);
+        for (let i = 0; i < total; i++) {
             const dot = document.createElement('div');
             dot.className = 'slider-dot' + (i === currentSlideIndex ? ' active' : '');
-            dot.onclick = () => goToSlide(i);
-            dotsContainer.appendChild(dot);
+            dot.addEventListener('click', () => goToSlide(i));
+            container.appendChild(dot);
         }
     }
 
     function updateDots() {
-        const dots = document.querySelectorAll('.slider-dot');
-        dots.forEach((dot, index) => {
-            dot.classList.toggle('active', index === currentSlideIndex);
+        document.querySelectorAll('.slider-dot').forEach((dot, i) => {
+            dot.classList.toggle('active', i === currentSlideIndex);
         });
     }
 
     function goToSlide(index) {
-        currentSlideIndex = index;
+        currentSlideIndex = Math.max(0, Math.min(index, maxSlideIndex()));
         updateSliderPosition();
         updateDots();
-        stopAutoSlide();
-        startAutoSlide();
+        restartAutoSlide();
     }
 
+    window.moveSlider = function (dir) {
+        let next = currentSlideIndex + dir;
+        if (next < 0) next = maxSlideIndex();
+        else if (next > maxSlideIndex()) next = 0;
+        currentSlideIndex = next;
+        updateSliderPosition();
+        updateDots();
+        restartAutoSlide();
+    };
+
     function startAutoSlide() {
-        stopAutoSlide();
         sliderInterval = setInterval(() => moveSlider(1), 5000);
     }
 
@@ -1054,25 +976,48 @@
         if (sliderInterval) clearInterval(sliderInterval);
     }
 
-    document.addEventListener('keydown', function(e) {
-        if (!testimonialSlider) return;
-        if (e.key === 'ArrowLeft') moveSlider(-1);
-        else if (e.key === 'ArrowRight') moveSlider(1);
+    function restartAutoSlide() {
+        stopAutoSlide();
+        startAutoSlide();
+    }
+
+    /* Touch / Swipe support */
+    let touchStartX = 0;
+    testimonialSlider.addEventListener('touchstart', e => {
+        touchStartX = e.changedTouches[0].screenX;
+    }, { passive: true });
+    testimonialSlider.addEventListener('touchend', e => {
+        const diff = touchStartX - e.changedTouches[0].screenX;
+        if (Math.abs(diff) > 50) moveSlider(diff > 0 ? 1 : -1);
+    }, { passive: true });
+
+    /* Keyboard */
+    document.addEventListener('keydown', e => {
+        if (e.key === 'ArrowLeft')  moveSlider(-1);
+        if (e.key === 'ArrowRight') moveSlider(1);
     });
 
-    let touchStartX = 0;
-    let touchEndX = 0;
+    /* Pause on hover */
+    testimonialSlider.addEventListener('mouseenter', stopAutoSlide);
+    testimonialSlider.addEventListener('mouseleave', startAutoSlide);
 
-    if (testimonialSlider) {
-        testimonialSlider.addEventListener('touchstart', function(e) {
-            touchStartX = e.changedTouches[0].screenX;
-        }, false);
+    /* Resize */
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+            updateCardsPerView();
+            currentSlideIndex = Math.min(currentSlideIndex, maxSlideIndex());
+            updateSliderPosition();
+            createDots();
+        }, 200);
+    });
 
-        testimonialSlider.addEventListener('touchend', function(e) {
-            touchEndX = e.changedTouches[0].screenX;
-            if (touchEndX < touchStartX - 50) moveSlider(1);
-            if (touchEndX > touchStartX + 50) moveSlider(-1);
-        }, false);
-    }
+    /* Init */
+    updateCardsPerView();
+    createDots();
+    updateSliderPosition();
+    startAutoSlide();
+});
 </script>
 @endpush

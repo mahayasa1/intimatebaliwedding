@@ -412,7 +412,7 @@
     <nav id="navbar">
         <div class="navbar-container">
             <a href="{{ url('/') }}" class="navbar-logo">
-                <img src="{{ asset('assets/Logo_IBW_1.png') }}" alt="Intimate Bali Wedding">
+                <img src="{{ asset('assets/Logo_IBW_2B.png') }}" alt="Intimate Bali Wedding">
             </a>
 
             <div class="navbar-menu">

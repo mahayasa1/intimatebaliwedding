@@ -224,7 +224,7 @@
     <div class="login-container">
         <!-- Logo -->
         <div class="login-logo">
-            <img src="{{ asset('assets/logo_IBW.png') }}" alt="Intimate Bali Wedding Logo" style=" height:100px;">
+            <img src="{{ asset('assets/logo_IBW_1B.png') }}" alt="Intimate Bali Wedding Logo" style=" height:100px;">
         </div>
 
         <!-- Alerts -->

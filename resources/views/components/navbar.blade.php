@@ -363,7 +363,7 @@
     <div class="navbar-container">
         <!-- Logo - Left -->
         <a href="{{ url('/') }}" class="navbar-logo">
-            <img src="{{ asset('assets/Logo_IBW_1.png') }}" alt="Intimate Bali Wedding Logo" style=" height:65px;">
+            <img src="{{ asset('assets/Logo_IBW.jng') }}" alt="Intimate Bali Wedding Logo" style=" height:65px;">
         </a>
 
         <!-- Desktop Menu - Center -->
