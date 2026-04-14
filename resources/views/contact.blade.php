@@ -9,22 +9,28 @@
                     url('https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=1920&q=80');
         background-size: cover;
         background-position: center;
+        height: 50vh; /* samakan */
         display: flex;
         align-items: center;
         justify-content: center;
         color: white;
         text-align: center;
+        margin-top: -80px; /* penting */
+        padding-top: 80px; /* penting */
     }
-
     .contact-hero h1 {
         font-family: 'Playfair Display', serif;
-        font-size: clamp(2rem, 5vw, 3.5rem);
+        font-size: 3.5rem;
         font-weight: 700;
+        margin-bottom: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
     }
-
+    
     .contact-hero p {
-        font-size: clamp(0.9rem, 2vw, 1.1rem);
+        font-size: 1.1rem;
         font-weight: 300;
+        letter-spacing: 1px;
     }
 
     .contact-container {
