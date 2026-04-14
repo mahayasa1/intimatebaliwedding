@@ -9,7 +9,7 @@
                     url('https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=1920&q=80');
         background-size: cover;
         background-position: center;
-        height: 60vh;
+        height: 50vh; /* samakan dengan packages */
         display: flex;
         align-items: center;
         justify-content: center;
@@ -24,6 +24,14 @@
         font-size: 3.5rem;
         font-weight: 700;
         margin-bottom: 1rem;
+        text-transform: uppercase; /* tambah ini */
+        letter-spacing: 2px; /* tambah ini */
+    }
+
+    .about-hero p {
+        font-size: 1.1rem; /* samakan */
+        font-weight: 300;
+        letter-spacing: 1px; /* tambah ini */
     }
 
     .about-content {
@@ -119,8 +127,8 @@
 <!-- Hero Section -->
 <section class="about-hero">
     <div>
-        <h1>ABOUT US</h1>
-        <p style="font-size: 1.2rem; font-weight: 300;">Creating Unforgettable Wedding Experiences in Bali</p>
+        <h1>About Us</h1>
+        <p>Creating Unforgettable Wedding Experiences in Bali</p>
     </div>
 </section>
 
