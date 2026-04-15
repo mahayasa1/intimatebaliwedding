@@ -44,6 +44,47 @@
 
     textarea.form-control { min-height: 140px; resize: vertical; line-height: 1.6; }
 
+    /* Category */
+    .category-input-wrapper { position: relative; }
+
+    .category-suggestions {
+        position: absolute; top: calc(100% + 4px); left: 0; right: 0;
+        background: white; border: 2px solid #e0e0e0; border-radius: 10px;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.12); z-index: 100; display: none;
+        max-height: 200px; overflow-y: auto;
+    }
+
+    .category-suggestions.show { display: block; }
+
+    .category-suggestion-item {
+        padding: 0.75rem 1.25rem; cursor: pointer;
+        font-family: 'Work Sans', sans-serif; font-size: 0.9rem; color: #333;
+        transition: background 0.2s ease; display: flex; align-items: center; gap: 0.5rem;
+    }
+
+    .category-suggestion-item:hover { background: #f5f0eb; color: #8B7355; }
+    .category-suggestion-item i { color: #D4AF37; font-size: 0.75rem; }
+
+    .category-tags {
+        display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.75rem;
+    }
+
+    .category-tag {
+        display: inline-flex; align-items: center; gap: 0.35rem;
+        padding: 0.3rem 0.75rem;
+        background: linear-gradient(135deg, rgba(139,115,85,0.12), rgba(107,86,68,0.12));
+        color: #8B7355; border: 1px solid rgba(139,115,85,0.25);
+        border-radius: 20px; font-size: 0.78rem; font-weight: 600;
+        font-family: 'Work Sans', sans-serif; cursor: pointer; transition: all 0.2s ease;
+    }
+
+    .category-tag:hover { background: #8B7355; color: white; border-color: #8B7355; }
+
+    .form-help {
+        font-family: 'Work Sans', sans-serif; color: #999;
+        font-size: 0.85rem; margin-top: 0.5rem; font-style: italic;
+    }
+
     .current-image { margin-bottom: 1rem; position: relative; display: inline-block; }
     .current-image img { max-width: 300px; max-height: 200px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
     .current-image-label { display: block; font-size: 0.85rem; color: #666; margin-bottom: 0.5rem; }
@@ -83,11 +124,6 @@
     }
 
     .remove-existing-photo:hover, .remove-photo:hover { background: #c0392b; transform: scale(1.1); }
-
-    .form-help {
-        font-family: 'Work Sans', sans-serif; color: #999;
-        font-size: 0.85rem; margin-top: 0.5rem; font-style: italic;
-    }
 
     /* Subpackage Styles */
     .subpackage-item {
@@ -183,6 +219,44 @@
                     value="{{ old('name', $package->name) }}" required>
             </div>
 
+            <!-- Category Field -->
+            <div class="form-group">
+                <label for="category" class="form-label">Category</label>
+                <div class="category-input-wrapper">
+                    <input
+                        type="text"
+                        id="category"
+                        name="category"
+                        class="form-control @error('category') error @enderror"
+                        value="{{ old('category', $package->category) }}"
+                        placeholder="e.g., Intimate, Garden, Beach, Chapel"
+                        autocomplete="off"
+                    >
+                    @if($categories->count() > 0)
+                    <div class="category-suggestions" id="categorySuggestions">
+                        @foreach($categories as $cat)
+                        <div class="category-suggestion-item" onclick="selectCategory('{{ $cat }}')">
+                            <i class="fas fa-tag"></i> {{ $cat }}
+                        </div>
+                        @endforeach
+                    </div>
+                    @endif
+                </div>
+                @if($categories->count() > 0)
+                <div class="category-tags">
+                    @foreach($categories as $cat)
+                    <span class="category-tag" onclick="selectCategory('{{ $cat }}')">
+                        <i class="fas fa-tag"></i> {{ $cat }}
+                    </span>
+                    @endforeach
+                </div>
+                @endif
+                @error('category')
+                <div class="error-message">{{ $message }}</div>
+                @enderror
+                <div class="form-help">Kategori untuk memfilter paket di halaman depan</div>
+            </div>
+
             <div class="form-group">
                 <label for="image" class="form-label">Main Package Image</label>
                 @if($package->image)
@@ -215,9 +289,7 @@
             </h3>
             <div class="form-help" style="margin-bottom:1.5rem;">Tambahkan pilihan atau tier yang tersedia dalam package ini (opsional)</div>
 
-            <div id="subpackageList">
-                {{-- Populated by JS with existing subpackages --}}
-            </div>
+            <div id="subpackageList"></div>
 
             <button type="button" class="btn-add-sub" onclick="addSubpackage()">
                 <i class="fas fa-plus"></i> Add Sub-package
@@ -271,6 +343,35 @@
 </div>
 
 <script>
+// ==================== CATEGORY ====================
+function selectCategory(cat) {
+    document.getElementById('category').value = cat;
+    document.getElementById('categorySuggestions')?.classList.remove('show');
+}
+
+const categoryInput = document.getElementById('category');
+const categorySuggestions = document.getElementById('categorySuggestions');
+
+if (categoryInput && categorySuggestions) {
+    categoryInput.addEventListener('focus', () => {
+        if (categorySuggestions.children.length > 0) categorySuggestions.classList.add('show');
+    });
+    categoryInput.addEventListener('blur', () => {
+        setTimeout(() => categorySuggestions.classList.remove('show'), 200);
+    });
+    categoryInput.addEventListener('input', function() {
+        const val = this.value.toLowerCase();
+        const items = categorySuggestions.querySelectorAll('.category-suggestion-item');
+        let hasVisible = false;
+        items.forEach(item => {
+            const match = item.textContent.toLowerCase().includes(val);
+            item.style.display = match ? '' : 'none';
+            if (match) hasVisible = true;
+        });
+        categorySuggestions.classList.toggle('show', hasVisible && val.length > 0);
+    });
+}
+
 // ==================== SUBPACKAGES ====================
 let subIndex = 0;
 
@@ -364,11 +465,9 @@ function renumberSubpackages() {
     });
 }
 
-// Load existing subpackages from DB
 const existingSubpackages = @json($package->subpackages);
 existingSubpackages.forEach(sub => addSubpackage(sub));
 
-// ==================== SUBPACKAGE IMAGE PREVIEW ====================
 function previewSubImage(event, previewId) {
     const file = event.target.files[0];
     if (!file) return;

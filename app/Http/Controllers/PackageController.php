@@ -17,7 +17,8 @@ class PackageController extends Controller
     public function index()
     {
         $packages = Package::with('subpackages')->latest()->paginate(12);
-        return view('packages.index', compact('packages'));
+        $categories = Package::distinct()->pluck('category')->filter();
+        return view('packages.index', compact('packages', 'categories'));
     }
 
     /**
@@ -60,7 +61,8 @@ class PackageController extends Controller
      */
     public function create()
     {
-        return view('admin.packages.create');
+        $categories = Package::distinct()->pluck('category')->filter();
+        return view('admin.packages.create', compact('categories'));
     }
 
     /**
@@ -71,6 +73,7 @@ class PackageController extends Controller
         $validated = $request->validate([
             'name'                        => 'required|string|max:255',
             'description'                 => 'nullable|string',
+            'category'                    => 'nullable|string|max:255',
             'image'                       => 'required|image|mimes:jpeg,png,jpg,webp|max:20480',
             'photos.*'                    => 'nullable|image|mimes:jpeg,png,jpg,webp|max:20480',
             'subpackages.*.name'          => 'required|string|max:255',
@@ -157,7 +160,8 @@ class PackageController extends Controller
     public function edit(Package $package)
     {
         $package->load('subpackages');
-        return view('admin.packages.edit', compact('package'));
+        $categories = Package::distinct()->pluck('category')->filter();
+        return view('admin.packages.edit', compact('package', 'categories'));
     }
 
     /**
@@ -168,6 +172,7 @@ class PackageController extends Controller
         $validated = $request->validate([
             'name'                        => 'required|string|max:255',
             'description'                 => 'nullable|string',
+            'category'                    => 'nullable|string|max:255',
             'image'                       => 'nullable|image|mimes:jpeg,png,jpg,webp|max:20480',
             'photos.*'                    => 'nullable|image|mimes:jpeg,png,jpg,webp|max:20480',
             'subpackages.*.name'          => 'required_with:subpackages|string|max:255',
@@ -218,7 +223,6 @@ class PackageController extends Controller
             $package->update($validated);
 
             // Update subpackages: hapus semua lalu buat ulang
-            // Hapus file lama dulu
             foreach ($package->subpackages as $oldSub) {
                 if ($oldSub->image) {
                     Storage::disk('public')->delete($oldSub->image);
@@ -236,7 +240,6 @@ class PackageController extends Controller
             if ($request->has('subpackages')) {
                 foreach ($request->subpackages as $index => $sub) {
                     if (!empty($sub['name'])) {
-                        // Upload subpackage main image
                         $subImage = $sub['existing_image'] ?? null;
                         if (!empty($sub['image']) && $sub['image'] instanceof \Illuminate\Http\UploadedFile) {
                             $subImagePath = $sub['image']->store('packages/subpackages', 'public');
@@ -244,7 +247,6 @@ class PackageController extends Controller
                             $subImage = $subImagePath;
                         }
 
-                        // Upload subpackage photos
                         $subPhotos = !empty($sub['existing_photos']) ? (array) $sub['existing_photos'] : [];
                         if (!empty($sub['photos']) && is_array($sub['photos'])) {
                             foreach ($sub['photos'] as $subPhoto) {

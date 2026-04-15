@@ -47,7 +47,7 @@
     /* Stats Grid */
     .stats-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
         gap: 1.5rem;
         margin-bottom: 2.5rem;
     }
@@ -66,9 +66,7 @@
     .stat-card::before {
         content: '';
         position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
+        top: 0; left: 0; right: 0;
         height: 3px;
         background: linear-gradient(90deg, #8B7355, #6B5644);
         transform: scaleX(0);
@@ -82,9 +80,7 @@
         border-color: #8B7355;
     }
 
-    .stat-card:hover::before {
-        transform: scaleX(1);
-    }
+    .stat-card:hover::before { transform: scaleX(1); }
 
     .stat-header {
         display: flex;
@@ -121,6 +117,56 @@
         font-weight: 700;
         color: #1a1a1a;
         line-height: 1;
+    }
+
+    /* Filter Section */
+    .filter-section {
+        background: white;
+        padding: 1.25rem 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        border: 1px solid #e8e8e8;
+        margin-bottom: 1.5rem;
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    .filter-label {
+        font-family: 'Work Sans', sans-serif;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #666;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-right: 0.25rem;
+    }
+
+    .filter-tab {
+        font-family: 'Work Sans', sans-serif;
+        padding: 0.45rem 1rem;
+        border: 1.5px solid #e0e0e0;
+        background: white;
+        border-radius: 20px;
+        cursor: pointer;
+        transition: all 0.25s ease;
+        font-size: 0.82rem;
+        font-weight: 500;
+        color: #666;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+    }
+
+    .filter-tab:hover { border-color: #8B7355; color: #8B7355; }
+
+    .filter-tab.active {
+        background: linear-gradient(135deg, #8B7355, #6B5644);
+        border-color: transparent;
+        color: white;
+        box-shadow: 0 2px 8px rgba(139,115,85,0.25);
     }
 
     /* Table Card */
@@ -180,9 +226,7 @@
         color: #999;
     }
 
-    .table-responsive {
-        overflow-x: auto;
-    }
+    .table-responsive { overflow-x: auto; }
 
     table {
         width: 100%;
@@ -223,9 +267,7 @@
         color: #333;
     }
 
-    table tr:last-child td {
-        border-bottom: none;
-    }
+    table tr:last-child td { border-bottom: none; }
 
     .package-info {
         display: flex;
@@ -241,9 +283,7 @@
         box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
 
-    .package-details {
-        flex: 1;
-    }
+    .package-details { flex: 1; }
 
     .package-name {
         font-weight: 600;
@@ -256,8 +296,25 @@
         color: #666;
         font-size: 0.85rem;
         line-height: 1.5;
-        max-width: 400px;
+        max-width: 360px;
     }
+
+    /* Category Badge */
+    .category-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.4rem 0.9rem;
+        background: linear-gradient(135deg, rgba(139,115,85,0.12), rgba(107,86,68,0.12));
+        color: #8B7355;
+        border: 1px solid rgba(139,115,85,0.25);
+        border-radius: 20px;
+        font-size: 0.78rem;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    .category-badge i { font-size: 0.65rem; }
 
     .photos-count {
         display: inline-flex;
@@ -272,17 +329,10 @@
         border: 1px solid #90caf9;
     }
 
-    .date-display {
-        font-size: 0.9rem;
-        color: #666;
-    }
+    .date-display { font-size: 0.9rem; color: #666; }
 
     /* Action Buttons */
-    .action-buttons {
-        display: flex;
-        gap: 0.5rem;
-        flex-wrap: wrap;
-    }
+    .action-buttons { display: flex; gap: 0.5rem; flex-wrap: wrap; }
 
     .btn {
         font-family: 'Work Sans', sans-serif;
@@ -299,43 +349,13 @@
         gap: 0.5rem;
     }
 
-    .btn-primary {
-        background: linear-gradient(135deg, #8B7355 0%, #6B5644 100%);
-        color: white;
-        box-shadow: 0 2px 8px rgba(139, 115, 85, 0.2);
-    }
-
-    .btn-primary:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(139, 115, 85, 0.3);
-    }
-
-    .btn-success {
-        background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
-        color: white;
-        box-shadow: 0 2px 8px rgba(46, 204, 113, 0.2);
-    }
-
-    .btn-success:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(46, 204, 113, 0.3);
-    }
-
-    .btn-danger {
-        background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
-        color: white;
-        box-shadow: 0 2px 8px rgba(231, 76, 60, 0.2);
-    }
-
-    .btn-danger:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
-    }
-
-    .btn-sm {
-        padding: 0.4rem 0.85rem;
-        font-size: 0.8rem;
-    }
+    .btn-primary { background: linear-gradient(135deg, #8B7355 0%, #6B5644 100%); color: white; box-shadow: 0 2px 8px rgba(139, 115, 85, 0.2); }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(139, 115, 85, 0.3); }
+    .btn-success { background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%); color: white; box-shadow: 0 2px 8px rgba(46, 204, 113, 0.2); }
+    .btn-success:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(46, 204, 113, 0.3); }
+    .btn-danger { background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); color: white; box-shadow: 0 2px 8px rgba(231, 76, 60, 0.2); }
+    .btn-danger:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3); }
+    .btn-sm { padding: 0.4rem 0.85rem; font-size: 0.8rem; }
 
     /* Empty State */
     .empty-state {
@@ -343,84 +363,30 @@
         padding: 5rem 2rem;
     }
 
-    .empty-state-icon {
-        font-size: 5rem;
-        margin-bottom: 1.5rem;
-        opacity: 0.3;
-        filter: grayscale(1);
-    }
+    .empty-state-icon { font-size: 5rem; margin-bottom: 1.5rem; opacity: 0.3; filter: grayscale(1); }
 
     .empty-state h3 {
         font-family: 'Playfair Display', serif;
-        font-size: 1.75rem;
-        color: #1a1a1a;
-        margin-bottom: 0.75rem;
+        font-size: 1.75rem; color: #1a1a1a; margin-bottom: 0.75rem;
     }
 
-    .empty-state p {
-        font-family: 'Work Sans', sans-serif;
-        color: #999;
-        font-size: 1rem;
-        margin-bottom: 2rem;
-    }
+    .empty-state p { font-family: 'Work Sans', sans-serif; color: #999; font-size: 1rem; margin-bottom: 2rem; }
 
     /* Pagination */
-    .pagination {
-        display: flex;
-        justify-content: center;
-        gap: 0.5rem;
-        margin-top: 2rem;
-        padding: 1.5rem;
-    }
+    .pagination { display: flex; justify-content: center; gap: 0.5rem; margin-top: 2rem; padding: 1.5rem; }
 
     /* Responsive */
     @media (max-width: 768px) {
-        .page-header {
-            flex-direction: column;
-            gap: 1rem;
-            align-items: flex-start;
-        }
-
-        .btn-add {
-            width: 100%;
-            justify-content: center;
-        }
-
-        .stats-grid {
-            grid-template-columns: 1fr;
-        }
-
-        .table-header {
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        .search-box {
-            width: 100%;
-        }
-
-        table {
-            font-size: 0.85rem;
-        }
-
-        table th,
-        table td {
-            padding: 1rem 0.75rem;
-        }
-
-        .package-info {
-            flex-direction: column;
-            align-items: flex-start;
-        }
-
-        .action-buttons {
-            flex-direction: column;
-        }
-
-        .btn {
-            width: 100%;
-            justify-content: center;
-        }
+        .page-header { flex-direction: column; gap: 1rem; align-items: flex-start; }
+        .btn-add { width: 100%; justify-content: center; }
+        .stats-grid { grid-template-columns: 1fr; }
+        .table-header { flex-direction: column; gap: 1rem; }
+        .search-box { width: 100%; }
+        table { font-size: 0.85rem; }
+        table th, table td { padding: 1rem 0.75rem; }
+        .package-info { flex-direction: column; align-items: flex-start; }
+        .action-buttons { flex-direction: column; }
+        .btn { width: 100%; justify-content: center; }
     }
 </style>
 @endpush
@@ -454,12 +420,37 @@
 
     <div class="stat-card">
         <div class="stat-header">
+            <div class="stat-title">Categories</div>
+            <div class="stat-icon"><i class="fas fa-tags"></i></div>
+        </div>
+        <div class="stat-value">{{ $packages->pluck('category')->filter()->unique()->count() }}</div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-header">
             <div class="stat-title">This Month</div>
             <div class="stat-icon"><i class="fas fa-calendar-alt"></i></div>
         </div>
         <div class="stat-value">{{ $packages->where('created_at', '>=', now()->startOfMonth())->count() }}</div>
     </div>
 </div>
+
+<!-- Category Filter Tabs -->
+@php
+    $allCategories = $packages->pluck('category')->filter()->unique()->values();
+@endphp
+
+@if($allCategories->count() > 0)
+<div class="filter-section">
+    <span class="filter-label"><i class="fas fa-filter"></i> Filter:</span>
+    <button class="filter-tab active" data-category="all">All ({{ $packages->total() }})</button>
+    @foreach($allCategories as $cat)
+    <button class="filter-tab" data-category="{{ $cat }}">
+        <i class="fas fa-tag"></i> {{ $cat }}
+    </button>
+    @endforeach
+</div>
+@endif
 
 <!-- Packages Table -->
 <div class="table-card">
@@ -476,6 +467,7 @@
             <thead>
                 <tr>
                     <th>Package Details</th>
+                    <th>Category</th>
                     <th>Gallery Photos</th>
                     <th>Created Date</th>
                     <th>Actions</th>
@@ -483,7 +475,7 @@
             </thead>
             <tbody id="packageTable">
                 @foreach($packages as $package)
-                <tr>
+                <tr data-category="{{ $package->category ?? '' }}">
                     <td>
                         <div class="package-info">
                             @if($package->image)
@@ -499,11 +491,21 @@
                                 <div class="package-name">{{ $package->name }}</div>
                                 @if($package->description)
                                 <div class="package-description">
-                                    {{ Str::limit($package->description, 80) }}
+                                    {{ Str::limit($package->description, 70) }}
                                 </div>
                                 @endif
                             </div>
                         </div>
+                    </td>
+                    <td>
+                        @if($package->category)
+                        <span class="category-badge">
+                            <i class="fas fa-tag"></i>
+                            {{ $package->category }}
+                        </span>
+                        @else
+                        <span style="color: #ccc; font-size: 0.85rem;">—</span>
+                        @endif
                     </td>
                     <td>
                         @php
@@ -567,10 +569,33 @@
     document.getElementById('searchInput')?.addEventListener('keyup', function() {
         const searchValue = this.value.toLowerCase();
         const rows = document.querySelectorAll('#packageTable tr');
-        
         rows.forEach(row => {
             const text = row.textContent.toLowerCase();
-            row.style.display = text.includes(searchValue) ? '' : 'none';
+            const activeCategory = document.querySelector('.filter-tab.active')?.dataset.category || 'all';
+            const rowCat = row.dataset.category || '';
+            const matchesSearch = text.includes(searchValue);
+            const matchesFilter = activeCategory === 'all' || rowCat === activeCategory;
+            row.style.display = (matchesSearch && matchesFilter) ? '' : 'none';
+        });
+    });
+
+    // Category filter tabs
+    document.querySelectorAll('.filter-tab').forEach(tab => {
+        tab.addEventListener('click', function() {
+            document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+            this.classList.add('active');
+
+            const cat = this.dataset.category;
+            const searchValue = document.getElementById('searchInput')?.value.toLowerCase() || '';
+            const rows = document.querySelectorAll('#packageTable tr');
+
+            rows.forEach(row => {
+                const rowCat = row.dataset.category || '';
+                const text = row.textContent.toLowerCase();
+                const matchesFilter = cat === 'all' || rowCat === cat;
+                const matchesSearch = !searchValue || text.includes(searchValue);
+                row.style.display = (matchesFilter && matchesSearch) ? '' : 'none';
+            });
         });
     });
 </script>

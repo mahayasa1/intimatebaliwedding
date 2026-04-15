@@ -15,6 +15,7 @@ class Package extends Model
         'description',
         'image',
         'photo',
+        'category',
     ];
 
     protected $casts = [
