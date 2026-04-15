@@ -76,9 +76,26 @@
         nav#navbar.scrolled .navbar-logo { color: #333; }
 
         .navbar-logo img {
-            height: 60px;
+            height: 80px;
             width: auto;
             object-fit: contain;
+            transition: filter 0.3s ease;
+        }
+
+        /* Default (navbar transparan) → putih pekat */
+        nav#navbar:not(.scrolled) .navbar-logo img {
+            filter:
+                brightness(0)
+                invert(1)
+                contrast(200%)
+                saturate(0%);
+        }
+
+        /* Saat scroll → hitam */
+        nav#navbar.scrolled .navbar-logo img {
+            filter:
+                brightness(0)
+                contrast(120%);
         }
 
         /* Desktop menu */
