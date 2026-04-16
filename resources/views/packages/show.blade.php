@@ -6,11 +6,14 @@
 @push('styles')
 <style>
     .package-detail-hero {
-        background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), 
-                    url('https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=1920&q=80');
-        background-size: cover; background-position: center;
-        height: 40vh; display: flex; align-items: center; justify-content: center;
-        color: white; text-align: center; margin-top: -80px; padding-top: 80px;
+        height: 40vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        text-align: center;
+        margin-top: -80px;
+        padding-top: 80px;
     }
 
     .package-detail-hero h1 {
@@ -321,7 +324,16 @@
 
 @section('content')
 <!-- Hero Section -->
-<section class="package-detail-hero">
+<section class="package-detail-hero"
+    style="
+        background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)),
+        url('{{ $package->image 
+            ? asset('storage/' . ImageHelper::thumb($package->image)) 
+            : 'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=1920&q=80' 
+        }}');
+        background-size: cover;
+        background-position: center;
+    ">
     <div>
         <h1>{{ strtoupper($package->name) }}</h1>
     </div>
