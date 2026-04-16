@@ -180,7 +180,7 @@
                 <div class="contact-info-item">
                     <div class="contact-icon">📱</div>
                     <div class="contact-text">
-                        <a href="tel:+6282145678901">+62 821 4567 8901</a>
+                        <a href="tel:+6287861775445">+62 878-6177-5445</a>
                     </div>
                 </div>
                 <div class="contact-info-item">
