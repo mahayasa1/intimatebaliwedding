@@ -6,7 +6,7 @@
 <style>
     .blog-hero {
         background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), 
-                    url('https://images.unsplash.com/photo-1522413452208-996ff3f3e740?w=1920&q=80');
+                    url('/assets/background/bg_template.jpg');
         background-size: cover;
         background-position: center;
         height: 50vh;

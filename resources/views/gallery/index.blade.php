@@ -7,7 +7,7 @@
 <style>
     .gallery-hero {
         background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), 
-                    url('https://images.unsplash.com/photo-1606216794074-735e91aa2c92?w=1920&q=80');
+                    url('/assets/background/bg_template.jpg');
         background-size: cover; background-position: center;
         height: 50vh; display: flex; align-items: center; justify-content: center;
         color: white; text-align: center; margin-top: -80px; padding-top: 80px;

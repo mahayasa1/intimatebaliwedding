@@ -6,7 +6,7 @@
 <style>
     .about-hero {
         background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), 
-                    url('https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=1920&q=80');
+                    url('/assets/background/bg_template.jpg');
         background-size: cover;
         background-position: center;
         height: 50vh; /* samakan dengan packages */

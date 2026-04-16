@@ -6,7 +6,7 @@
 <style>
     .contact-hero {
         background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)),
-                    url('https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=1920&q=80');
+                    url('/assets/background/bg_template.jpg');
         background-size: cover;
         background-position: center;
         height: 50vh; /* samakan */
