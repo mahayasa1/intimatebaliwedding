@@ -16,6 +16,8 @@ return new class extends Migration
             $table->string('title');
             $table->string('image');
             $table->json('photo')->nullable();
+            $table->string('video_url')->nullable();
+            $table->string('type')->default('photo');
             $table->text('description')->nullable();
             $table->string('category')->nullable();
             $table->integer('order')->default(0);

@@ -42,7 +42,7 @@ class PackageController extends Controller
     public function showSubpackage($packageId, $subpackageId)
     {
         $package    = Package::with('subpackages')->findOrFail($packageId);
-        $subpackage = $package->subpackages->firstOrFail(fn($s) => $s->id === $subpackageId);
+        $subpackage = $package->subpackages->firstWhere('id', $subpackageId) ?? abort(404);
 
         return view('packages.subpackage', compact('package', 'subpackage'));
     }

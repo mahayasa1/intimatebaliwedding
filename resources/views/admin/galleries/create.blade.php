@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
-@section('title', 'Add New Photo')
-@section('page-title', 'Add New Photo to Gallery')
+@section('title', 'Add New Gallery Item')
+@section('page-title', 'Add New Gallery Item')
 
 @push('styles')
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -61,7 +61,98 @@
         font-size: 0.85rem; margin-top: 0.5rem; font-style: italic;
     }
 
-    /* Upload Area */
+    /* ── TYPE TOGGLE ── */
+    .type-toggle {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .type-option input[type="radio"] {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .type-option {
+        position: relative;
+    }
+
+    .type-label {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1.25rem 1.5rem;
+        border: 2px solid #e0e0e0;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background: white;
+        font-family: 'Work Sans', sans-serif;
+    }
+
+    .type-label:hover {
+        border-color: #8B7355;
+        background: #faf8f5;
+    }
+
+    .type-option input[type="radio"]:checked + .type-label {
+        border-color: #8B7355;
+        background: linear-gradient(135deg, rgba(139,115,85,0.08), rgba(107,86,68,0.06));
+    }
+
+    .type-icon {
+        width: 46px; height: 46px;
+        border-radius: 10px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.4rem; color: white; flex-shrink: 0;
+    }
+
+    .type-icon.photo { background: linear-gradient(135deg, #8B7355, #6B5644); }
+    .type-icon.video { background: linear-gradient(135deg, #e74c3c, #c0392b); }
+
+    .type-info h4 {
+        font-weight: 700; color: #1a1a1a; margin: 0 0 0.2rem; font-size: 1rem;
+    }
+
+    .type-info p {
+        font-size: 0.8rem; color: #888; margin: 0;
+    }
+
+    /* ── VIDEO PREVIEW ── */
+    .video-preview {
+        display: none;
+        margin-top: 1rem;
+        border-radius: 12px;
+        overflow: hidden;
+        aspect-ratio: 16/9;
+        background: #000;
+    }
+
+    .video-preview.show { display: block; }
+
+    .video-preview iframe {
+        width: 100%; height: 100%; border: none;
+    }
+
+    .youtube-info {
+        display: none;
+        margin-top: 0.75rem;
+        padding: 0.75rem 1rem;
+        background: #fff3cd;
+        border: 1px solid #ffd54f;
+        border-radius: 8px;
+        font-family: 'Work Sans', sans-serif;
+        font-size: 0.88rem;
+        color: #7a5c00;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .youtube-info.show { display: flex; }
+
+    /* ── IMAGE UPLOAD ── */
     .image-upload-wrapper {
         position: relative; border: 2px dashed #e0e0e0; border-radius: 12px;
         padding: 2rem; text-align: center; transition: all 0.3s ease; background: #fafafa;
@@ -69,8 +160,7 @@
 
     .image-upload-wrapper:hover { border-color: #8B7355; background: #f5f5f5; }
     .image-upload-wrapper.dragover {
-        border-color: #8B7355; border-style: solid;
-        background: rgba(139,115,85,0.05);
+        border-color: #8B7355; border-style: solid; background: rgba(139,115,85,0.05);
     }
 
     .image-upload-wrapper input[type="file"] {
@@ -82,7 +172,6 @@
     .upload-text { color: #666; font-size: 0.95rem; font-family: 'Work Sans', sans-serif; }
     .upload-text strong { color: #8B7355; }
 
-    /* Main preview */
     .main-preview-wrapper {
         display: none; margin-top: 1rem; position: relative;
         max-width: 400px; margin-left: auto; margin-right: auto;
@@ -105,7 +194,6 @@
 
     .remove-main:hover { background: #e74c3c; transform: scale(1.1); }
 
-    /* Photos grid preview */
     .photos-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
@@ -136,7 +224,7 @@
         font-family: 'Work Sans', sans-serif;
     }
 
-    /* Compression indicator */
+    /* Compress info */
     .compress-info {
         display: flex; align-items: center; gap: 0.5rem;
         background: linear-gradient(135deg, #e8f4f8 0%, #d1ecf1 100%);
@@ -145,26 +233,11 @@
         color: #0d47a1; font-family: 'Work Sans', sans-serif;
     }
 
-    .compress-info i { color: #1565c0; }
-
-    /* Progress */
-    .upload-progress {
-        display: none; margin-top: 1rem;
-    }
-
-    .progress-bar-wrap {
-        background: #f0f0f0; border-radius: 8px; overflow: hidden; height: 8px;
-    }
-
-    .progress-bar {
-        height: 100%; background: linear-gradient(90deg, #8B7355, #D4AF37);
-        border-radius: 8px; transition: width 0.3s ease; width: 0%;
-    }
-
-    .progress-label {
-        font-size: 0.8rem; color: #666; margin-top: 0.5rem; text-align: center;
-        font-family: 'Work Sans', sans-serif;
-    }
+    /* Upload Progress */
+    .upload-progress { display: none; margin-top: 1rem; }
+    .progress-bar-wrap { background: #f0f0f0; border-radius: 8px; overflow: hidden; height: 8px; }
+    .progress-bar { height: 100%; background: linear-gradient(90deg, #8B7355, #D4AF37); border-radius: 8px; transition: width 0.3s ease; width: 0%; }
+    .progress-label { font-size: 0.8rem; color: #666; margin-top: 0.5rem; text-align: center; font-family: 'Work Sans', sans-serif; }
 
     /* Action Buttons */
     .action-section {
@@ -182,23 +255,15 @@
         border: none; cursor: pointer; font-size: 0.95rem;
     }
 
-    .btn-secondary {
-        background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
-        color: white; box-shadow: 0 2px 8px rgba(149, 165, 166, 0.2);
-    }
-
-    .btn-secondary:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(149, 165, 166, 0.3); }
-
-    .btn-primary {
-        background: linear-gradient(135deg, #8B7355 0%, #6B5644 100%);
-        color: white; box-shadow: 0 2px 8px rgba(139, 115, 85, 0.2);
-    }
-
-    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(139, 115, 85, 0.3); }
+    .btn-secondary { background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%); color: white; }
+    .btn-secondary:hover { transform: translateY(-2px); }
+    .btn-primary { background: linear-gradient(135deg, #8B7355 0%, #6B5644 100%); color: white; }
+    .btn-primary:hover { transform: translateY(-2px); }
     .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
 
     @media (max-width: 768px) {
         .form-card { padding: 1.5rem; }
+        .type-toggle { grid-template-columns: 1fr; }
         .action-buttons { flex-direction: column; }
         .btn { width: 100%; justify-content: center; }
         .photos-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); }
@@ -211,16 +276,47 @@
     <form action="{{ route('admin.galleries.store') }}" method="POST" enctype="multipart/form-data" id="galleryForm">
         @csrf
 
-        {{-- Photo Information --}}
+        {{-- TYPE SELECTOR --}}
         <div class="form-card">
             <h3 class="section-title">
-                <span class="section-icon"><i class="fa-solid fa-image"></i></span>
-                Photo Information
+                <span class="section-icon"><i class="fa-solid fa-photo-film"></i></span>
+                Jenis Konten
+            </h3>
+
+            <div class="type-toggle">
+                <div class="type-option">
+                    <input type="radio" id="type_photo" name="type" value="photo" checked>
+                    <label for="type_photo" class="type-label">
+                        <div class="type-icon photo"><i class="fa-solid fa-image"></i></div>
+                        <div class="type-info">
+                            <h4>Foto</h4>
+                            <p>Upload gambar ke gallery</p>
+                        </div>
+                    </label>
+                </div>
+                <div class="type-option">
+                    <input type="radio" id="type_video" name="type" value="video">
+                    <label for="type_video" class="type-label">
+                        <div class="type-icon video"><i class="fa-brands fa-youtube"></i></div>
+                        <div class="type-info">
+                            <h4>Video YouTube</h4>
+                            <p>Embed video dari YouTube</p>
+                        </div>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        {{-- INFO DASAR --}}
+        <div class="form-card">
+            <h3 class="section-title">
+                <span class="section-icon"><i class="fa-solid fa-circle-info"></i></span>
+                Informasi
             </h3>
 
             <div class="form-group">
                 <label for="title" class="form-label">
-                    Photo Title <span class="required">*</span>
+                    Judul <span class="required">*</span>
                 </label>
                 <input type="text" id="title" name="title"
                     class="form-control @error('title') error @enderror"
@@ -231,17 +327,17 @@
             </div>
 
             <div class="form-group">
-                <label for="description" class="form-label">Description</label>
+                <label for="description" class="form-label">Deskripsi</label>
                 <textarea id="description" name="description"
                     class="form-control @error('description') error @enderror"
-                    placeholder="Describe the photo...">{{ old('description') }}</textarea>
+                    placeholder="Deskripsi singkat...">{{ old('description') }}</textarea>
                 @error('description')
                 <div class="error-message"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</div>
                 @enderror
             </div>
 
             <div class="form-group">
-                <label for="category" class="form-label">Category</label>
+                <label for="category" class="form-label">Kategori</label>
                 <input type="text" id="category" name="category"
                     class="form-control @error('category') error @enderror"
                     value="{{ old('category') }}" placeholder="e.g., Hero, Beach, Garden">
@@ -251,33 +347,68 @@
             </div>
 
             <div class="form-group">
-                <label for="order" class="form-label">Display Order</label>
+                <label for="order" class="form-label">Urutan Tampil</label>
                 <input type="number" id="order" name="order"
                     class="form-control @error('order') error @enderror"
                     value="{{ old('order', 0) }}" min="0">
-                @error('order')
-                <div class="error-message"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</div>
-                @enderror
-                <div class="form-help">Lower number = shown first (0 = default)</div>
+                <div class="form-help">Angka lebih kecil = tampil lebih dulu (0 = default)</div>
             </div>
         </div>
 
-        {{-- Main Photo Upload --}}
-        <div class="form-card">
+        {{-- SECTION VIDEO (hidden by default) --}}
+        <div class="form-card" id="videoSection" style="display:none;">
+            <h3 class="section-title">
+                <span class="section-icon" style="background: linear-gradient(135deg, #e74c3c, #c0392b);">
+                    <i class="fa-brands fa-youtube"></i>
+                </span>
+                URL Video YouTube
+            </h3>
+
+            <div class="form-group">
+                <label for="video_url" class="form-label">
+                    URL YouTube <span class="required">*</span>
+                </label>
+                <input type="url" id="video_url" name="video_url"
+                    class="form-control @error('video_url') error @enderror"
+                    value="{{ old('video_url') }}"
+                    placeholder="https://www.youtube.com/watch?v=..."
+                    oninput="previewYoutube(this.value)">
+                @error('video_url')
+                <div class="error-message"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</div>
+                @enderror
+                <div class="form-help">
+                    Format yang didukung: youtube.com/watch?v=..., youtu.be/..., youtube.com/shorts/...
+                </div>
+            </div>
+
+            <div class="youtube-info" id="youtubeInfo">
+                <i class="fa-brands fa-youtube" style="font-size:1.2rem; flex-shrink:0;"></i>
+                <span id="youtubeInfoText">Video ditemukan</span>
+            </div>
+
+            <div class="video-preview" id="videoPreview">
+                <iframe id="videoIframe" src="" allowfullscreen
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture">
+                </iframe>
+            </div>
+        </div>
+
+        {{-- SECTION FOTO --}}
+        <div class="form-card" id="photoSection">
             <h3 class="section-title">
                 <span class="section-icon"><i class="fa-solid fa-star"></i></span>
-                Main Photo <span style="font-size:0.8rem;color:#999;font-weight:400;">(Cover / Grid)</span>
+                Foto Utama <span style="font-size:0.8rem;color:#999;font-weight:400;">(Cover / Grid)</span>
             </h3>
 
             <div class="form-group">
                 <div class="image-upload-wrapper" id="mainUploadArea">
                     <input type="file" id="foto" name="foto"
                         accept="image/jpeg,image/png,image/jpg,image/webp"
-                        required onchange="handleMainImage(event)">
+                        onchange="handleMainImage(event)">
                     <div class="upload-icon"><i class="fa-solid fa-camera-retro"></i></div>
                     <div class="upload-text">
-                        <strong>Click or drag & drop</strong><br>
-                        <small>JPG, PNG, WEBP — maks 20MB — akan dikompres otomatis ke maks 1920px</small>
+                        <strong>Click atau drag & drop</strong><br>
+                        <small>JPG, PNG, WEBP — max 20MB — dikompres otomatis ke max 1920px</small>
                     </div>
                 </div>
                 <div class="main-preview-wrapper" id="mainPreview">
@@ -292,18 +423,17 @@
             </div>
         </div>
 
-        {{-- Additional Photos --}}
-        <div class="form-card">
+        {{-- FOTO TAMBAHAN --}}
+        <div class="form-card" id="photosSection">
             <h3 class="section-title">
                 <span class="section-icon"><i class="fa-solid fa-images"></i></span>
-                Additional Photos
-                <span style="font-size:0.8rem;color:#999;font-weight:400;">(Opsional — bisa banyak sekaligus)</span>
+                Foto Tambahan
+                <span style="font-size:0.8rem;color:#999;font-weight:400;">(Opsional)</span>
             </h3>
 
             <div class="compress-info">
                 <i class="fa-solid fa-bolt"></i>
-                Semua foto akan dikompres otomatis di browser sebelum diupload — resolusi maks 1920px, kualitas 85%.
-                Tidak perlu resize manual.
+                Semua foto dikompres otomatis — resolusi max 1920px, kualitas 85%.
             </div>
 
             <div class="form-group" style="margin-top:1.25rem;">
@@ -313,8 +443,8 @@
                         multiple onchange="handleAdditionalPhotos(event)">
                     <div class="upload-icon"><i class="fa-solid fa-cloud-arrow-up"></i></div>
                     <div class="upload-text">
-                        <strong>Click atau drag & drop</strong> untuk upload banyak foto<br>
-                        <small>JPG, PNG, WEBP — pilih sekaligus banyak file</small>
+                        <strong>Click atau drag & drop</strong> beberapa foto sekaligus<br>
+                        <small>JPG, PNG, WEBP</small>
                     </div>
                 </div>
 
@@ -339,7 +469,7 @@
                     <i class="fa-solid fa-arrow-left"></i> Cancel
                 </a>
                 <button type="submit" class="btn btn-primary" id="submitBtn">
-                    <i class="fa-solid fa-floppy-disk"></i> Add to Gallery
+                    <i class="fa-solid fa-floppy-disk"></i> Simpan ke Gallery
                 </button>
             </div>
         </div>
@@ -349,47 +479,79 @@
 
 @push('scripts')
 <script>
-// ==================== COMPRESSION UTILS ====================
+// ==================== TYPE TOGGLE ====================
+const typeRadios = document.querySelectorAll('input[name="type"]');
+const videoSection  = document.getElementById('videoSection');
+const photoSection  = document.getElementById('photoSection');
+const photosSection = document.getElementById('photosSection');
+const videoUrlInput = document.getElementById('video_url');
+const fotoInput     = document.getElementById('foto');
 
-/**
- * Compress an image File to max maxWidth px, quality 0–1.
- * Returns a new File.
- */
+typeRadios.forEach(radio => {
+    radio.addEventListener('change', function () {
+        if (this.value === 'video') {
+            videoSection.style.display  = 'block';
+            photoSection.style.display  = 'none';
+            photosSection.style.display = 'none';
+            // Hapus required dari foto
+            fotoInput.removeAttribute('required');
+            videoUrlInput.setAttribute('required', 'required');
+        } else {
+            videoSection.style.display  = 'none';
+            photoSection.style.display  = 'block';
+            photosSection.style.display = 'block';
+            fotoInput.setAttribute('required', 'required');
+            videoUrlInput.removeAttribute('required');
+        }
+    });
+});
+
+// ==================== YOUTUBE PREVIEW ====================
+function extractYoutubeId(url) {
+    const match = url.match(
+        /(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/
+    );
+    return match ? match[1] : null;
+}
+
+function previewYoutube(url) {
+    const preview = document.getElementById('videoPreview');
+    const iframe  = document.getElementById('videoIframe');
+    const info    = document.getElementById('youtubeInfo');
+    const infoText = document.getElementById('youtubeInfoText');
+
+    const id = extractYoutubeId(url);
+
+    if (id) {
+        iframe.src = `https://www.youtube.com/embed/${id}?rel=0&modestbranding=1`;
+        preview.classList.add('show');
+        infoText.textContent = `Video ID: ${id} — Preview tersedia di bawah`;
+        info.classList.add('show');
+    } else {
+        iframe.src = '';
+        preview.classList.remove('show');
+        info.classList.remove('show');
+    }
+}
+
+// ==================== COMPRESSION ====================
 async function compressImage(file, maxWidth = 1920, quality = 0.85) {
     return new Promise((resolve) => {
         const img = new Image();
         const url = URL.createObjectURL(file);
-
         img.onload = () => {
             URL.revokeObjectURL(url);
-
-            // If already small enough, skip compression
-            if (img.width <= maxWidth) {
-                resolve(file);
-                return;
-            }
-
+            if (img.width <= maxWidth) { resolve(file); return; }
             const ratio  = maxWidth / img.width;
             const canvas = document.createElement('canvas');
             canvas.width  = maxWidth;
             canvas.height = Math.round(img.height * ratio);
-
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
+            canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
             canvas.toBlob(
-                (blob) => {
-                    const compressed = new File([blob], file.name.replace(/\.[^.]+$/, '.jpg'), {
-                        type: 'image/jpeg',
-                        lastModified: Date.now(),
-                    });
-                    resolve(compressed);
-                },
-                'image/jpeg',
-                quality
+                (blob) => resolve(new File([blob], file.name.replace(/\.[^.]+$/, '.jpg'), { type: 'image/jpeg', lastModified: Date.now() })),
+                'image/jpeg', quality
             );
         };
-
         img.onerror = () => { URL.revokeObjectURL(url); resolve(file); };
         img.src = url;
     });
@@ -402,20 +564,11 @@ function formatBytes(bytes) {
 }
 
 // ==================== MAIN IMAGE ====================
-
-let mainFileCompressed = null;
-
 async function handleMainImage(event) {
     const file = event.target.files[0];
     if (!file) return;
-
     const compressed = await compressImage(file, 1920, 0.85);
-    mainFileCompressed = compressed;
-
-    // Inject compressed file back
     injectFileToInput('foto', [compressed]);
-
-    // Preview
     const reader = new FileReader();
     reader.onload = e => {
         document.getElementById('mainPreviewImg').src = e.target.result;
@@ -427,23 +580,19 @@ async function handleMainImage(event) {
 
 function removeMainImage() {
     document.getElementById('foto').value = '';
-    mainFileCompressed = null;
     document.getElementById('mainPreview').classList.remove('show');
     document.getElementById('mainPreviewImg').src = '';
     document.getElementById('mainUploadArea').style.display = 'block';
 }
 
 // ==================== ADDITIONAL PHOTOS ====================
-
 let additionalFiles = [];
 
 async function handleAdditionalPhotos(event) {
     const rawFiles = Array.from(event.target.files);
     if (!rawFiles.length) return;
-
-    // Show progress
-    const progressWrap = document.getElementById('uploadProgress');
-    const progressBar  = document.getElementById('progressBar');
+    const progressWrap  = document.getElementById('uploadProgress');
+    const progressBar   = document.getElementById('progressBar');
     const progressLabel = document.getElementById('progressLabel');
     progressWrap.style.display = 'block';
     progressBar.style.width = '0%';
@@ -453,7 +602,6 @@ async function handleAdditionalPhotos(event) {
     for (let i = 0; i < rawFiles.length; i++) {
         const compressed = await compressImage(rawFiles[i], 1920, 0.85);
         newCompressed.push(compressed);
-
         const pct = Math.round(((i + 1) / rawFiles.length) * 100);
         progressBar.style.width = pct + '%';
         progressLabel.textContent = `Memproses ${i + 1} / ${rawFiles.length} foto...`;
@@ -461,8 +609,6 @@ async function handleAdditionalPhotos(event) {
 
     additionalFiles = [...additionalFiles, ...newCompressed];
     progressWrap.style.display = 'none';
-
-    // Inject to input
     injectFileToInput('photos', additionalFiles);
     renderPhotoGrid();
 }
@@ -476,14 +622,8 @@ function removeAdditionalPhoto(index) {
 function renderPhotoGrid() {
     const grid = document.getElementById('photosGrid');
     grid.innerHTML = '';
-
-    if (additionalFiles.length === 0) {
-        grid.style.display = 'none';
-        return;
-    }
-
+    if (additionalFiles.length === 0) { grid.style.display = 'none'; return; }
     grid.style.display = 'grid';
-
     additionalFiles.forEach((file, index) => {
         const reader = new FileReader();
         reader.onload = e => {
@@ -502,8 +642,6 @@ function renderPhotoGrid() {
     });
 }
 
-// ==================== INJECT FILES HELPER ====================
-
 function injectFileToInput(inputId, files) {
     const dt = new DataTransfer();
     files.forEach(f => dt.items.add(f));
@@ -511,37 +649,30 @@ function injectFileToInput(inputId, files) {
 }
 
 // ==================== DRAG & DROP ====================
-
-function setupDragDrop(areaId, inputId, multi = false) {
+function setupDragDrop(areaId, inputId) {
     const area = document.getElementById(areaId);
     if (!area) return;
-
     area.addEventListener('dragover', e => { e.preventDefault(); area.classList.add('dragover'); });
     area.addEventListener('dragleave', () => area.classList.remove('dragover'));
     area.addEventListener('drop', e => {
         e.preventDefault();
         area.classList.remove('dragover');
-        const input = document.getElementById(inputId);
-        const files  = e.dataTransfer.files;
-        if (!files.length) return;
-
-        // Simulate change event
         const dt = new DataTransfer();
-        Array.from(files).forEach(f => dt.items.add(f));
+        Array.from(e.dataTransfer.files).forEach(f => dt.items.add(f));
+        const input = document.getElementById(inputId);
         input.files = dt.files;
         input.dispatchEvent(new Event('change'));
     });
 }
 
-setupDragDrop('mainUploadArea', 'foto', false);
-setupDragDrop('photosUploadArea', 'photos', true);
+setupDragDrop('mainUploadArea', 'foto');
+setupDragDrop('photosUploadArea', 'photos');
 
-// ==================== SUBMIT GUARD ====================
-
+// ==================== SUBMIT ====================
 document.getElementById('galleryForm').addEventListener('submit', function() {
     const btn = document.getElementById('submitBtn');
     btn.disabled = true;
-    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Uploading...';
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...';
 });
 </script>
 @endpush

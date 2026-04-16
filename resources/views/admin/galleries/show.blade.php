@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
-@section('title', 'Photo Details')
-@section('page-title', 'Photo Details')
+@section('title', $gallery->isVideo() ? 'Video Details' : 'Photo Details')
+@section('page-title', $gallery->isVideo() ? 'Video Details' : 'Photo Details')
 
 @push('styles')
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -10,12 +10,31 @@
 
     .detail-container { max-width: 1200px; margin: 0 auto; }
 
-    /* Main photo */
-    .main-photo-section {
+    /* ── TYPE BADGE HEADER ── */
+    .type-header-badge {
+        display: inline-flex; align-items: center; gap: 0.5rem;
+        padding: 0.35rem 1rem; border-radius: 20px;
+        font-family: 'Work Sans', sans-serif; font-size: 0.8rem; font-weight: 700;
+        letter-spacing: 0.4px; text-transform: uppercase; margin-bottom: 1.5rem;
+    }
+
+    .type-header-badge.photo {
+        background: linear-gradient(135deg, rgba(139,115,85,0.12), rgba(107,86,68,0.1));
+        color: #8B7355; border: 1px solid rgba(139,115,85,0.25);
+    }
+
+    .type-header-badge.video {
+        background: linear-gradient(135deg, rgba(231,76,60,0.1), rgba(192,57,43,0.08));
+        color: #c0392b; border: 1px solid rgba(231,76,60,0.2);
+    }
+
+    /* ── MAIN SECTIONS ── */
+    .main-photo-section, .video-section {
         margin-bottom: 2rem; border-radius: 16px; overflow: hidden;
         box-shadow: 0 8px 30px rgba(0,0,0,0.12); background: white; padding: 2rem;
     }
 
+    /* Photo viewer */
     .main-photo-wrapper {
         position: relative; border-radius: 12px; overflow: hidden;
         background: #f5f5f5; cursor: pointer;
@@ -34,11 +53,33 @@
         background: rgba(0,0,0,0.6); color: white;
         font-size: 0.78rem; padding: 5px 10px; border-radius: 6px;
         display: flex; align-items: center; gap: 5px;
-        font-family: 'Work Sans', sans-serif; opacity: 0;
-        transition: opacity 0.3s ease;
+        font-family: 'Work Sans', sans-serif; opacity: 0; transition: opacity 0.3s ease;
     }
 
     .main-photo-wrapper:hover .photo-zoom-hint { opacity: 1; }
+
+    /* Video embed */
+    .video-embed-wrapper {
+        border-radius: 12px; overflow: hidden; aspect-ratio: 16/9; background: #000;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    }
+
+    .video-embed-wrapper iframe {
+        width: 100%; height: 100%; border: none; display: block;
+    }
+
+    .video-url-link {
+        display: inline-flex; align-items: center; gap: 0.5rem;
+        margin-top: 1rem; color: #c0392b; font-family: 'Work Sans', sans-serif;
+        font-size: 0.88rem; font-weight: 600; text-decoration: none;
+        padding: 0.5rem 1rem; border: 1.5px solid rgba(231,76,60,0.25);
+        border-radius: 8px; transition: all 0.3s ease;
+    }
+
+    .video-url-link:hover {
+        background: rgba(231,76,60,0.06); border-color: rgba(231,76,60,0.5);
+        transform: translateY(-1px);
+    }
 
     /* Additional photos */
     .additional-photos-section {
@@ -58,6 +99,8 @@
         color: white; border-radius: 10px; font-size: 1.1rem;
     }
 
+    .card-title-icon.video { background: linear-gradient(135deg, #e74c3c, #c0392b); }
+
     .photos-grid {
         display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
         gap: 1rem;
@@ -65,19 +108,11 @@
 
     .photo-grid-item {
         position: relative; aspect-ratio: 1; border-radius: 10px; overflow: hidden;
-        cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        transition: all 0.3s ease;
+        cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.1); transition: all 0.3s ease;
     }
 
-    .photo-grid-item:hover {
-        transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-    }
-
-    .photo-grid-item img {
-        width: 100%; height: 100%; object-fit: cover; display: block;
-        transition: transform 0.3s ease;
-    }
-
+    .photo-grid-item:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0,0,0,0.15); }
+    .photo-grid-item img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.3s ease; }
     .photo-grid-item:hover img { transform: scale(1.08); }
 
     .photo-grid-overlay {
@@ -112,6 +147,9 @@
         font-family: 'Work Sans', sans-serif; font-size: 1rem; color: #1a1a1a; font-weight: 500;
     }
 
+    .info-value a { color: #c0392b; text-decoration: none; word-break: break-all; }
+    .info-value a:hover { text-decoration: underline; }
+
     /* Lightbox */
     .lightbox {
         display: none; position: fixed; inset: 0;
@@ -120,12 +158,8 @@
     }
 
     .lightbox.active { display: flex; }
-
     .lightbox-content { max-width: 90vw; max-height: 90vh; position: relative; }
-
-    .lightbox-content img {
-        max-width: 100%; max-height: 90vh; object-fit: contain; border-radius: 4px; display: block;
-    }
+    .lightbox-content img { max-width: 100%; max-height: 90vh; object-fit: contain; border-radius: 4px; display: block; }
 
     .lb-close {
         position: fixed; top: 20px; right: 28px; color: white;
@@ -179,7 +213,7 @@
     .btn-danger:hover { transform: translateY(-2px); }
 
     @media (max-width: 768px) {
-        .detail-card, .main-photo-section, .additional-photos-section { padding: 1.5rem; }
+        .detail-card, .main-photo-section, .video-section, .additional-photos-section { padding: 1.5rem; }
         .action-buttons { flex-direction: column; }
         .btn { width: 100%; justify-content: center; }
         .photos-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
@@ -190,9 +224,50 @@
 @endpush
 
 @section('content')
+@php $isVideo = $gallery->isVideo(); @endphp
 <div class="detail-container">
 
-    {{-- Main Photo --}}
+    {{-- Type badge --}}
+    <div class="type-header-badge {{ $isVideo ? 'video' : 'photo' }}">
+        <i class="fa-solid {{ $isVideo ? 'fa-play' : 'fa-image' }}"></i>
+        {{ $isVideo ? 'Video YouTube' : 'Photo' }}
+    </div>
+
+    @if($isVideo)
+    {{-- ═══════════════════════════════════════
+         VIDEO SECTION
+    ═══════════════════════════════════════ --}}
+    <div class="video-section">
+        <h3 class="card-title">
+            <span class="card-title-icon video"><i class="fa-brands fa-youtube"></i></span>
+            Embedded Video
+        </h3>
+
+        @if($gallery->youtube_embed_url)
+        <div class="video-embed-wrapper">
+            <iframe src="{{ $gallery->youtube_embed_url }}" allowfullscreen
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture">
+            </iframe>
+        </div>
+        @else
+        <div style="height:200px;background:#f5f5f5;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#ccc;font-size:3rem;">
+            <i class="fa-brands fa-youtube"></i>
+        </div>
+        @endif
+
+        @if($gallery->video_url)
+        <a href="{{ $gallery->video_url }}" target="_blank" rel="noopener" class="video-url-link">
+            <i class="fa-brands fa-youtube"></i>
+            Buka di YouTube
+            <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:0.75rem;"></i>
+        </a>
+        @endif
+    </div>
+
+    @else
+    {{-- ═══════════════════════════════════════
+         PHOTO SECTION
+    ═══════════════════════════════════════ --}}
     <div class="main-photo-section">
         <h3 class="card-title">
             <span class="card-title-icon"><i class="fa-solid fa-star"></i></span>
@@ -233,25 +308,59 @@
                      loading="lazy"
                      onerror="this.onerror=null; this.parentElement.style.background='#f5f5f5';">
                 <div class="photo-grid-overlay">
-                    <i class="fa-solid fa-search-plus"></i>
+                    <i class="fa-solid fa-magnifying-glass-plus"></i>
                 </div>
             </div>
             @endforeach
         </div>
     </div>
     @endif
+    @endif {{-- end !isVideo --}}
 
-    {{-- Info --}}
+    {{-- ═══════════════════════════════════════
+         INFO CARD (shared for both types)
+    ═══════════════════════════════════════ --}}
     <div class="detail-card">
         <h3 class="card-title">
             <span class="card-title-icon"><i class="fa-solid fa-circle-info"></i></span>
-            Photo Information
+            {{ $isVideo ? 'Video' : 'Photo' }} Information
         </h3>
         <div class="info-grid">
             <div class="info-item">
                 <div class="info-label">Title</div>
                 <div class="info-value">{{ $gallery->title }}</div>
             </div>
+
+            <div class="info-item">
+                <div class="info-label">Type</div>
+                <div class="info-value">
+                    @if($isVideo)
+                        <span style="color:#c0392b;"><i class="fa-brands fa-youtube"></i> Video YouTube</span>
+                    @else
+                        <span style="color:#8B7355;"><i class="fa-solid fa-image"></i> Photo</span>
+                    @endif
+                </div>
+            </div>
+
+            @if($isVideo && $gallery->video_url)
+            <div class="info-item">
+                <div class="info-label">YouTube URL</div>
+                <div class="info-value">
+                    <a href="{{ $gallery->video_url }}" target="_blank" rel="noopener">
+                        {{ $gallery->video_url }}
+                    </a>
+                </div>
+            </div>
+            @endif
+
+            @if($isVideo && $gallery->youtube_id)
+            <div class="info-item">
+                <div class="info-label">Video ID</div>
+                <div class="info-value" style="font-family:monospace;font-size:0.9rem;">
+                    {{ $gallery->youtube_id }}
+                </div>
+            </div>
+            @endif
 
             @if($gallery->description)
             <div class="info-item">
@@ -274,10 +383,13 @@
                 <div class="info-value">{{ $gallery->order ?? 0 }}</div>
             </div>
 
+            @if(!$isVideo)
+            @php $photos = is_array($gallery->photo) ? $gallery->photo : []; @endphp
             <div class="info-item">
                 <div class="info-label">Additional Photos</div>
                 <div class="info-value">{{ count($photos) }} foto</div>
             </div>
+            @endif
 
             <div class="info-item">
                 <div class="info-label">Uploaded On</div>
@@ -298,10 +410,10 @@
                 <i class="fa-solid fa-arrow-left"></i> Back to Gallery
             </a>
             <a href="{{ route('admin.galleries.edit', $gallery) }}" class="btn btn-primary">
-                <i class="fa-solid fa-pen"></i> Edit Photo
+                <i class="fa-solid fa-pen"></i> Edit {{ $isVideo ? 'Video' : 'Photo' }}
             </a>
             <form action="{{ route('admin.galleries.destroy', $gallery) }}" method="POST"
-                style="margin:0;" onsubmit="return confirm('Hapus foto ini? Tindakan ini tidak bisa dibatalkan.');">
+                style="margin:0;" onsubmit="return confirm('Hapus item ini? Tindakan ini tidak bisa dibatalkan.');">
                 @csrf
                 @method('DELETE')
                 <button type="submit" class="btn btn-danger">
@@ -312,7 +424,8 @@
     </div>
 </div>
 
-{{-- Lightbox --}}
+@if(!$isVideo)
+{{-- Lightbox (photos only) --}}
 <div id="lightbox" class="lightbox" onclick="closeLightbox(event)">
     <button class="lb-close" onclick="closeLightbox()">
         <i class="fa-solid fa-xmark"></i>
@@ -330,13 +443,12 @@
         <span id="lb-cur">1</span> / <span id="lb-total">1</span>
     </div>
 </div>
-@endsection
 
 @push('scripts')
 <script>
-// Build image pool
-const mainPhoto      = @json($gallery->image ? asset('storage/' . $gallery->image) : null);
-const additionalPhotos = @json(array_map(fn($p) => asset('storage/' . $p), $photos));
+@php $photosForJs = is_array($gallery->photo) ? $gallery->photo : []; @endphp
+const mainPhoto        = @json($gallery->image ? asset('storage/' . $gallery->image) : null);
+const additionalPhotos = @json(array_map(fn($p) => asset('storage/' . $p), $photosForJs));
 
 let pool = [];
 let currentIdx = 0;
@@ -346,7 +458,6 @@ function openLightbox(source, index) {
         pool = mainPhoto ? [mainPhoto, ...additionalPhotos] : additionalPhotos;
         currentIdx = 0;
     } else {
-        // additional only
         pool = additionalPhotos;
         currentIdx = index;
     }
@@ -354,10 +465,9 @@ function openLightbox(source, index) {
     if (!pool.length) return;
 
     document.getElementById('lb-img').src = pool[currentIdx];
-    document.getElementById('lb-cur').textContent = currentIdx + 1;
+    document.getElementById('lb-cur').textContent  = currentIdx + 1;
     document.getElementById('lb-total').textContent = pool.length;
 
-    // Show/hide nav arrows
     const showNav = pool.length > 1;
     document.querySelector('.lb-prev').style.display = showNav ? 'flex' : 'none';
     document.querySelector('.lb-next').style.display = showNav ? 'flex' : 'none';
@@ -381,9 +491,11 @@ function changeLb(dir) {
 
 document.addEventListener('keydown', e => {
     if (!document.getElementById('lightbox').classList.contains('active')) return;
-    if (e.key === 'ArrowLeft') changeLb(-1);
+    if (e.key === 'ArrowLeft')  changeLb(-1);
     if (e.key === 'ArrowRight') changeLb(1);
-    if (e.key === 'Escape') closeLightbox();
+    if (e.key === 'Escape')     closeLightbox();
 });
 </script>
 @endpush
+@endif
+@endsection

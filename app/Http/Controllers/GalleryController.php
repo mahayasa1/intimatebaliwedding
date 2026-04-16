@@ -18,13 +18,32 @@ class GalleryController extends Controller
     }
 
     /**
-     * Display a listing of the resource (Frontend).
+     * Display a listing of the resource (Frontend) — FOTO dan VIDEO terpisah.
      */
     public function index()
     {
+        // Ambil semua foto (type = photo atau video_url kosong)
+        $photos = Gallery::where(function ($q) {
+                        $q->where('type', 'photo')
+                          ->orWhereNull('type')
+                          ->orWhere('type', '');
+                    })
+                    ->whereNull('video_url')
+                    ->orWhere(function ($q) {
+                        $q->where('type', 'photo')->whereNull('video_url');
+                    })
+                    ->orderBy('order')
+                    ->latest()
+                    ->get();
+
+        // Lebih simpel: pisahkan setelah ambil semua
         $allGalleries = Gallery::orderBy('order')->latest()->get();
 
-        $sortedGalleries = $allGalleries->sortByDesc(function ($gallery) {
+        $photoGalleries = $allGalleries->filter(fn($g) => !$g->isVideo());
+        $videoGalleries = $allGalleries->filter(fn($g) => $g->isVideo());
+
+        // Sort foto by aspect ratio (wide first) untuk masonry
+        $sortedPhotos = $photoGalleries->sortByDesc(function ($gallery) {
             if (!$gallery->image) return 0;
             $imagePath = storage_path('app/public/' . $gallery->image);
             if (file_exists($imagePath)) {
@@ -34,22 +53,36 @@ class GalleryController extends Controller
             return 0;
         });
 
+        // Paginate foto
         $page    = request()->get('page', 1);
         $perPage = 12;
-        $galleries = new \Illuminate\Pagination\LengthAwarePaginator(
-            $sortedGalleries->forPage($page, $perPage),
-            $sortedGalleries->count(),
+
+        $photos = new \Illuminate\Pagination\LengthAwarePaginator(
+            $sortedPhotos->forPage($page, $perPage),
+            $sortedPhotos->count(),
             $perPage,
             $page,
             ['path' => request()->url(), 'query' => request()->query()]
         );
 
-        $categories = Gallery::distinct()->pluck('category')->filter();
+        $categories = Gallery::where(function ($q) {
+                            $q->whereNull('video_url')->orWhere('video_url', '');
+                        })
+                        ->where('type', '!=', 'video')
+                        ->distinct()
+                        ->pluck('category')
+                        ->filter();
 
         $googleReviews  = $this->googleMapsService->getReviews(6);
         $businessStats  = $this->googleMapsService->getBusinessStats();
 
-        return view('gallery.index', compact('galleries', 'categories', 'googleReviews', 'businessStats'));
+        return view('gallery.index', compact(
+            'photos',
+            'videoGalleries',
+            'categories',
+            'googleReviews',
+            'businessStats'
+        ));
     }
 
     public function show($id)
@@ -101,35 +134,55 @@ class GalleryController extends Controller
      */
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'title'       => 'required|string|max:255',
-            'foto'        => 'required|image|mimes:jpeg,png,jpg,webp|max:20480',
-            'photos.*'    => 'nullable|image|mimes:jpeg,png,jpg,webp|max:20480',
-            'description' => 'nullable|string',
-            'category'    => 'nullable|string|max:255',
-            'order'       => 'nullable|integer',
-        ]);
+        $type = $request->input('type', 'photo');
 
-        // Upload main image + thumbnail
-        if ($request->hasFile('foto')) {
-            $path = $request->file('foto')->store('gallery', 'public');
-            ImageHelper::createThumbnail($path);
-            $validated['image'] = $path;
-        }
+        if ($type === 'video') {
+            $validated = $request->validate([
+                'title'       => 'required|string|max:255',
+                'video_url'   => 'required|url',
+                'description' => 'nullable|string',
+                'category'    => 'nullable|string|max:255',
+                'order'       => 'nullable|integer',
+            ]);
 
-        // Upload additional photos + thumbnails
-        $photos = [];
-        if ($request->hasFile('photos')) {
-            foreach ($request->file('photos') as $photo) {
-                $path = $photo->store('gallery/photos', 'public');
+            $validated['type'] = 'video';
+            $validated['image'] = '';
+            $validated['photo'] = [];
+
+            Gallery::create($validated);
+        } else {
+            $validated = $request->validate([
+                'title'       => 'required|string|max:255',
+                'foto'        => 'required|image|mimes:jpeg,png,jpg,webp|max:20480',
+                'photos.*'    => 'nullable|image|mimes:jpeg,png,jpg,webp|max:20480',
+                'description' => 'nullable|string',
+                'category'    => 'nullable|string|max:255',
+                'order'       => 'nullable|integer',
+            ]);
+
+            $validated['type'] = 'photo';
+
+            // Upload main image + thumbnail
+            if ($request->hasFile('foto')) {
+                $path = $request->file('foto')->store('gallery', 'public');
                 ImageHelper::createThumbnail($path);
-                $photos[] = $path;
+                $validated['image'] = $path;
             }
-        }
-        $validated['photo'] = $photos;
 
-        unset($validated['foto'], $validated['photos']);
-        Gallery::create($validated);
+            // Upload additional photos + thumbnails
+            $photos = [];
+            if ($request->hasFile('photos')) {
+                foreach ($request->file('photos') as $photo) {
+                    $path = $photo->store('gallery/photos', 'public');
+                    ImageHelper::createThumbnail($path);
+                    $photos[] = $path;
+                }
+            }
+            $validated['photo'] = $photos;
+
+            unset($validated['foto'], $validated['photos']);
+            Gallery::create($validated);
+        }
 
         return redirect()->route('admin.galleries.index')
             ->with('success', 'Gallery item created successfully.');
@@ -156,54 +209,71 @@ class GalleryController extends Controller
      */
     public function update(Request $request, Gallery $gallery)
     {
-        $validated = $request->validate([
-            'title'       => 'required|string|max:255',
-            'foto'        => 'nullable|image|mimes:jpeg,png,jpg,webp|max:20480',
-            'photos.*'    => 'nullable|image|mimes:jpeg,png,jpg,webp|max:20480',
-            'description' => 'nullable|string',
-            'category'    => 'nullable|string|max:255',
-            'order'       => 'nullable|integer',
-        ]);
+        $type = $request->input('type', $gallery->type ?? 'photo');
 
-        // Update main image jika ada file baru
-        if ($request->hasFile('foto')) {
-            if ($gallery->image) {
-                Storage::disk('public')->delete($gallery->image);
-                ImageHelper::deleteThumb($gallery->image);
+        if ($type === 'video') {
+            $validated = $request->validate([
+                'title'       => 'required|string|max:255',
+                'video_url'   => 'required|url',
+                'description' => 'nullable|string',
+                'category'    => 'nullable|string|max:255',
+                'order'       => 'nullable|integer',
+            ]);
+
+            $validated['type'] = 'video';
+            $gallery->update($validated);
+        } else {
+            $validated = $request->validate([
+                'title'       => 'required|string|max:255',
+                'foto'        => 'nullable|image|mimes:jpeg,png,jpg,webp|max:20480',
+                'photos.*'    => 'nullable|image|mimes:jpeg,png,jpg,webp|max:20480',
+                'description' => 'nullable|string',
+                'category'    => 'nullable|string|max:255',
+                'order'       => 'nullable|integer',
+            ]);
+
+            $validated['type'] = 'photo';
+
+            // Update main image jika ada file baru
+            if ($request->hasFile('foto')) {
+                if ($gallery->image) {
+                    Storage::disk('public')->delete($gallery->image);
+                    ImageHelper::deleteThumb($gallery->image);
+                }
+                $path = $request->file('foto')->store('gallery', 'public');
+                ImageHelper::createThumbnail($path);
+                $validated['image'] = $path;
             }
-            $path = $request->file('foto')->store('gallery', 'public');
-            ImageHelper::createThumbnail($path);
-            $validated['image'] = $path;
-        }
 
-        // Ambil foto-foto yang masih ada
-        $existingPhotos = $gallery->photo ?? [];
+            // Ambil foto-foto yang masih ada
+            $existingPhotos = $gallery->photo ?? [];
 
-        // Hapus foto yang di-remove oleh admin
-        if ($request->has('removed_photos')) {
-            $removedPhotos = json_decode($request->removed_photos, true);
-            if (is_array($removedPhotos)) {
-                foreach ($removedPhotos as $photoPath) {
-                    Storage::disk('public')->delete($photoPath);
-                    ImageHelper::deleteThumb($photoPath);
-                    $existingPhotos = array_filter($existingPhotos, fn($p) => $p !== $photoPath);
+            // Hapus foto yang di-remove oleh admin
+            if ($request->has('removed_photos')) {
+                $removedPhotos = json_decode($request->removed_photos, true);
+                if (is_array($removedPhotos)) {
+                    foreach ($removedPhotos as $photoPath) {
+                        Storage::disk('public')->delete($photoPath);
+                        ImageHelper::deleteThumb($photoPath);
+                        $existingPhotos = array_filter($existingPhotos, fn($p) => $p !== $photoPath);
+                    }
                 }
             }
-        }
 
-        // Upload foto baru + buat thumbnail
-        if ($request->hasFile('photos')) {
-            foreach ($request->file('photos') as $photo) {
-                $path = $photo->store('gallery/photos', 'public');
-                ImageHelper::createThumbnail($path);
-                $existingPhotos[] = $path;
+            // Upload foto baru + buat thumbnail
+            if ($request->hasFile('photos')) {
+                foreach ($request->file('photos') as $photo) {
+                    $path = $photo->store('gallery/photos', 'public');
+                    ImageHelper::createThumbnail($path);
+                    $existingPhotos[] = $path;
+                }
             }
+
+            $validated['photo'] = array_values($existingPhotos);
+            unset($validated['foto'], $validated['photos']);
+
+            $gallery->update($validated);
         }
-
-        $validated['photo'] = array_values($existingPhotos);
-        unset($validated['foto'], $validated['photos']);
-
-        $gallery->update($validated);
 
         return redirect()->route('admin.galleries.index')
             ->with('success', 'Gallery item updated successfully.');

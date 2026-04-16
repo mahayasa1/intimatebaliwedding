@@ -87,6 +87,45 @@
 
     .gallery-card:hover .gallery-image { transform: scale(1.05); }
 
+    /* Video overlay play button */
+    .video-play-overlay {
+        position: absolute; inset: 0;
+        display: flex; align-items: center; justify-content: center;
+        background: rgba(0,0,0,0.25);
+        transition: background 0.3s ease;
+        z-index: 2;
+    }
+
+    .gallery-card:hover .video-play-overlay { background: rgba(0,0,0,0.4); }
+
+    .video-play-btn {
+        width: 52px; height: 52px; background: rgba(255,255,255,0.95);
+        border-radius: 50%; display: flex; align-items: center; justify-content: center;
+        color: #e74c3c; font-size: 1.3rem;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+        transition: transform 0.3s ease;
+        padding-left: 3px; /* optical centering for play icon */
+    }
+
+    .gallery-card:hover .video-play-btn { transform: scale(1.12); }
+
+    /* Type badge (top-left) */
+    .type-badge {
+        position: absolute; top: 10px; left: 10px; z-index: 3;
+        display: inline-flex; align-items: center; gap: 0.3rem;
+        padding: 3px 9px; border-radius: 6px;
+        font-family: 'Work Sans', sans-serif; font-size: 0.7rem; font-weight: 700;
+        letter-spacing: 0.3px; text-transform: uppercase;
+    }
+
+    .type-badge.video {
+        background: rgba(231,76,60,0.92); color: white;
+    }
+
+    .type-badge.photo {
+        background: rgba(139,115,85,0.85); color: white;
+    }
+
     /* Photo count badge */
     .photo-count-badge {
         position: absolute; bottom: 8px; right: 8px;
@@ -94,7 +133,7 @@
         font-size: 0.72rem; font-weight: 600;
         padding: 3px 8px; border-radius: 6px;
         display: flex; align-items: center; gap: 4px;
-        font-family: 'Work Sans', sans-serif;
+        font-family: 'Work Sans', sans-serif; z-index: 3;
     }
 
     /* No image placeholder */
@@ -103,6 +142,12 @@
         background: linear-gradient(135deg, #f5f0eb, #ede5d8);
         display: flex; align-items: center; justify-content: center;
         color: #D4AF37; font-size: 3rem;
+    }
+
+    /* Video placeholder (no thumbnail) */
+    .gallery-placeholder.video-ph {
+        background: linear-gradient(135deg, #2c1a1a, #3d1f1f);
+        color: #e74c3c;
     }
 
     .gallery-content { padding: 1.25rem; }
@@ -132,6 +177,11 @@
     .meta-badge.category {
         background: linear-gradient(135deg, rgba(139,115,85,0.12), rgba(107,86,68,0.12));
         color: #8B7355; border: 1px solid rgba(139,115,85,0.2);
+    }
+
+    .meta-badge.video-badge {
+        background: linear-gradient(135deg, rgba(231,76,60,0.1), rgba(192,57,43,0.1));
+        color: #c0392b; border: 1px solid rgba(231,76,60,0.2);
     }
 
     .gallery-actions {
@@ -165,21 +215,34 @@
 
     .gallery-list-item:hover { transform: translateX(8px); box-shadow: 0 6px 25px rgba(0,0,0,0.1); }
 
-    .list-image {
-        width: 120px; height: 120px; object-fit: cover; border-radius: 12px; flex-shrink: 0;
+    .list-thumb {
+        width: 120px; height: 120px; border-radius: 12px; flex-shrink: 0;
+        position: relative; overflow: hidden; background: #f5f5f5;
     }
 
-    .list-image-placeholder {
-        width: 120px; height: 120px; border-radius: 12px; flex-shrink: 0;
+    .list-thumb img {
+        width: 100%; height: 100%; object-fit: cover; display: block;
+    }
+
+    .list-thumb .video-play-overlay {
+        border-radius: 0;
+    }
+
+    .list-thumb-placeholder {
+        width: 100%; height: 100%;
         background: linear-gradient(135deg, #f5f0eb, #ede5d8);
         display: flex; align-items: center; justify-content: center;
         color: #D4AF37; font-size: 2rem;
     }
 
+    .list-thumb-placeholder.video-ph {
+        background: linear-gradient(135deg, #2c1a1a, #3d1f1f);
+        color: #e74c3c;
+    }
+
     .list-content { flex: 1; }
 
     .list-actions { display: flex; gap: 0.5rem; flex-shrink: 0; }
-
     .list-actions .btn-icon { flex: initial; width: 40px; height: 40px; }
 
     /* Empty State */
@@ -198,7 +261,7 @@
         .header-section { flex-direction: column; align-items: stretch; }
         .btn-add { width: 100%; justify-content: center; }
         .gallery-list-item { flex-direction: column; }
-        .list-image, .list-image-placeholder { width: 100%; height: 200px; }
+        .list-thumb { width: 100%; height: 200px; }
         .list-actions { width: 100%; }
         .list-actions .btn-icon { flex: 1; }
     }
@@ -210,7 +273,7 @@
 <div class="header-section">
     <h2 class="header-title">Gallery Collection</h2>
     <a href="{{ route('admin.galleries.create') }}" class="btn-add">
-        <i class="fa-solid fa-plus"></i> Add New Photo
+        <i class="fa-solid fa-plus"></i> Add New Item
     </a>
 </div>
 
@@ -239,26 +302,55 @@
 @if($galleries->count() > 0)
 <div class="gallery-grid" id="gallery-grid">
     @foreach($galleries as $gallery)
+    @php $isVideo = $gallery->isVideo(); @endphp
     <div class="gallery-card">
         <div class="gallery-image-wrapper">
-            @if($gallery->image)
-                <img src="{{ asset('storage/' . $gallery->image) }}"
-                     alt="{{ $gallery->title }}" class="gallery-image"
-                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                <div class="gallery-placeholder" style="display:none;">
-                    <i class="fa-solid fa-image"></i>
+
+            {{-- Type badge --}}
+            <span class="type-badge {{ $isVideo ? 'video' : 'photo' }}">
+                <i class="fa-solid {{ $isVideo ? 'fa-play' : 'fa-image' }}"></i>
+                {{ $isVideo ? 'Video' : 'Photo' }}
+            </span>
+
+            @if($isVideo)
+                {{-- YouTube thumbnail --}}
+                @if($gallery->youtube_thumbnail)
+                    <img src="{{ $gallery->youtube_thumbnail }}"
+                         alt="{{ $gallery->title }}" class="gallery-image"
+                         onerror="this.style.display='none'; this.closest('.gallery-image-wrapper').querySelector('.gallery-placeholder').style.display='flex';">
+                    <div class="gallery-placeholder video-ph" style="display:none;">
+                        <i class="fa-brands fa-youtube"></i>
+                    </div>
+                @else
+                    <div class="gallery-placeholder video-ph">
+                        <i class="fa-brands fa-youtube"></i>
+                    </div>
+                @endif
+                <div class="video-play-overlay">
+                    <div class="video-play-btn">
+                        <i class="fa-solid fa-play"></i>
+                    </div>
                 </div>
             @else
-                <div class="gallery-placeholder">
-                    <i class="fa-solid fa-image"></i>
-                </div>
-            @endif
+                @if($gallery->image)
+                    <img src="{{ asset('storage/' . $gallery->image) }}"
+                         alt="{{ $gallery->title }}" class="gallery-image"
+                         onerror="this.style.display='none'; this.closest('.gallery-image-wrapper').querySelector('.gallery-placeholder').style.display='flex';">
+                    <div class="gallery-placeholder" style="display:none;">
+                        <i class="fa-solid fa-image"></i>
+                    </div>
+                @else
+                    <div class="gallery-placeholder">
+                        <i class="fa-solid fa-image"></i>
+                    </div>
+                @endif
 
-            @php $photoCount = is_array($gallery->photo) ? count($gallery->photo) : 0; @endphp
-            @if($photoCount > 0)
-            <div class="photo-count-badge">
-                <i class="fa-solid fa-images"></i> +{{ $photoCount }}
-            </div>
+                @php $photoCount = is_array($gallery->photo) ? count($gallery->photo) : 0; @endphp
+                @if($photoCount > 0)
+                <div class="photo-count-badge">
+                    <i class="fa-solid fa-images"></i> +{{ $photoCount }}
+                </div>
+                @endif
             @endif
         </div>
 
@@ -280,10 +372,13 @@
                     {{ $gallery->category }}
                 </span>
                 @endif
-                @if($gallery->order)
+                @if($isVideo)
+                <span class="meta-badge video-badge">
+                    <i class="fa-brands fa-youtube"></i> YouTube
+                </span>
+                @elseif($gallery->order)
                 <span class="meta-badge">
-                    <i class="fa-solid fa-sort"></i>
-                    Order: {{ $gallery->order }}
+                    <i class="fa-solid fa-sort"></i> Order: {{ $gallery->order }}
                 </span>
                 @endif
             </div>
@@ -296,7 +391,7 @@
                     <i class="fa-solid fa-pen"></i> Edit
                 </a>
                 <form action="{{ route('admin.galleries.destroy', $gallery) }}" method="POST"
-                    style="flex: 1;" onsubmit="return confirm('Hapus foto ini?');">
+                    style="flex: 1;" onsubmit="return confirm('Hapus item ini?');">
                     @csrf
                     @method('DELETE')
                     <button type="submit" class="btn-icon btn-delete" style="width: 100%;">
@@ -312,19 +407,33 @@
 <!-- Gallery List View -->
 <div class="gallery-list" id="gallery-list">
     @foreach($galleries as $gallery)
+    @php $isVideo = $gallery->isVideo(); @endphp
     <div class="gallery-list-item">
-        @if($gallery->image)
-            <img src="{{ asset('storage/' . $gallery->image) }}"
-                 alt="{{ $gallery->title }}" class="list-image"
-                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-            <div class="list-image-placeholder" style="display:none;">
-                <i class="fa-solid fa-image"></i>
-            </div>
-        @else
-            <div class="list-image-placeholder">
-                <i class="fa-solid fa-image"></i>
-            </div>
-        @endif
+        <div class="list-thumb">
+            @if($isVideo)
+                @if($gallery->youtube_thumbnail)
+                    <img src="{{ $gallery->youtube_thumbnail }}" alt="{{ $gallery->title }}"
+                         onerror="this.style.display='none';">
+                @else
+                    <div class="list-thumb-placeholder video-ph">
+                        <i class="fa-brands fa-youtube"></i>
+                    </div>
+                @endif
+                <div class="video-play-overlay">
+                    <div class="video-play-btn" style="width:38px;height:38px;font-size:1rem;">
+                        <i class="fa-solid fa-play"></i>
+                    </div>
+                </div>
+            @elseif($gallery->image)
+                <img src="{{ asset('storage/' . $gallery->image) }}"
+                     alt="{{ $gallery->title }}"
+                     onerror="this.style.display='none';">
+            @else
+                <div class="list-thumb-placeholder">
+                    <i class="fa-solid fa-image"></i>
+                </div>
+            @endif
+        </div>
 
         <div class="list-content">
             <h3 class="gallery-title">{{ $gallery->title }}</h3>
@@ -341,14 +450,21 @@
                     <i class="fa-solid fa-tag"></i> {{ $gallery->category }}
                 </span>
                 @endif
-                @php $pc = is_array($gallery->photo) ? count($gallery->photo) : 0; @endphp
-                @if($pc > 0)
-                <span class="meta-badge">
-                    <i class="fa-solid fa-images"></i> {{ $pc }} additional photo{{ $pc > 1 ? 's' : '' }}
+                @if($isVideo)
+                <span class="meta-badge video-badge">
+                    <i class="fa-brands fa-youtube"></i> YouTube
                 </span>
+                @else
+                    @php $pc = is_array($gallery->photo) ? count($gallery->photo) : 0; @endphp
+                    @if($pc > 0)
+                    <span class="meta-badge">
+                        <i class="fa-solid fa-images"></i> {{ $pc }} additional photo{{ $pc > 1 ? 's' : '' }}
+                    </span>
+                    @endif
                 @endif
             </div>
         </div>
+
         <div class="list-actions">
             <a href="{{ route('admin.galleries.show', $gallery) }}" class="btn-icon btn-view" title="View">
                 <i class="fa-solid fa-eye"></i>
@@ -357,7 +473,7 @@
                 <i class="fa-solid fa-pen"></i>
             </a>
             <form action="{{ route('admin.galleries.destroy', $gallery) }}" method="POST"
-                style="display: inline;" onsubmit="return confirm('Hapus foto ini?');">
+                style="display: inline;" onsubmit="return confirm('Hapus item ini?');">
                 @csrf
                 @method('DELETE')
                 <button type="submit" class="btn-icon btn-delete" title="Delete">
@@ -375,17 +491,17 @@
 </div>
 @else
 <div class="empty-state">
-    <div class="empty-icon"><i class="fa-solid fa-images"></i></div>
-    <h3 class="empty-title">No Photos Found</h3>
+    <div class="empty-icon"><i class="fa-solid fa-photo-film"></i></div>
+    <h3 class="empty-title">No Items Found</h3>
     <p class="empty-text">
         @if(request('search'))
-            No photos match your search criteria.
+            No gallery items match your search criteria.
         @else
-            Start building your gallery by adding your first photo.
+            Start building your gallery by adding your first photo or video.
         @endif
     </p>
     <a href="{{ route('admin.galleries.create') }}" class="btn-add">
-        <i class="fa-solid fa-plus"></i> Add First Photo
+        <i class="fa-solid fa-plus"></i> Add First Item
     </a>
 </div>
 @endif
