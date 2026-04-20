@@ -173,9 +173,8 @@ class GalleryController extends Controller
             $photos = [];
             if ($request->hasFile('photos')) {
                 foreach ($request->file('photos') as $photo) {
-                    $path = $photo->store('gallery/photos', 'public');
-                    ImageHelper::createThumbnail($path);
-                    $photos[] = $path;
+                    $result  = ImageHelper::storeAndCompress($photo, 'gallery/photos');
+                    $photos[] = $result['path'];
                 }
             }
             $validated['photo'] = $photos;
@@ -261,11 +260,11 @@ class GalleryController extends Controller
             }
 
             // Upload foto baru + buat thumbnail
+            $photos = [];
             if ($request->hasFile('photos')) {
                 foreach ($request->file('photos') as $photo) {
-                    $path = $photo->store('gallery/photos', 'public');
-                    ImageHelper::createThumbnail($path);
-                    $existingPhotos[] = $path;
+                    $result  = ImageHelper::storeAndCompress($photo, 'gallery/photos');
+                    $photos[] = $result['path'];
                 }
             }
 

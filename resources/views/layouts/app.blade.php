@@ -475,6 +475,7 @@
     <!-- Footer -->
     @include('components.footer')
 
+    <script src="{{ asset('js/image-compressor.js') }}"></script>
     <script src="https://snapwidget.com/js/snapwidget.js"></script>
 
     <script>

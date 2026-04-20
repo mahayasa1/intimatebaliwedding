@@ -85,9 +85,8 @@ class PackageController extends Controller
         DB::transaction(function () use ($request, $validated) {
             // Upload main image + buat thumbnail
             if ($request->hasFile('image')) {
-                $path = $request->file('image')->store('packages', 'public');
-                ImageHelper::createThumbnail($path);
-                $validated['image'] = $path;
+                $result = ImageHelper::storeAndCompress($request->file('image'), 'packages');
+                $validated['image'] = $result['path'];
             }
 
             // Upload multiple photos + buat thumbnail masing-masing
@@ -188,9 +187,8 @@ class PackageController extends Controller
                     Storage::disk('public')->delete($package->image);
                     ImageHelper::deleteThumb($package->image);
                 }
-                $path = $request->file('image')->store('packages', 'public');
-                ImageHelper::createThumbnail($path);
-                $validated['image'] = $path;
+                $result = ImageHelper::storeAndCompress($request->file('image'), 'packages');
+                $validated['image'] = $result['path'];
             }
 
             // Ambil foto-foto yang masih ada
