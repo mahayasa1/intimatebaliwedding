@@ -229,7 +229,7 @@
     {{-- Featured image --}}
     @if($blog->image)
     <div class="featured-image-wrapper">
-        <img src="{{ asset('storage/' . $blog->image) }}" alt="{{ $blog->title }}" class="featured-image">
+        <x-image :src="$blog->image" :alt="$blog->title" class="featured-image" :eager="true" :thumb="false" />
     </div>
     @endif
 

@@ -1,44 +1,42 @@
 {{--
-    Komponen gambar teroptimasi dengan lazy loading + WebP fallback.
-
+    Komponen gambar teroptimasi.
     Usage:
-        <x-image :src="$gallery->image" alt="Wedding photo" class="my-class" />
-        <x-image :src="$package->image" :thumb="true" width="640" height="480" eager />
-
+        <x-image :src="$gallery->image" alt="Wedding photo" />
+        <x-image :src="$pkg->image" :thumb="true" :eager="true" class="hero-img" />
     Props:
-        src    (string)  — path relatif di disk 'public'  ATAU URL absolut
-        alt    (string)  — teks alt
-        class  (string)  — CSS class tambahan
-        thumb  (bool)    — pakai thumbnail (default true)
-        eager  (bool)    — eager load (hero images); default false = lazy
-        width  (int)     — attribute width
-        height (int)     — attribute height
-        style  (string)  — inline style
+        src    — path relatif disk 'public' ATAU URL absolut
+        alt    — teks alt (wajib untuk aksesibilitas)
+        thumb  — gunakan thumbnail (default true)
+        eager  — eager load untuk above-fold (default false)
+        class  — CSS class tambahan
+        width  — attribute width
+        height — attribute height
+        style  — inline style
 --}}
 
 @php
     use App\Helpers\ImageHelper;
 
-    $src   = $src   ?? '';
-    $alt   = $alt   ?? '';
-    $thumb = $thumb ?? true;
-    $eager = $eager ?? false;
+    $src    = $src    ?? '';
+    $alt    = $alt    ?? '';
+    $thumb  = $thumb  ?? true;
+    $eager  = $eager  ?? false;
 
-    // Tentukan URL
     if ($src === '') {
-        $url = asset('assets/placeholder.jpg');
+        $url     = asset('assets/placeholder.jpg');
+        $urlFull = $url;
     } elseif (str_starts_with($src, 'http://') || str_starts_with($src, 'https://')) {
-        // URL absolut (Google Photos, CDN, dll)
-        $url = $src;
+        $url     = $src;
+        $urlFull = $src;
     } else {
-        // Path relatif di disk 'public'
-        $displayPath = $thumb ? ImageHelper::thumb($src) : $src;
-        $url = asset('storage/' . $displayPath);
+        $thumbPath = $thumb ? ImageHelper::thumb($src) : $src;
+        $url       = asset('storage/' . $thumbPath);
+        $urlFull   = asset('storage/' . $src);
     }
 
     $loading  = $eager ? 'eager'  : 'lazy';
     $decoding = $eager ? 'sync'   : 'async';
-    $priority = $eager ? 'high'   : 'low';
+    $fetchpri = $eager ? 'high'   : 'low';
 @endphp
 
 <img
@@ -46,10 +44,10 @@
     alt="{{ $alt }}"
     loading="{{ $loading }}"
     decoding="{{ $decoding }}"
-    fetchpriority="{{ $priority }}"
+    fetchpriority="{{ $fetchpri }}"
     @if(!empty($width))  width="{{ $width }}"   @endif
     @if(!empty($height)) height="{{ $height }}"  @endif
     @if(!empty($style))  style="{{ $style }}"    @endif
     {{ $attributes->merge(['class' => $class ?? '']) }}
-    onerror="this.onerror=null; this.src='{{ asset('assets/placeholder.jpg') }}';"
+    onerror="if(this.src!=='{{ $urlFull }}'){this.src='{{ $urlFull }}';}else{this.src='{{ asset('assets/placeholder.jpg') }}';}this.onerror=null;"
 >

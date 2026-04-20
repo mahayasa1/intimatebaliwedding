@@ -1,33 +1,30 @@
 /**
  * image-compressor.js
- * Kompres gambar di browser sebelum dikirim ke server.
- * Gunakan: <script src="/js/image-compressor.js"></script>
- *
- * API:
- *   ImageCompressor.compress(file, options?)  → Promise<File>
- *   ImageCompressor.compressAll(files, options?) → Promise<File[]>
- *   ImageCompressor.attachTo(inputEl, options?) → void
+ * Kompres gambar di browser SEBELUM upload ke server.
+ * Mengurangi ukuran file secara drastis sebelum dikirim.
  */
 (function (global) {
     'use strict';
 
     const DEFAULTS = {
-        maxWidth   : 1280,   // px — lebar maksimal
-        maxHeight  : 1280,   // px — tinggi maksimal
-        quality    : 0.72,   // WebP quality 0–1
+        maxWidth   : 1280,
+        maxHeight  : 1280,
+        quality    : 0.78,
         outputType : 'image/webp',
-        onProgress : null,   // callback(current, total)
+        onProgress : null,
     };
 
-    /* ------------------------------------------------------------------ */
-    /* Core compress                                                        */
-    /* ------------------------------------------------------------------ */
     function compress(file, opts) {
         opts = Object.assign({}, DEFAULTS, opts || {});
 
-        return new Promise(function (resolve, reject) {
-            // Bukan gambar → langsung lanjut
+        return new Promise(function (resolve) {
             if (!file.type.startsWith('image/')) {
+                resolve(file);
+                return;
+            }
+
+            // File sudah sangat kecil (< 100 KB), skip
+            if (file.size < 100 * 1024) {
                 resolve(file);
                 return;
             }
@@ -41,7 +38,6 @@
                 var origW = img.naturalWidth;
                 var origH = img.naturalHeight;
 
-                // Hitung dimensi baru dengan menjaga aspect ratio
                 var ratio = 1;
                 if (origW > opts.maxWidth)  ratio = Math.min(ratio, opts.maxWidth  / origW);
                 if (origH > opts.maxHeight) ratio = Math.min(ratio, opts.maxHeight / origH);
@@ -52,31 +48,27 @@
                 var canvas   = document.createElement('canvas');
                 canvas.width  = newW;
                 canvas.height = newH;
-                var ctx = canvas.getContext('2d');
 
-                // Background putih (untuk JPEG/WebP agar tidak transparan hitam)
+                var ctx = canvas.getContext('2d');
+                ctx.imageSmoothingEnabled  = true;
+                ctx.imageSmoothingQuality  = 'high';
                 ctx.fillStyle = '#ffffff';
                 ctx.fillRect(0, 0, newW, newH);
                 ctx.drawImage(img, 0, 0, newW, newH);
 
                 canvas.toBlob(
                     function (blob) {
-                        if (!blob) {
-                            // Fallback ke file asli jika gagal
-                            resolve(file);
-                            return;
-                        }
+                        if (!blob) { resolve(file); return; }
 
-                        // Pakai WebP jika hasilnya lebih kecil, else pakai JPEG
+                        // Pakai hasil kompres hanya jika lebih kecil
+                        if (blob.size >= file.size) { resolve(file); return; }
+
                         var ext  = opts.outputType === 'image/webp' ? '.webp' : '.jpg';
                         var name = file.name.replace(/\.[^.]+$/, '') + ext;
-                        var compressed = new File([blob], name, {
+                        resolve(new File([blob], name, {
                             type         : opts.outputType,
                             lastModified : Date.now(),
-                        });
-
-                        // Jika hasil lebih besar dari asli, kembalikan asli
-                        resolve(compressed.size < file.size ? compressed : file);
+                        }));
                     },
                     opts.outputType,
                     opts.quality
@@ -85,16 +77,13 @@
 
             img.onerror = function () {
                 URL.revokeObjectURL(url);
-                resolve(file); // fallback ke file asli
+                resolve(file);
             };
 
             img.src = url;
         });
     }
 
-    /* ------------------------------------------------------------------ */
-    /* Compress array of files                                              */
-    /* ------------------------------------------------------------------ */
     function compressAll(files, opts) {
         opts = Object.assign({}, DEFAULTS, opts || {});
         var arr    = Array.from(files);
@@ -110,51 +99,41 @@
                     }
                 });
             });
-        }, Promise.resolve()).then(function () {
-            return results;
-        });
+        }, Promise.resolve()).then(function () { return results; });
     }
 
-    /* ------------------------------------------------------------------ */
-    /* Attach to <input type="file">                                        */
-    /* ------------------------------------------------------------------ */
     function attachTo(inputEl, opts) {
         if (!inputEl) return;
 
         opts = Object.assign({
-            showProgress : true,
-            progressClass: 'img-compress-progress',
+            showProgress  : true,
+            progressClass : 'img-compress-progress',
         }, DEFAULTS, opts || {});
 
         inputEl.addEventListener('change', function (e) {
             var files = Array.from(e.target.files);
             if (!files.length) return;
 
-            // Tampilkan progress jika diminta
-            var progressEl = null;
-            if (opts.showProgress) {
-                progressEl = inputEl.parentNode
-                    ? inputEl.parentNode.querySelector('.' + opts.progressClass)
-                    : null;
-            }
+            var progressEl = opts.showProgress && inputEl.parentNode
+                ? inputEl.parentNode.querySelector('.' + opts.progressClass)
+                : null;
 
             var progressOpts = Object.assign({}, opts, {
                 onProgress: function (cur, total) {
                     if (progressEl) {
-                        progressEl.textContent = 'Memproses ' + cur + ' / ' + total + ' gambar…';
+                        progressEl.textContent = 'Memproses ' + cur + ' / ' + total + '…';
                         progressEl.style.display = 'block';
                     }
                 },
             });
 
             compressAll(files, progressOpts).then(function (compressed) {
-                // Inject kembali ke input menggunakan DataTransfer
                 try {
                     var dt = new DataTransfer();
                     compressed.forEach(function (f) { dt.items.add(f); });
                     inputEl.files = dt.files;
                 } catch (err) {
-                    console.warn('[ImageCompressor] DataTransfer not supported, skipping inject.', err);
+                    console.warn('[ImageCompressor] DataTransfer tidak didukung:', err);
                 }
 
                 if (progressEl) {
@@ -162,19 +141,11 @@
                     setTimeout(function () { progressEl.style.display = 'none'; }, 2500);
                 }
 
-                // Trigger change event supaya preview/listener lain ikut update
                 inputEl.dispatchEvent(new Event('compressed', { bubbles: true }));
             });
         });
     }
 
-    /* ------------------------------------------------------------------ */
-    /* Expose                                                               */
-    /* ------------------------------------------------------------------ */
-    global.ImageCompressor = {
-        compress    : compress,
-        compressAll : compressAll,
-        attachTo    : attachTo,
-    };
+    global.ImageCompressor = { compress: compress, compressAll: compressAll, attachTo: attachTo };
 
 }(typeof window !== 'undefined' ? window : this));

@@ -157,7 +157,7 @@
         <!-- Dynamic Blog Posts from Database -->
         @foreach($blogs as $blog)
         <div class="blog-card">
-            <img src="{{ asset('storage/' . $blog->image) }}" alt="{{ $blog->title }}" class="blog-image">
+            <x-image :src="$blog->image" :alt="$blog->title" class="blog-image" :thumb="true" />
             <div class="blog-content">
                 <h3 class="blog-title">
                     <a href="{{ route('blogs.show', $blog->slug) }}">{{ $blog->title }}</a>

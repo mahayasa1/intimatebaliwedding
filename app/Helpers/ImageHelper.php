@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Storage;
 class ImageHelper
 {
     // =========================================================================
-    // KONFIGURASI KOMPRESI
+    // KONFIGURASI — sesuaikan sesuai kebutuhan
     // =========================================================================
 
     /** Lebar maksimum gambar utama (px) */
@@ -16,26 +16,25 @@ class ImageHelper
     /** Lebar maksimum thumbnail (px) */
     const THUMB_WIDTH = 640;
 
-    /** Kualitas WebP untuk gambar utama (0–100) */
-    const QUALITY_MAIN = 72;
+    /** Kualitas WebP gambar utama (0–100) */
+    const QUALITY_MAIN = 75;
 
-    /** Kualitas WebP untuk thumbnail (0–100) */
+    /** Kualitas WebP thumbnail (0–100) */
     const QUALITY_THUMB = 65;
 
-    /** Threshold lebar agar gambar di-skip kompresi (sudah cukup kecil) */
+    /** Skip kompresi jika gambar sudah kecil dari lebar ini */
     const SKIP_COMPRESS_WIDTH = 200;
+
+    /** Maksimum ukuran file input (bytes). Tolak sebelum proses GD */
+    const MAX_INPUT_BYTES = 20 * 1024 * 1024; // 20 MB
 
     // =========================================================================
     // PUBLIC API
     // =========================================================================
 
     /**
-     * Kompres & convert gambar yang sudah tersimpan di storage ke WebP.
-     * Menggantikan file asli dengan versi yang sudah dikompres.
-     * Mengembalikan path baru (bisa berubah ekstensi ke .webp).
-     *
-     * @param  string  $storagePath  Path relatif di disk 'public'
-     * @return string                Path setelah kompresi
+     * Kompres & convert gambar ke WebP. Gantikan file asli.
+     * Kembalikan path baru (bisa berubah ekstensi ke .webp).
      */
     public static function compress(string $storagePath): string
     {
@@ -49,6 +48,12 @@ class ImageHelper
             return $storagePath;
         }
 
+        // Tolak file terlalu besar
+        if (filesize($fullPath) > self::MAX_INPUT_BYTES) {
+            \Illuminate\Support\Facades\Log::warning("[ImageHelper] File terlalu besar: {$storagePath}");
+            return $storagePath;
+        }
+
         $info = @getimagesize($fullPath);
         if (!$info) {
             return $storagePath;
@@ -56,7 +61,7 @@ class ImageHelper
 
         [$origW, $origH, $type] = $info;
 
-        // Gambar sudah sangat kecil → skip
+        // Sudah sangat kecil, skip
         if ($origW <= self::SKIP_COMPRESS_WIDTH) {
             return $storagePath;
         }
@@ -66,14 +71,12 @@ class ImageHelper
             return $storagePath;
         }
 
-        // Hitung dimensi baru
         [$newW, $newH] = self::calcDimensions($origW, $origH, self::MAX_WIDTH);
 
         $canvas = self::createCanvas($newW, $newH, $type, $src);
         imagecopyresampled($canvas, $src, 0, 0, 0, 0, $newW, $newH, $origW, $origH);
         imagedestroy($src);
 
-        // Simpan sebagai WebP, ganti file lama
         $webpPath = self::toWebpPath($storagePath);
         $webpFull = Storage::disk('public')->path($webpPath);
 
@@ -81,7 +84,7 @@ class ImageHelper
         imagewebp($canvas, $webpFull, self::QUALITY_MAIN);
         imagedestroy($canvas);
 
-        // Hapus file asli jika berbeda path
+        // Hapus file asli jika ekstensi berbeda
         if ($storagePath !== $webpPath && file_exists($fullPath)) {
             @unlink($fullPath);
         }
@@ -90,17 +93,11 @@ class ImageHelper
     }
 
     /**
-     * Buat thumbnail WebP dari file yang sudah tersimpan di storage.
-     * Juga mengkompresi agresif untuk performa halaman.
-     *
-     * @param  string  $storagePath  Path relatif di disk 'public'
-     * @param  int     $width        Lebar thumbnail (default THUMB_WIDTH)
-     * @param  int     $quality      Kualitas WebP (default QUALITY_THUMB)
-     * @return string|null           Path thumbnail (relatif) atau null jika gagal
+     * Buat thumbnail WebP.
      */
     public static function createThumbnail(
         string $storagePath,
-        int $width = self::THUMB_WIDTH,
+        int $width   = self::THUMB_WIDTH,
         int $quality = self::QUALITY_THUMB
     ): ?string {
         if (!extension_loaded('gd')) {
@@ -120,15 +117,18 @@ class ImageHelper
 
         [$origW, $origH, $type] = $info;
 
-        // Susun path thumbnail
         $dir      = pathinfo($storagePath, PATHINFO_DIRNAME);
         $filename = pathinfo($storagePath, PATHINFO_FILENAME);
         $thumbRelPath = 'thumbs/' . ($dir !== '.' ? $dir . '/' : '') . $filename . '.webp';
         $thumbFullPath = Storage::disk('public')->path($thumbRelPath);
 
+        // Jika thumbnail sudah ada dan lebih baru dari sumber, skip
+        if (file_exists($thumbFullPath) && filemtime($thumbFullPath) >= filemtime($fullPath)) {
+            return $thumbRelPath;
+        }
+
         self::ensureDir(dirname($thumbFullPath));
 
-        // Gambar sudah lebih kecil dari target → simpan WebP langsung (masih kompres quality)
         if ($origW <= $width) {
             $src = self::createSource($fullPath, $type);
             if (!$src) {
@@ -140,13 +140,12 @@ class ImageHelper
         }
 
         [$newW, $newH] = self::calcDimensions($origW, $origH, $width);
-
-        $src    = self::createSource($fullPath, $type);
+        $src   = self::createSource($fullPath, $type);
         if (!$src) {
             return null;
         }
 
-        $thumb  = self::createCanvas($newW, $newH, $type, $src);
+        $thumb = self::createCanvas($newW, $newH, $type, $src);
         imagecopyresampled($thumb, $src, 0, 0, 0, 0, $newW, $newH, $origW, $origH);
         imagedestroy($src);
 
@@ -157,28 +156,30 @@ class ImageHelper
     }
 
     /**
-     * Upload & langsung kompres + buat thumbnail.
-     * Gunakan method ini di controller sebagai pengganti $request->file->store().
+     * Upload, kompres, buat thumbnail. Gunakan di controller.
      *
-     * @param  \Illuminate\Http\UploadedFile  $file
-     * @param  string                          $directory  Direktori di disk 'public'
      * @return array{path: string, thumb: string}
      */
     public static function storeAndCompress($file, string $directory): array
     {
-        // Simpan file asli dulu
-        $originalPath = $file->store($directory, 'public');
-
-        // Kompres → konversi ke WebP
+        $originalPath   = $file->store($directory, 'public');
         $compressedPath = self::compress($originalPath);
-
-        // Buat thumbnail
-        $thumbPath = self::createThumbnail($compressedPath) ?? $compressedPath;
+        $thumbPath      = self::createThumbnail($compressedPath) ?? $compressedPath;
 
         return [
             'path'  => $compressedPath,
             'thumb' => $thumbPath,
         ];
+    }
+
+    /**
+     * Ambil URL thumbnail. Jika tidak ada, kembalikan URL original.
+     * Mengembalikan URL lengkap (bukan path relatif).
+     */
+    public static function thumbUrl(string $storagePath): string
+    {
+        $thumbPath = self::thumb($storagePath);
+        return asset('storage/' . $thumbPath);
     }
 
     /**
@@ -194,7 +195,7 @@ class ImageHelper
     }
 
     /**
-     * Hapus thumbnail terkait sebuah file.
+     * Hapus thumbnail terkait.
      */
     public static function deleteThumb(string $storagePath): void
     {
@@ -208,7 +209,7 @@ class ImageHelper
     }
 
     /**
-     * Hapus gambar (original + thumbnail).
+     * Hapus gambar + thumbnail.
      */
     public static function delete(string $storagePath): void
     {
@@ -237,14 +238,12 @@ class ImageHelper
     {
         $canvas = imagecreatetruecolor($w, $h);
 
-        // Pertahankan transparansi PNG/GIF
         if ($type === IMAGETYPE_PNG || $type === IMAGETYPE_GIF) {
             imagealphablending($canvas, false);
             imagesavealpha($canvas, true);
             $transparent = imagecolorallocatealpha($canvas, 0, 0, 0, 127);
             imagefilledrectangle($canvas, 0, 0, $w, $h, $transparent);
         } else {
-            // Isi background putih untuk JPEG
             $white = imagecolorallocate($canvas, 255, 255, 255);
             imagefilledrectangle($canvas, 0, 0, $w, $h, $white);
         }

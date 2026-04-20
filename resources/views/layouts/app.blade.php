@@ -13,7 +13,29 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
+    {{-- Resource hints untuk font & CDN --}}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+
+    {{-- Preload hero image dari child view --}}
+    @stack('preload')
+
     <style>
+
+        /* Lazy load fade-in */
+        main img[loading="lazy"] {
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        main img[loading="lazy"].loaded {
+            opacity: 1;
+        }
+        /* Placeholder blur saat belum load */
+        main img {
+            background: #f0ede8;
+            min-height: 1px;
+        }
         /* ---- Reset ---- */
         *, *::before, *::after { box-sizing: border-box; }
         img { max-width: 100%; height: auto; display: block; }
@@ -539,7 +561,32 @@
             });
         });
     </script>
+    <script>
+        // Fade-in gambar lazy load
+        if ('IntersectionObserver' in window) {
+            const imgObserver = new IntersectionObserver(function(entries) {
+                entries.forEach(function(entry) {
+                    if (entry.isIntersecting) {
+                        const img = entry.target;
+                        img.addEventListener('load', function() {
+                            img.classList.add('loaded');
+                        });
+                        if (img.complete) img.classList.add('loaded');
+                        imgObserver.unobserve(img);
+                    }
+                });
+            }, { rootMargin: '200px' });
 
+            document.querySelectorAll('img[loading="lazy"]').forEach(function(img) {
+                imgObserver.observe(img);
+            });
+        } else {
+            // Fallback untuk browser lama
+            document.querySelectorAll('img[loading="lazy"]').forEach(function(img) {
+                img.classList.add('loaded');
+            });
+        }
+    </script>
     @stack('scripts')
 </body>
 </html>

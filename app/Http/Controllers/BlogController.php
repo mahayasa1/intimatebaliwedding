@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Smalot\PdfParser\Parser;
+use App\Helpers\ImageHelper;
 
 class BlogController extends Controller
 {
@@ -68,7 +69,8 @@ class BlogController extends Controller
         $validated['slug'] = Str::slug($validated['title']);
 
         if ($request->hasFile('image')) {
-            $validated['image'] = $request->file('image')->store('blogs', 'public');
+            $result = ImageHelper::storeAndCompress($request->file('image'), 'blogs');
+            $validated['image'] = $result['path'];
         }
 
         if ($request->hasFile('pdf')) {
@@ -113,8 +115,9 @@ class BlogController extends Controller
         $validated['slug'] = Str::slug($validated['title']);
 
         if ($request->hasFile('image')) {
-            if ($blog->image) Storage::disk('public')->delete($blog->image);
-            $validated['image'] = $request->file('image')->store('blogs', 'public');
+            if ($blog->image) ImageHelper::delete($blog->image);
+            $result = ImageHelper::storeAndCompress($request->file('image'), 'blogs');
+            $validated['image'] = $result['path'];
         }
 
         if ($request->hasFile('pdf')) {

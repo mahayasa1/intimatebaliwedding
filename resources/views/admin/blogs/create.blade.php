@@ -313,6 +313,13 @@
     const imagePreview = document.getElementById('imagePreview');
     const previewImg   = document.getElementById('previewImg');
 
+    ImageCompressor.attachTo(document.getElementById('image'), {
+        maxWidth: 1920,
+        maxHeight: 1920,
+        quality: 0.82,
+        showProgress: true,
+    });
+
     imageInput.addEventListener('change', function (e) {
         const file = e.target.files[0];
         if (!file) return;
