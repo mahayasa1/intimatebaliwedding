@@ -48,7 +48,6 @@
     }
 
     .form-control.error { border-color: #e74c3c; background: #fff5f5; }
-
     textarea.form-control { min-height: 120px; resize: vertical; line-height: 1.6; }
 
     .error-message {
@@ -61,142 +60,79 @@
         font-size: 0.85rem; margin-top: 0.5rem; font-style: italic;
     }
 
-    /* ── TYPE TOGGLE ── */
-    .type-toggle {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 1rem;
-        margin-bottom: 2rem;
-    }
-
-    .type-option input[type="radio"] {
-        position: absolute;
-        opacity: 0;
-        pointer-events: none;
-    }
-
-    .type-option {
-        position: relative;
-    }
+    /* Type toggle */
+    .type-toggle { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 2rem; }
+    .type-option { position: relative; }
+    .type-option input[type="radio"] { position: absolute; opacity: 0; pointer-events: none; }
 
     .type-label {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        padding: 1.25rem 1.5rem;
-        border: 2px solid #e0e0e0;
-        border-radius: 12px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        background: white;
-        font-family: 'Work Sans', sans-serif;
+        display: flex; align-items: center; gap: 1rem; padding: 1.25rem 1.5rem;
+        border: 2px solid #e0e0e0; border-radius: 12px; cursor: pointer;
+        transition: all 0.3s ease; background: white; font-family: 'Work Sans', sans-serif;
     }
 
-    .type-label:hover {
-        border-color: #8B7355;
-        background: #faf8f5;
-    }
-
+    .type-label:hover { border-color: #8B7355; background: #faf8f5; }
     .type-option input[type="radio"]:checked + .type-label {
-        border-color: #8B7355;
-        background: linear-gradient(135deg, rgba(139,115,85,0.08), rgba(107,86,68,0.06));
+        border-color: #8B7355; background: linear-gradient(135deg, rgba(139,115,85,0.08), rgba(107,86,68,0.06));
     }
 
     .type-icon {
-        width: 46px; height: 46px;
-        border-radius: 10px;
+        width: 46px; height: 46px; border-radius: 10px;
         display: flex; align-items: center; justify-content: center;
         font-size: 1.4rem; color: white; flex-shrink: 0;
     }
 
     .type-icon.photo { background: linear-gradient(135deg, #8B7355, #6B5644); }
     .type-icon.video { background: linear-gradient(135deg, #e74c3c, #c0392b); }
+    .type-info h4 { font-weight: 700; color: #1a1a1a; margin: 0 0 0.2rem; font-size: 1rem; }
+    .type-info p { font-size: 0.8rem; color: #888; margin: 0; }
 
-    .type-info h4 {
-        font-weight: 700; color: #1a1a1a; margin: 0 0 0.2rem; font-size: 1rem;
-    }
-
-    .type-info p {
-        font-size: 0.8rem; color: #888; margin: 0;
-    }
-
-    /* ── VIDEO PREVIEW ── */
+    /* Video preview */
     .video-preview {
-        display: none;
-        margin-top: 1rem;
-        border-radius: 12px;
-        overflow: hidden;
-        aspect-ratio: 16/9;
-        background: #000;
+        display: none; margin-top: 1rem; border-radius: 12px; overflow: hidden;
+        aspect-ratio: 16/9; background: #000;
     }
-
     .video-preview.show { display: block; }
-
-    .video-preview iframe {
-        width: 100%; height: 100%; border: none;
-    }
+    .video-preview iframe { width: 100%; height: 100%; border: none; }
 
     .youtube-info {
-        display: none;
-        margin-top: 0.75rem;
-        padding: 0.75rem 1rem;
-        background: #fff3cd;
-        border: 1px solid #ffd54f;
-        border-radius: 8px;
-        font-family: 'Work Sans', sans-serif;
-        font-size: 0.88rem;
-        color: #7a5c00;
-        align-items: center;
-        gap: 0.5rem;
+        display: none; margin-top: 0.75rem; padding: 0.75rem 1rem;
+        background: #fff3cd; border: 1px solid #ffd54f; border-radius: 8px;
+        font-family: 'Work Sans', sans-serif; font-size: 0.88rem; color: #7a5c00;
+        align-items: center; gap: 0.5rem;
     }
-
     .youtube-info.show { display: flex; }
 
-    /* ── IMAGE UPLOAD ── */
-    .image-upload-wrapper {
-        position: relative; border: 2px dashed #e0e0e0; border-radius: 12px;
-        padding: 2rem; text-align: center; transition: all 0.3s ease; background: #fafafa;
+    /* Upload area */
+    .upload-area {
+        border: 2px dashed #e0e0e0; border-radius: 12px;
+        padding: 2rem; text-align: center; cursor: pointer;
+        transition: all 0.3s ease; background: #fafafa;
+        position: relative; overflow: hidden;
     }
-
-    .image-upload-wrapper:hover { border-color: #8B7355; background: #f5f5f5; }
-    .image-upload-wrapper.dragover {
-        border-color: #8B7355; border-style: solid; background: rgba(139,115,85,0.05);
+    .upload-area:hover, .upload-area.drag-over { border-color: #8B7355; background: #f5f0eb; }
+    .upload-area input[type="file"] {
+        position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
     }
+    .upload-icon { font-size: 2.75rem; margin-bottom: 0.75rem; opacity: 0.45; }
+    .upload-text { color: #555; font-size: 0.95rem; font-family: 'Work Sans', sans-serif; margin-bottom: 0.25rem; }
+    .upload-hint { color: #aaa; font-size: 0.82rem; font-family: 'Work Sans', sans-serif; }
 
-    .image-upload-wrapper input[type="file"] {
-        position: absolute; width: 100%; height: 100%; top: 0; left: 0;
-        opacity: 0; cursor: pointer; z-index: 2;
-    }
-
-    .upload-icon { font-size: 3rem; color: #8B7355; opacity: 0.4; margin-bottom: 0.75rem; }
-    .upload-text { color: #666; font-size: 0.95rem; font-family: 'Work Sans', sans-serif; }
-    .upload-text strong { color: #8B7355; }
-
-    .main-preview-wrapper {
-        display: none; margin-top: 1rem; position: relative;
-        max-width: 400px; margin-left: auto; margin-right: auto;
-    }
-
-    .main-preview-wrapper img {
-        width: 100%; height: auto; border-radius: 10px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.12); display: block;
-    }
-
+    /* Preview */
+    .main-preview-wrapper { display: none; margin-top: 1rem; position: relative; max-width: 400px; margin-left: auto; margin-right: auto; }
+    .main-preview-wrapper img { width: 100%; height: auto; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.12); display: block; }
     .main-preview-wrapper.show { display: block; }
 
     .remove-main {
         position: absolute; top: 8px; right: 8px;
         background: rgba(231,76,60,0.9); color: white; border: none;
         border-radius: 50%; width: 32px; height: 32px; cursor: pointer;
-        display: flex; align-items: center; justify-content: center;
-        transition: all 0.3s ease;
+        display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;
     }
-
     .remove-main:hover { background: #e74c3c; transform: scale(1.1); }
 
     .photos-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+        display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
         gap: 1rem; margin-top: 1rem;
     }
 
@@ -214,7 +150,6 @@
         display: flex; align-items: center; justify-content: center;
         font-size: 0.8rem; transition: all 0.3s ease;
     }
-
     .remove-photo:hover { background: #e74c3c; transform: scale(1.1); }
 
     .photo-size-badge {
@@ -224,27 +159,21 @@
         font-family: 'Work Sans', sans-serif;
     }
 
-    /* Compress info */
-    .compress-info {
-        display: flex; align-items: center; gap: 0.5rem;
-        background: linear-gradient(135deg, #e8f4f8 0%, #d1ecf1 100%);
-        border: 1px solid #90caf9; border-radius: 8px;
-        padding: 0.75rem 1rem; margin-top: 0.75rem; font-size: 0.85rem;
-        color: #0d47a1; font-family: 'Work Sans', sans-serif;
+    /* Progress bar */
+    .compress-progress {
+        display: none; margin-top: 0.75rem; padding: 0.75rem 1rem;
+        background: #f0f7ff; border: 1px solid #90caf9; border-radius: 8px;
     }
+    .compress-progress.show { display: block; }
+    .progress-bar-wrap { background: #dde; border-radius: 4px; height: 6px; overflow: hidden; margin-top: 6px; }
+    .progress-bar { height: 100%; background: linear-gradient(90deg, #8B7355, #D4AF37); border-radius: 4px; transition: width 0.2s ease; width: 0%; }
+    .progress-label { font-family: 'Work Sans', sans-serif; font-size: 0.82rem; color: #1565c0; }
 
-    /* Upload Progress */
-    .upload-progress { display: none; margin-top: 1rem; }
-    .progress-bar-wrap { background: #f0f0f0; border-radius: 8px; overflow: hidden; height: 8px; }
-    .progress-bar { height: 100%; background: linear-gradient(90deg, #8B7355, #D4AF37); border-radius: 8px; transition: width 0.3s ease; width: 0%; }
-    .progress-label { font-size: 0.8rem; color: #666; margin-top: 0.5rem; text-align: center; font-family: 'Work Sans', sans-serif; }
-
-    /* Action Buttons */
+    /* Action */
     .action-section {
         background: white; padding: 2rem; border-radius: 16px;
         box-shadow: 0 4px 20px rgba(0,0,0,0.06); border: 1px solid #e8e8e8;
     }
-
     .action-buttons { display: flex; gap: 1rem; flex-wrap: wrap; }
 
     .btn {
@@ -254,7 +183,6 @@
         transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         border: none; cursor: pointer; font-size: 0.95rem;
     }
-
     .btn-secondary { background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%); color: white; }
     .btn-secondary:hover { transform: translateY(-2px); }
     .btn-primary { background: linear-gradient(135deg, #8B7355 0%, #6B5644 100%); color: white; }
@@ -282,26 +210,19 @@
                 <span class="section-icon"><i class="fa-solid fa-photo-film"></i></span>
                 Jenis Konten
             </h3>
-
             <div class="type-toggle">
                 <div class="type-option">
                     <input type="radio" id="type_photo" name="type" value="photo" checked>
                     <label for="type_photo" class="type-label">
                         <div class="type-icon photo"><i class="fa-solid fa-image"></i></div>
-                        <div class="type-info">
-                            <h4>Foto</h4>
-                            <p>Upload gambar ke gallery</p>
-                        </div>
+                        <div class="type-info"><h4>Foto</h4><p>Upload gambar ke gallery</p></div>
                     </label>
                 </div>
                 <div class="type-option">
                     <input type="radio" id="type_video" name="type" value="video">
                     <label for="type_video" class="type-label">
                         <div class="type-icon video"><i class="fa-brands fa-youtube"></i></div>
-                        <div class="type-info">
-                            <h4>Video YouTube</h4>
-                            <p>Embed video dari YouTube</p>
-                        </div>
+                        <div class="type-info"><h4>Video YouTube</h4><p>Embed video dari YouTube</p></div>
                     </label>
                 </div>
             </div>
@@ -313,49 +234,37 @@
                 <span class="section-icon"><i class="fa-solid fa-circle-info"></i></span>
                 Informasi
             </h3>
-
             <div class="form-group">
-                <label for="title" class="form-label">
-                    Judul <span class="required">*</span>
-                </label>
+                <label for="title" class="form-label">Judul <span class="required">*</span></label>
                 <input type="text" id="title" name="title"
                     class="form-control @error('title') error @enderror"
                     value="{{ old('title') }}" required placeholder="e.g., Beach Wedding Ceremony">
-                @error('title')
-                <div class="error-message"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</div>
-                @enderror
+                @error('title')<div class="error-message">{{ $message }}</div>@enderror
             </div>
-
             <div class="form-group">
                 <label for="description" class="form-label">Deskripsi</label>
                 <textarea id="description" name="description"
                     class="form-control @error('description') error @enderror"
                     placeholder="Deskripsi singkat...">{{ old('description') }}</textarea>
-                @error('description')
-                <div class="error-message"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</div>
-                @enderror
+                @error('description')<div class="error-message">{{ $message }}</div>@enderror
             </div>
-
             <div class="form-group">
                 <label for="category" class="form-label">Kategori</label>
                 <input type="text" id="category" name="category"
                     class="form-control @error('category') error @enderror"
                     value="{{ old('category') }}" placeholder="e.g., Hero, Beach, Garden">
-                @error('category')
-                <div class="error-message"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</div>
-                @enderror
+                @error('category')<div class="error-message">{{ $message }}</div>@enderror
             </div>
-
             <div class="form-group">
                 <label for="order" class="form-label">Urutan Tampil</label>
                 <input type="number" id="order" name="order"
                     class="form-control @error('order') error @enderror"
                     value="{{ old('order', 0) }}" min="0">
-                <div class="form-help">Angka lebih kecil = tampil lebih dulu (0 = default)</div>
+                <div class="form-help">Angka lebih kecil = tampil lebih dulu</div>
             </div>
         </div>
 
-        {{-- SECTION VIDEO (hidden by default) --}}
+        {{-- VIDEO SECTION --}}
         <div class="form-card" id="videoSection" style="display:none;">
             <h3 class="section-title">
                 <span class="section-icon" style="background: linear-gradient(135deg, #e74c3c, #c0392b);">
@@ -363,53 +272,43 @@
                 </span>
                 URL Video YouTube
             </h3>
-
             <div class="form-group">
-                <label for="video_url" class="form-label">
-                    URL YouTube <span class="required">*</span>
-                </label>
+                <label for="video_url" class="form-label">URL YouTube <span class="required">*</span></label>
                 <input type="url" id="video_url" name="video_url"
                     class="form-control @error('video_url') error @enderror"
                     value="{{ old('video_url') }}"
                     placeholder="https://www.youtube.com/watch?v=..."
                     oninput="previewYoutube(this.value)">
-                @error('video_url')
-                <div class="error-message"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</div>
-                @enderror
-                <div class="form-help">
-                    Format yang didukung: youtube.com/watch?v=..., youtu.be/..., youtube.com/shorts/...
-                </div>
+                @error('video_url')<div class="error-message">{{ $message }}</div>@enderror
+                <div class="form-help">Format: youtube.com/watch?v=..., youtu.be/..., youtube.com/shorts/...</div>
             </div>
-
             <div class="youtube-info" id="youtubeInfo">
                 <i class="fa-brands fa-youtube" style="font-size:1.2rem; flex-shrink:0;"></i>
                 <span id="youtubeInfoText">Video ditemukan</span>
             </div>
-
             <div class="video-preview" id="videoPreview">
                 <iframe id="videoIframe" src="" allowfullscreen
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture">
-                </iframe>
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>
             </div>
         </div>
 
-        {{-- SECTION FOTO --}}
+        {{-- FOTO UTAMA --}}
         <div class="form-card" id="photoSection">
             <h3 class="section-title">
                 <span class="section-icon"><i class="fa-solid fa-star"></i></span>
                 Foto Utama <span style="font-size:0.8rem;color:#999;font-weight:400;">(Cover / Grid)</span>
             </h3>
-
             <div class="form-group">
-                <div class="image-upload-wrapper" id="mainUploadArea">
+                <div class="upload-area" id="mainUploadArea">
                     <input type="file" id="foto" name="foto"
-                        accept="image/jpeg,image/png,image/jpg,image/webp"
-                        onchange="handleMainImage(event)">
+                        accept="image/jpeg,image/png,image/jpg,image/webp">
                     <div class="upload-icon"><i class="fa-solid fa-camera-retro"></i></div>
-                    <div class="upload-text">
-                        <strong>Click atau drag & drop</strong><br>
-                        <small>JPG, PNG, WEBP — max 20MB — dikompres otomatis ke max 1920px</small>
-                    </div>
+                    <div class="upload-text"><strong>Klik atau drag & drop</strong></div>
+                    <div class="upload-hint">JPG, PNG, WEBP — max 20MB — dikompres otomatis</div>
+                </div>
+                <div class="compress-progress" id="mainProgress">
+                    <div class="progress-label" id="mainProgressLabel">Mengompres…</div>
+                    <div class="progress-bar-wrap"><div class="progress-bar" id="mainProgressBar"></div></div>
                 </div>
                 <div class="main-preview-wrapper" id="mainPreview">
                     <img src="" alt="Preview" id="mainPreviewImg">
@@ -417,9 +316,7 @@
                         <i class="fa-solid fa-xmark"></i>
                     </button>
                 </div>
-                @error('foto')
-                <div class="error-message"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</div>
-                @enderror
+                @error('foto')<div class="error-message">{{ $message }}</div>@enderror
             </div>
         </div>
 
@@ -427,38 +324,22 @@
         <div class="form-card" id="photosSection">
             <h3 class="section-title">
                 <span class="section-icon"><i class="fa-solid fa-images"></i></span>
-                Foto Tambahan
-                <span style="font-size:0.8rem;color:#999;font-weight:400;">(Opsional)</span>
+                Foto Tambahan <span style="font-size:0.8rem;color:#999;font-weight:400;">(Opsional)</span>
             </h3>
-
-            <div class="compress-info">
-                <i class="fa-solid fa-bolt"></i>
-                Semua foto dikompres otomatis — resolusi max 1920px, kualitas 85%.
-            </div>
-
-            <div class="form-group" style="margin-top:1.25rem;">
-                <div class="image-upload-wrapper" id="photosUploadArea">
+            <div class="form-group">
+                <div class="upload-area" id="photosUploadArea">
                     <input type="file" id="photos" name="photos[]"
-                        accept="image/jpeg,image/png,image/jpg,image/webp"
-                        multiple onchange="handleAdditionalPhotos(event)">
+                        accept="image/jpeg,image/png,image/jpg,image/webp" multiple>
                     <div class="upload-icon"><i class="fa-solid fa-cloud-arrow-up"></i></div>
-                    <div class="upload-text">
-                        <strong>Click atau drag & drop</strong> beberapa foto sekaligus<br>
-                        <small>JPG, PNG, WEBP</small>
-                    </div>
+                    <div class="upload-text"><strong>Klik atau drag & drop</strong> beberapa foto sekaligus</div>
+                    <div class="upload-hint">JPG, PNG, WEBP — dikompres otomatis</div>
                 </div>
-
-                <div class="upload-progress" id="uploadProgress">
-                    <div class="progress-bar-wrap">
-                        <div class="progress-bar" id="progressBar"></div>
-                    </div>
-                    <div class="progress-label" id="progressLabel">Memproses...</div>
+                <div class="compress-progress" id="photosProgress">
+                    <div class="progress-label" id="photosProgressLabel">Mengompres…</div>
+                    <div class="progress-bar-wrap"><div class="progress-bar" id="photosProgressBar"></div></div>
                 </div>
-
                 <div id="photosGrid" class="photos-grid" style="display:none;"></div>
-                @error('photos.*')
-                <div class="error-message"><i class="fa-solid fa-circle-exclamation"></i>{{ $message }}</div>
-                @enderror
+                @error('photos.*')<div class="error-message">{{ $message }}</div>@enderror
             </div>
         </div>
 
@@ -479,13 +360,13 @@
 
 @push('scripts')
 <script>
-// ==================== TYPE TOGGLE ====================
-const typeRadios = document.querySelectorAll('input[name="type"]');
+/* ── TYPE TOGGLE ── */
+const typeRadios    = document.querySelectorAll('input[name="type"]');
 const videoSection  = document.getElementById('videoSection');
 const photoSection  = document.getElementById('photoSection');
 const photosSection = document.getElementById('photosSection');
-const videoUrlInput = document.getElementById('video_url');
 const fotoInput     = document.getElementById('foto');
+const videoUrlInput = document.getElementById('video_url');
 
 typeRadios.forEach(radio => {
     radio.addEventListener('change', function () {
@@ -493,7 +374,6 @@ typeRadios.forEach(radio => {
             videoSection.style.display  = 'block';
             photoSection.style.display  = 'none';
             photosSection.style.display = 'none';
-            // Hapus required dari foto
             fotoInput.removeAttribute('required');
             videoUrlInput.setAttribute('required', 'required');
         } else {
@@ -506,26 +386,22 @@ typeRadios.forEach(radio => {
     });
 });
 
-// ==================== YOUTUBE PREVIEW ====================
+/* ── YOUTUBE PREVIEW ── */
 function extractYoutubeId(url) {
-    const match = url.match(
-        /(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/
-    );
-    return match ? match[1] : null;
+    const m = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+    return m ? m[1] : null;
 }
 
 function previewYoutube(url) {
-    const preview = document.getElementById('videoPreview');
-    const iframe  = document.getElementById('videoIframe');
-    const info    = document.getElementById('youtubeInfo');
-    const infoText = document.getElementById('youtubeInfoText');
-
     const id = extractYoutubeId(url);
-
+    const preview  = document.getElementById('videoPreview');
+    const iframe   = document.getElementById('videoIframe');
+    const info     = document.getElementById('youtubeInfo');
+    const infoText = document.getElementById('youtubeInfoText');
     if (id) {
         iframe.src = `https://www.youtube.com/embed/${id}?rel=0&modestbranding=1`;
         preview.classList.add('show');
-        infoText.textContent = `Video ID: ${id} — Preview tersedia di bawah`;
+        infoText.textContent = `Video ID: ${id}`;
         info.classList.add('show');
     } else {
         iframe.src = '';
@@ -534,145 +410,136 @@ function previewYoutube(url) {
     }
 }
 
-// ==================== COMPRESSION ====================
-async function compressImage(file, maxWidth = 1920, quality = 0.85) {
-    return new Promise((resolve) => {
-        const img = new Image();
-        const url = URL.createObjectURL(file);
-        img.onload = () => {
-            URL.revokeObjectURL(url);
-            if (img.width <= maxWidth) { resolve(file); return; }
-            const ratio  = maxWidth / img.width;
-            const canvas = document.createElement('canvas');
-            canvas.width  = maxWidth;
-            canvas.height = Math.round(img.height * ratio);
-            canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
-            canvas.toBlob(
-                (blob) => resolve(new File([blob], file.name.replace(/\.[^.]+$/, '.jpg'), { type: 'image/jpeg', lastModified: Date.now() })),
-                'image/jpeg', quality
-            );
-        };
-        img.onerror = () => { URL.revokeObjectURL(url); resolve(file); };
-        img.src = url;
-    });
-}
-
-function formatBytes(bytes) {
-    if (bytes < 1024) return bytes + ' B';
-    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(0) + ' KB';
-    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
-}
-
-// ==================== MAIN IMAGE ====================
-async function handleMainImage(event) {
-    const file = event.target.files[0];
+/* ── MAIN IMAGE ── */
+ImageCompressor.attachTo(fotoInput, { maxWidth: 1920, maxHeight: 1920, quality: 0.82 }, function (files) {
+    const file = files[0];
     if (!file) return;
-    const compressed = await compressImage(file, 1920, 0.85);
-    injectFileToInput('foto', [compressed]);
     const reader = new FileReader();
     reader.onload = e => {
         document.getElementById('mainPreviewImg').src = e.target.result;
         document.getElementById('mainPreview').classList.add('show');
         document.getElementById('mainUploadArea').style.display = 'none';
     };
-    reader.readAsDataURL(compressed);
-}
+    reader.readAsDataURL(file);
+});
+
+// Show progress manually via event
+fotoInput.addEventListener('change', function () {
+    if (!this.files.length) return;
+    const prog  = document.getElementById('mainProgress');
+    const bar   = document.getElementById('mainProgressBar');
+    const label = document.getElementById('mainProgressLabel');
+    prog.classList.add('show');
+    bar.style.width = '60%';
+    label.textContent = 'Mengompres foto…';
+});
+
+fotoInput.addEventListener('compressed', function () {
+    const prog  = document.getElementById('mainProgress');
+    const bar   = document.getElementById('mainProgressBar');
+    const label = document.getElementById('mainProgressLabel');
+    bar.style.width = '100%';
+    bar.style.background = '#27ae60';
+    label.style.color = '#155724';
+    label.textContent = '✓ Foto siap diupload';
+    setTimeout(() => { prog.classList.remove('show'); bar.style.background = ''; label.style.color = ''; }, 2500);
+});
 
 function removeMainImage() {
-    document.getElementById('foto').value = '';
+    fotoInput.value = '';
     document.getElementById('mainPreview').classList.remove('show');
     document.getElementById('mainPreviewImg').src = '';
     document.getElementById('mainUploadArea').style.display = 'block';
 }
 
-// ==================== ADDITIONAL PHOTOS ====================
+/* ── ADDITIONAL PHOTOS ── */
 let additionalFiles = [];
+const photosInput   = document.getElementById('photos');
 
-async function handleAdditionalPhotos(event) {
-    const rawFiles = Array.from(event.target.files);
+photosInput.addEventListener('change', async function () {
+    const rawFiles = Array.from(this.files);
     if (!rawFiles.length) return;
-    const progressWrap  = document.getElementById('uploadProgress');
-    const progressBar   = document.getElementById('progressBar');
-    const progressLabel = document.getElementById('progressLabel');
-    progressWrap.style.display = 'block';
-    progressBar.style.width = '0%';
-    progressLabel.textContent = `Memproses 0 / ${rawFiles.length} foto...`;
 
-    const newCompressed = [];
+    const prog  = document.getElementById('photosProgress');
+    const bar   = document.getElementById('photosProgressBar');
+    const label = document.getElementById('photosProgressLabel');
+    prog.classList.add('show');
+    bar.style.width  = '0%';
+    bar.style.background = '';
+    label.style.color = '';
+    label.textContent = `Mengompres 0 / ${rawFiles.length} foto…`;
+
+    const compressed = [];
     for (let i = 0; i < rawFiles.length; i++) {
-        const compressed = await compressImage(rawFiles[i], 1920, 0.85);
-        newCompressed.push(compressed);
+        const result = await ImageCompressor.compress(rawFiles[i], { maxWidth: 1920, maxHeight: 1920, quality: 0.82 });
+        compressed.push(result);
         const pct = Math.round(((i + 1) / rawFiles.length) * 100);
-        progressBar.style.width = pct + '%';
-        progressLabel.textContent = `Memproses ${i + 1} / ${rawFiles.length} foto...`;
+        bar.style.width  = pct + '%';
+        label.textContent = `Mengompres ${i + 1} / ${rawFiles.length} foto…`;
     }
 
-    additionalFiles = [...additionalFiles, ...newCompressed];
-    progressWrap.style.display = 'none';
-    injectFileToInput('photos', additionalFiles);
+    additionalFiles = [...additionalFiles, ...compressed];
+    ImageCompressor.replaceFiles(photosInput, additionalFiles);
+
+    bar.style.width    = '100%';
+    bar.style.background = '#27ae60';
+    label.style.color  = '#155724';
+    label.textContent  = `✓ ${additionalFiles.length} foto siap diupload`;
+    setTimeout(() => { prog.classList.remove('show'); bar.style.background = ''; label.style.color = ''; }, 2500);
+
     renderPhotoGrid();
-}
+});
 
 function removeAdditionalPhoto(index) {
     additionalFiles.splice(index, 1);
-    injectFileToInput('photos', additionalFiles);
+    ImageCompressor.replaceFiles(photosInput, additionalFiles);
     renderPhotoGrid();
 }
 
 function renderPhotoGrid() {
     const grid = document.getElementById('photosGrid');
     grid.innerHTML = '';
-    if (additionalFiles.length === 0) { grid.style.display = 'none'; return; }
+    if (!additionalFiles.length) { grid.style.display = 'none'; return; }
     grid.style.display = 'grid';
-    additionalFiles.forEach((file, index) => {
+    additionalFiles.forEach((file, i) => {
         const reader = new FileReader();
         reader.onload = e => {
             const div = document.createElement('div');
             div.className = 'photo-preview-item';
             div.innerHTML = `
-                <img src="${e.target.result}" alt="Photo ${index + 1}">
-                <button type="button" class="remove-photo" onclick="removeAdditionalPhoto(${index})">
+                <img src="${e.target.result}" alt="Photo ${i + 1}">
+                <button type="button" class="remove-photo" onclick="removeAdditionalPhoto(${i})">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
-                <span class="photo-size-badge">${formatBytes(file.size)}</span>
-            `;
+                <span class="photo-size-badge">${ImageCompressor.formatBytes(file.size)}</span>`;
             grid.appendChild(div);
         };
         reader.readAsDataURL(file);
     });
 }
 
-function injectFileToInput(inputId, files) {
-    const dt = new DataTransfer();
-    files.forEach(f => dt.items.add(f));
-    document.getElementById(inputId).files = dt.files;
-}
-
-// ==================== DRAG & DROP ====================
-function setupDragDrop(areaId, inputId) {
-    const area = document.getElementById(areaId);
+/* ── DRAG & DROP ── */
+['mainUploadArea', 'photosUploadArea'].forEach(id => {
+    const area = document.getElementById(id);
     if (!area) return;
-    area.addEventListener('dragover', e => { e.preventDefault(); area.classList.add('dragover'); });
-    area.addEventListener('dragleave', () => area.classList.remove('dragover'));
+    area.addEventListener('dragover',  e => { e.preventDefault(); area.classList.add('drag-over'); });
+    area.addEventListener('dragleave', ()  => area.classList.remove('drag-over'));
     area.addEventListener('drop', e => {
-        e.preventDefault();
-        area.classList.remove('dragover');
+        e.preventDefault(); area.classList.remove('drag-over');
+        const inputId = id === 'mainUploadArea' ? 'foto' : 'photos';
+        const input   = document.getElementById(inputId);
         const dt = new DataTransfer();
         Array.from(e.dataTransfer.files).forEach(f => dt.items.add(f));
-        const input = document.getElementById(inputId);
         input.files = dt.files;
         input.dispatchEvent(new Event('change'));
     });
-}
+});
 
-setupDragDrop('mainUploadArea', 'foto');
-setupDragDrop('photosUploadArea', 'photos');
-
-// ==================== SUBMIT ====================
-document.getElementById('galleryForm').addEventListener('submit', function() {
+/* ── SUBMIT ── */
+document.getElementById('galleryForm').addEventListener('submit', function () {
     const btn = document.getElementById('submitBtn');
     btn.disabled = true;
-    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...';
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan…';
 });
 </script>
 @endpush

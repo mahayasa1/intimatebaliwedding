@@ -45,6 +45,7 @@
     .form-control.error { border-color: #e74c3c; background: #fff5f5; }
     textarea.form-control { min-height: 140px; resize: vertical; line-height: 1.6; }
 
+    /* Category suggestions */
     .category-input-wrapper { position: relative; }
 
     .category-suggestions {
@@ -63,7 +64,6 @@
     }
 
     .category-suggestion-item:hover { background: #f5f0eb; color: #8B7355; }
-    .category-suggestion-item i { color: #D4AF37; font-size: 0.75rem; }
 
     .category-tags { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.75rem; }
 
@@ -82,31 +82,39 @@
         font-size: 0.85rem; margin-top: 0.5rem; font-style: italic;
     }
 
-    .compress-badge {
-        display: inline-flex; align-items: center; gap: 0.4rem;
-        background: linear-gradient(135deg, #e8f4f8, #d1ecf1);
-        border: 1px solid #90caf9; border-radius: 8px;
-        padding: 0.5rem 0.9rem; margin-top: 0.6rem;
-        font-size: 0.82rem; color: #0d47a1; font-family: 'Work Sans', sans-serif;
+    .error-message {
+        font-family: 'Work Sans', sans-serif; color: #e74c3c; font-size: 0.85rem;
+        margin-top: 0.5rem; display: flex; align-items: center; gap: 0.5rem;
     }
 
-    .image-upload-wrapper {
-        position: relative; border: 2px dashed #e0e0e0; border-radius: 12px;
-        padding: 2rem; text-align: center; transition: all 0.3s ease; background: #fafafa;
+    /* Upload */
+    .upload-area {
+        border: 2px dashed #e0e0e0; border-radius: 12px;
+        padding: 2rem; text-align: center; cursor: pointer;
+        transition: all 0.3s ease; background: #fafafa;
+        position: relative; overflow: hidden;
     }
 
-    .image-upload-wrapper:hover { border-color: #8B7355; background: #f5f5f5; }
+    .upload-area:hover, .upload-area.drag-over { border-color: #8B7355; background: #f5f0eb; }
 
-    .image-upload-wrapper input[type="file"] {
-        position: absolute; width: 100%; height: 100%; top: 0; left: 0; opacity: 0; cursor: pointer;
+    .upload-area input[type="file"] {
+        position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
     }
 
-    .upload-icon { font-size: 3rem; color: #8B7355; margin-bottom: 1rem; }
+    .upload-icon { font-size: 3rem; color: #8B7355; margin-bottom: 1rem; opacity: 0.5; }
     .upload-text { color: #666; font-size: 0.95rem; }
     .upload-text strong { color: #8B7355; }
 
+    /* Progress */
+    .compress-progress { display: none; margin-top: 0.75rem; padding: 0.75rem 1rem; background: #f0f7ff; border: 1px solid #90caf9; border-radius: 8px; }
+    .compress-progress.show { display: block; }
+    .progress-bar-wrap { background: #dde; border-radius: 4px; height: 6px; overflow: hidden; margin-top: 6px; }
+    .progress-bar { height: 100%; background: linear-gradient(90deg, #8B7355, #D4AF37); border-radius: 4px; transition: width 0.2s ease; width: 0%; }
+    .progress-label { font-family: 'Work Sans', sans-serif; font-size: 0.82rem; color: #1565c0; }
+
+    /* Preview */
     .image-preview { margin-top: 1rem; display: none; position: relative; }
-    .image-preview img { max-width: 100%; max-height: 300px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    .image-preview img { max-width: 100%; max-height: 300px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); display: block; }
 
     .remove-image {
         position: absolute; top: 10px; right: 10px; background: #e74c3c; color: white;
@@ -116,17 +124,10 @@
 
     .remove-image:hover { background: #c0392b; transform: scale(1.1); }
 
-    .photos-grid {
-        display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-        gap: 1rem; margin-top: 1rem;
-    }
+    .photos-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 1rem; margin-top: 1rem; }
 
-    .photo-preview-item {
-        position: relative; aspect-ratio: 1; border-radius: 8px; overflow: hidden;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-
-    .photo-preview-item img { width: 100%; height: 100%; object-fit: cover; }
+    .photo-preview-item { position: relative; aspect-ratio: 1; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .photo-preview-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
     .remove-photo {
         position: absolute; top: 5px; right: 5px; background: #e74c3c; color: white;
@@ -137,12 +138,7 @@
 
     .remove-photo:hover { background: #c0392b; transform: scale(1.1); }
 
-    .error-message {
-        font-family: 'Work Sans', sans-serif; color: #e74c3c; font-size: 0.85rem;
-        margin-top: 0.5rem; display: flex; align-items: center; gap: 0.5rem;
-    }
-
-    /* Subpackage Styles */
+    /* Subpackages */
     .subpackage-item {
         background: #f8f9fa; border: 1px solid #e0e0e0; border-radius: 12px;
         padding: 1.5rem; margin-bottom: 1rem; position: relative; transition: all 0.3s ease;
@@ -180,6 +176,7 @@
 
     .btn-add-sub:hover { background: #f5f0eb; }
 
+    /* Actions */
     .action-section {
         background: white; padding: 2rem; border-radius: 16px;
         box-shadow: 0 4px 20px rgba(0,0,0,0.06); border: 1px solid #e8e8e8;
@@ -211,10 +208,10 @@
 
 @section('content')
 <div class="form-container">
-    <form action="{{ route('admin.packages.store') }}" method="POST" enctype="multipart/form-data">
+    <form action="{{ route('admin.packages.store') }}" method="POST" enctype="multipart/form-data" id="packageForm">
         @csrf
 
-        <!-- Package Information -->
+        {{-- Package Information --}}
         <div class="form-card">
             <h3 class="section-title">Package Information</h3>
 
@@ -223,12 +220,9 @@
                 <input type="text" id="name" name="name"
                     class="form-control @error('name') error @enderror"
                     value="{{ old('name') }}" required placeholder="e.g., Beach Wedding Package">
-                @error('name')
-                <div class="error-message">{{ $message }}</div>
-                @enderror
+                @error('name')<div class="error-message">{{ $message }}</div>@enderror
             </div>
 
-            <!-- Category Field -->
             <div class="form-group">
                 <label for="category" class="form-label">Category</label>
                 <div class="category-input-wrapper">
@@ -256,81 +250,69 @@
                     @endforeach
                 </div>
                 @endif
-                @error('category')
-                <div class="error-message">{{ $message }}</div>
-                @enderror
+                @error('category')<div class="error-message">{{ $message }}</div>@enderror
             </div>
 
             <div class="form-group">
                 <label for="image" class="form-label">Main Package Image <span class="required">*</span></label>
-                <div class="image-upload-wrapper">
-                    <input type="file" id="image" name="image" accept="image/*" required>
+                <div class="upload-area" id="imageUploadArea">
+                    <input type="file" id="image" name="image" accept="image/jpeg,image/png,image/jpg,image/webp" required>
                     <div class="upload-icon"><i class="fas fa-cloud-upload-alt"></i></div>
-                    <div class="upload-text">
-                        <strong>Click to upload</strong> or drag and drop<br>
-                        <small>PNG, JPG, WEBP (max. 20MB)</small>
-                    </div>
+                    <div class="upload-text"><strong>Click to upload</strong> or drag and drop<br><small>PNG, JPG, WEBP — dikompres otomatis sebelum upload</small></div>
                 </div>
-                <div class="compress-badge">
-                    <i class="fas fa-bolt"></i> Auto-compressed before upload (max 1920px, WebP)
+                <div class="compress-progress" id="imageProgress">
+                    <div class="progress-label" id="imageProgressLabel">Mengompres…</div>
+                    <div class="progress-bar-wrap"><div class="progress-bar" id="imageProgressBar"></div></div>
                 </div>
                 <div class="image-preview" id="imagePreview">
-                    <button type="button" class="remove-image" onclick="removeImage()"><i class="fas fa-times"></i></button>
-                    <img id="preview" src="" alt="Preview">
+                    <button type="button" class="remove-image" onclick="removeMainImage()"><i class="fas fa-times"></i></button>
+                    <img id="imagePreviewImg" src="" alt="Preview">
                 </div>
-                @error('image')
-                <div class="error-message">{{ $message }}</div>
-                @enderror
+                @error('image')<div class="error-message">{{ $message }}</div>@enderror
             </div>
 
             <div class="form-group">
                 <label for="description" class="form-label">Description</label>
                 <textarea id="description" name="description"
                     class="form-control @error('description') error @enderror"
-                    placeholder="Describe the package and what it includes...">{{ old('description') }}</textarea>
-                @error('description')
-                <div class="error-message">{{ $message }}</div>
-                @enderror
+                    placeholder="Describe the package...">{{ old('description') }}</textarea>
+                @error('description')<div class="error-message">{{ $message }}</div>@enderror
             </div>
         </div>
 
-        <!-- Subpackages -->
+        {{-- Subpackages --}}
         <div class="form-card">
             <h3 class="section-title">
                 <i class="fas fa-list-ul" style="color:#8B7355;font-size:1.2rem;"></i>
                 Sub-packages / Options
             </h3>
-            <div class="form-help" style="margin-bottom:1.5rem;">Tambahkan pilihan atau tier yang tersedia dalam package ini (opsional)</div>
+            <div class="form-help" style="margin-bottom:1.5rem;">Tambahkan pilihan atau tier yang tersedia (opsional)</div>
             <div id="subpackageList"></div>
             <button type="button" class="btn-add-sub" onclick="addSubpackage()">
                 <i class="fas fa-plus"></i> Add Sub-package
             </button>
         </div>
 
-        <!-- Gallery Photos -->
+        {{-- Gallery Photos --}}
         <div class="form-card">
             <h3 class="section-title">Package Gallery Photos</h3>
             <div class="form-group">
                 <label for="photos" class="form-label">Additional Photos</label>
-                <div class="image-upload-wrapper">
-                    <input type="file" id="photos" name="photos[]" accept="image/*" multiple>
+                <div class="upload-area" id="photosUploadArea">
+                    <input type="file" id="photos" name="photos[]" accept="image/jpeg,image/png,image/jpg,image/webp" multiple>
                     <div class="upload-icon"><i class="fas fa-images"></i></div>
-                    <div class="upload-text">
-                        <strong>Click to upload</strong> or drag and drop<br>
-                        <small>PNG, JPG, WEBP (max. 20MB each) — Multiple files allowed</small>
-                    </div>
+                    <div class="upload-text"><strong>Click to upload</strong> or drag and drop<br><small>PNG, JPG, WEBP — Multiple files — dikompres otomatis</small></div>
                 </div>
-                <div class="compress-badge">
-                    <i class="fas fa-bolt"></i> All photos auto-compressed before upload
+                <div class="compress-progress" id="photosProgress">
+                    <div class="progress-label" id="photosProgressLabel">Mengompres…</div>
+                    <div class="progress-bar-wrap"><div class="progress-bar" id="photosProgressBar"></div></div>
                 </div>
-                @error('photos.*')
-                <div class="error-message">{{ $message }}</div>
-                @enderror
+                @error('photos.*')<div class="error-message">{{ $message }}</div>@enderror
             </div>
-            <div id="photosGrid" class="photos-grid" style="display: none;"></div>
+            <div id="photosGrid" class="photos-grid" style="display:none;"></div>
         </div>
 
-        <!-- Actions -->
+        {{-- Actions --}}
         <div class="action-section">
             <div class="action-buttons">
                 <a href="{{ route('admin.packages.index') }}" class="btn btn-secondary">← Cancel</a>
@@ -343,7 +325,7 @@
 
 @push('scripts')
 <script>
-// ==================== CATEGORY ====================
+/* ── CATEGORY ── */
 function selectCategory(cat) {
     document.getElementById('category').value = cat;
     document.getElementById('categorySuggestions')?.classList.remove('show');
@@ -356,14 +338,11 @@ if (categoryInput && categorySuggestions) {
     categoryInput.addEventListener('focus', () => {
         if (categorySuggestions.children.length > 0) categorySuggestions.classList.add('show');
     });
-    categoryInput.addEventListener('blur', () => {
-        setTimeout(() => categorySuggestions.classList.remove('show'), 200);
-    });
-    categoryInput.addEventListener('input', function() {
+    categoryInput.addEventListener('blur', () => setTimeout(() => categorySuggestions.classList.remove('show'), 200));
+    categoryInput.addEventListener('input', function () {
         const val = this.value.toLowerCase();
-        const items = categorySuggestions.querySelectorAll('.category-suggestion-item');
         let hasVisible = false;
-        items.forEach(item => {
+        categorySuggestions.querySelectorAll('.category-suggestion-item').forEach(item => {
             const match = item.textContent.toLowerCase().includes(val);
             item.style.display = match ? '' : 'none';
             if (match) hasVisible = true;
@@ -372,94 +351,116 @@ if (categoryInput && categorySuggestions) {
     });
 }
 
-// ==================== MAIN IMAGE (compress + preview) ====================
+/* ── MAIN IMAGE ── */
 const imageInput = document.getElementById('image');
 
-// Attach compression to main image
-ImageCompressor.attachTo(imageInput, { maxWidth: 1920, quality: 0.82, showProgress: true });
+imageInput.addEventListener('change', async function () {
+    const raw = this.files[0];
+    if (!raw) return;
+    showProgress('image', 40, 'Mengompres gambar…', false);
+    const result = await ImageCompressor.compress(raw, { maxWidth: 1920, maxHeight: 1920, quality: 0.82 });
+    ImageCompressor.replaceFiles(imageInput, [result]);
+    showProgress('image', 100, '✓ Gambar siap diupload', true);
 
-imageInput.addEventListener('compressed', function (e) {
-    const file = e.detail.files[0];
-    if (!file) return;
     const reader = new FileReader();
-    reader.onload = ev => {
-        document.getElementById('preview').src = ev.target.result;
+    reader.onload = e => {
+        document.getElementById('imagePreviewImg').src = e.target.result;
         document.getElementById('imagePreview').style.display = 'block';
+        document.getElementById('imageUploadArea').style.display = 'none';
     };
-    reader.readAsDataURL(file);
+    reader.readAsDataURL(result);
 });
 
-// Also handle change in case 'compressed' fires before we attach listener
-imageInput.addEventListener('change', function () {
-    const file = this.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = ev => {
-        document.getElementById('preview').src = ev.target.result;
-        document.getElementById('imagePreview').style.display = 'block';
-    };
-    reader.readAsDataURL(file);
-});
-
-function removeImage() {
+function removeMainImage() {
     imageInput.value = '';
     document.getElementById('imagePreview').style.display = 'none';
-    document.getElementById('preview').src = '';
+    document.getElementById('imagePreviewImg').src = '';
+    document.getElementById('imageUploadArea').style.display = 'block';
 }
 
-// ==================== GALLERY PHOTOS (compress + preview) ====================
-const photosInput = document.getElementById('photos');
+/* ── GALLERY PHOTOS ── */
 let photoFiles    = [];
+const photosInput = document.getElementById('photos');
 
-// Attach compression — we still need manual handling to accumulate files
 photosInput.addEventListener('change', async function () {
     const rawFiles = Array.from(this.files);
     if (!rawFiles.length) return;
+    showProgress('photos', 0, `Mengompres 0 / ${rawFiles.length}…`, false);
 
-    const compressed = await ImageCompressor.compressAll(rawFiles, { maxWidth: 1920, quality: 0.82 });
+    const compressed = [];
+    for (let i = 0; i < rawFiles.length; i++) {
+        const result = await ImageCompressor.compress(rawFiles[i], { maxWidth: 1920, maxHeight: 1920, quality: 0.82 });
+        compressed.push(result);
+        showProgress('photos', Math.round(((i + 1) / rawFiles.length) * 100), `Mengompres ${i + 1} / ${rawFiles.length}…`, false);
+    }
+
     photoFiles = [...photoFiles, ...compressed];
-
-    // Replace input FileList
-    const dt = new DataTransfer();
-    photoFiles.forEach(f => dt.items.add(f));
-    photosInput.files = dt.files;
-
-    displayPhotos();
+    ImageCompressor.replaceFiles(photosInput, photoFiles);
+    showProgress('photos', 100, `✓ ${photoFiles.length} foto siap diupload`, true);
+    renderPhotos();
 });
 
-function displayPhotos() {
+function renderPhotos() {
     const grid = document.getElementById('photosGrid');
     grid.innerHTML = '';
-    if (photoFiles.length > 0) {
-        grid.style.display = 'grid';
-        photoFiles.forEach((file, index) => {
-            const reader = new FileReader();
-            reader.onload = e => {
-                const div = document.createElement('div');
-                div.className = 'photo-preview-item';
-                div.innerHTML = `
-                    <img src="${e.target.result}" alt="Photo ${index + 1}">
-                    <button type="button" class="remove-photo" onclick="removePhoto(${index})">
-                        <i class="fas fa-times"></i>
-                    </button>`;
-                grid.appendChild(div);
-            };
-            reader.readAsDataURL(file);
-        });
-    } else {
-        grid.style.display = 'none';
-    }
+    if (!photoFiles.length) { grid.style.display = 'none'; return; }
+    grid.style.display = 'grid';
+    photoFiles.forEach((file, index) => {
+        const reader = new FileReader();
+        reader.onload = e => {
+            const div = document.createElement('div');
+            div.className = 'photo-preview-item';
+            div.innerHTML = `
+                <img src="${e.target.result}" alt="Photo ${index + 1}">
+                <button type="button" class="remove-photo" onclick="removePhoto(${index})">
+                    <i class="fas fa-times"></i>
+                </button>`;
+            grid.appendChild(div);
+        };
+        reader.readAsDataURL(file);
+    });
 }
 
 function removePhoto(index) {
     photoFiles.splice(index, 1);
-    const dt = new DataTransfer();
-    photoFiles.forEach(f => dt.items.add(f));
-    photosInput.files = dt.files;
-    displayPhotos();
+    ImageCompressor.replaceFiles(photosInput, photoFiles);
+    renderPhotos();
 }
 
-// ==================== SUBPACKAGES ====================
+/* ── PROGRESS HELPER ── */
+function showProgress(prefix, pct, text, done) {
+    const prog  = document.getElementById(prefix + 'Progress');
+    const bar   = document.getElementById(prefix + 'ProgressBar');
+    const label = document.getElementById(prefix + 'ProgressLabel');
+    if (!prog) return;
+    prog.classList.add('show');
+    bar.style.width = pct + '%';
+    label.textContent = text;
+    if (done) {
+        bar.style.background = '#27ae60';
+        label.style.color    = '#155724';
+        setTimeout(() => { prog.classList.remove('show'); bar.style.background = ''; label.style.color = ''; }, 2500);
+    }
+}
+
+/* ── DRAG & DROP ── */
+['imageUploadArea', 'photosUploadArea'].forEach(id => {
+    const area = document.getElementById(id);
+    if (!area) return;
+    area.addEventListener('dragover',  e => { e.preventDefault(); area.classList.add('drag-over'); });
+    area.addEventListener('dragleave', ()  => area.classList.remove('drag-over'));
+    area.addEventListener('drop', e => {
+        e.preventDefault(); area.classList.remove('drag-over');
+        const inputId = id === 'imageUploadArea' ? 'image' : 'photos';
+        const input   = document.getElementById(inputId);
+        const dt = new DataTransfer();
+        Array.from(e.dataTransfer.files).forEach(f => dt.items.add(f));
+        input.files = dt.files;
+        input.dispatchEvent(new Event('change'));
+    });
+});
+
+/* ── SUBPACKAGES ── */
 let subIndex = 0;
 
 function addSubpackage(data) {
@@ -491,10 +492,15 @@ function addSubpackage(data) {
             </div>
             <div class="form-group full-width">
                 <label class="form-label">Main Image</label>
-                <div class="image-upload-wrapper" style="padding:1.25rem;">
-                    <input type="file" id="sub_img_${idx}" name="subpackages[${idx}][image]" accept="image/*">
-                    <div style="font-size:1.5rem;color:#8B7355;margin-bottom:0.5rem;"><i class="fas fa-cloud-upload-alt"></i></div>
-                    <div class="upload-text"><strong>Click to upload</strong><br><small>PNG, JPG, WEBP (max 20MB)</small></div>
+                <div class="upload-area" style="padding:1.25rem;" id="sub_area_${idx}">
+                    <input type="file" id="sub_img_${idx}" name="subpackages[${idx}][image]"
+                        accept="image/jpeg,image/png,image/jpg,image/webp">
+                    <div style="font-size:1.5rem;color:#8B7355;margin-bottom:0.5rem;opacity:0.5;"><i class="fas fa-cloud-upload-alt"></i></div>
+                    <div class="upload-text"><strong>Click to upload</strong><br><small>PNG, JPG, WEBP — dikompres otomatis</small></div>
+                </div>
+                <div class="compress-progress" id="sub_img_prog_${idx}">
+                    <div class="progress-label" id="sub_img_label_${idx}">Mengompres…</div>
+                    <div class="progress-bar-wrap"><div class="progress-bar" id="sub_img_bar_${idx}"></div></div>
                 </div>
                 <div id="sub_img_preview_${idx}" style="display:none;margin-top:0.75rem;">
                     <img style="max-width:200px;max-height:150px;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.1);" src="" alt="preview">
@@ -502,10 +508,15 @@ function addSubpackage(data) {
             </div>
             <div class="form-group full-width">
                 <label class="form-label">Additional Photos</label>
-                <div class="image-upload-wrapper" style="padding:1.25rem;">
-                    <input type="file" id="sub_photos_${idx}" name="subpackages[${idx}][photos][]" accept="image/*" multiple>
-                    <div style="font-size:1.5rem;color:#8B7355;margin-bottom:0.5rem;"><i class="fas fa-images"></i></div>
-                    <div class="upload-text"><strong>Click to upload</strong> multiple photos<br><small>PNG, JPG, WEBP (max 20MB each)</small></div>
+                <div class="upload-area" style="padding:1.25rem;" id="sub_photos_area_${idx}">
+                    <input type="file" id="sub_photos_${idx}" name="subpackages[${idx}][photos][]"
+                        accept="image/jpeg,image/png,image/jpg,image/webp" multiple>
+                    <div style="font-size:1.5rem;color:#8B7355;margin-bottom:0.5rem;opacity:0.5;"><i class="fas fa-images"></i></div>
+                    <div class="upload-text"><strong>Click to upload</strong> multiple photos — dikompres otomatis</div>
+                </div>
+                <div class="compress-progress" id="sub_photos_prog_${idx}">
+                    <div class="progress-label" id="sub_photos_label_${idx}">Mengompres…</div>
+                    <div class="progress-bar-wrap"><div class="progress-bar" id="sub_photos_bar_${idx}"></div></div>
                 </div>
                 <div id="sub_photos_grid_${idx}" class="photos-grid" style="display:none;margin-top:0.75rem;"></div>
             </div>
@@ -514,54 +525,71 @@ function addSubpackage(data) {
     list.appendChild(div);
     renumberSubpackages();
 
-    // Attach compression to subpackage image inputs
-    const subImgInput    = document.getElementById(`sub_img_${idx}`);
-    const subPhotosInput = document.getElementById(`sub_photos_${idx}`);
-
-    ImageCompressor.attachTo(subImgInput, { maxWidth: 1920, quality: 0.82 });
-    subImgInput.addEventListener('change', function () {
-        const file = this.files[0];
-        if (!file) return;
+    /* Compress sub main image */
+    const subImgInput = document.getElementById(`sub_img_${idx}`);
+    subImgInput.addEventListener('change', async function () {
+        const raw = this.files[0];
+        if (!raw) return;
+        showSubProgress(idx, 'img', 40, 'Mengompres…', false);
+        const result = await ImageCompressor.compress(raw, { maxWidth: 1920, maxHeight: 1920, quality: 0.82 });
+        ImageCompressor.replaceFiles(subImgInput, [result]);
+        showSubProgress(idx, 'img', 100, '✓ Siap', true);
         const reader = new FileReader();
         reader.onload = e => {
             const container = document.getElementById(`sub_img_preview_${idx}`);
             container.style.display = 'block';
             container.querySelector('img').src = e.target.result;
         };
-        reader.readAsDataURL(file);
+        reader.readAsDataURL(result);
     });
 
-    // Sub photos with compression
+    /* Compress sub additional photos */
     let subPhotoFiles = [];
+    const subPhotosInput = document.getElementById(`sub_photos_${idx}`);
     subPhotosInput.addEventListener('change', async function () {
-        const raw        = Array.from(this.files);
-        const compressed = await ImageCompressor.compressAll(raw, { maxWidth: 1920, quality: 0.82 });
-        subPhotoFiles    = [...subPhotoFiles, ...compressed];
+        const raw = Array.from(this.files);
+        if (!raw.length) return;
+        showSubProgress(idx, 'photos', 0, `Mengompres 0 / ${raw.length}…`, false);
+        const compressed = [];
+        for (let i = 0; i < raw.length; i++) {
+            const result = await ImageCompressor.compress(raw[i], { maxWidth: 1920, maxHeight: 1920, quality: 0.82 });
+            compressed.push(result);
+            showSubProgress(idx, 'photos', Math.round(((i + 1) / raw.length) * 100), `Mengompres ${i + 1} / ${raw.length}…`, false);
+        }
+        subPhotoFiles = [...subPhotoFiles, ...compressed];
+        ImageCompressor.replaceFiles(subPhotosInput, subPhotoFiles);
+        showSubProgress(idx, 'photos', 100, `✓ ${subPhotoFiles.length} foto siap`, true);
 
-        const dt = new DataTransfer();
-        subPhotoFiles.forEach(f => dt.items.add(f));
-        subPhotosInput.files = dt.files;
-
-        _renderSubPhotos(subPhotoFiles, `sub_photos_grid_${idx}`, subPhotosInput, () => subPhotoFiles);
+        const grid = document.getElementById(`sub_photos_grid_${idx}`);
+        grid.innerHTML = '';
+        if (!subPhotoFiles.length) { grid.style.display = 'none'; return; }
+        grid.style.display = 'grid';
+        subPhotoFiles.forEach((file, i) => {
+            const reader = new FileReader();
+            reader.onload = e => {
+                const d = document.createElement('div');
+                d.className = 'photo-preview-item';
+                d.innerHTML = `<img src="${e.target.result}" alt="Photo ${i + 1}" style="width:100%;height:100%;object-fit:cover;">`;
+                grid.appendChild(d);
+            };
+            reader.readAsDataURL(file);
+        });
     });
 }
 
-function _renderSubPhotos(files, gridId, inputEl, getFiles) {
-    const grid = document.getElementById(gridId);
-    if (!grid) return;
-    grid.innerHTML = '';
-    if (!files.length) { grid.style.display = 'none'; return; }
-    grid.style.display = 'grid';
-    files.forEach((file, i) => {
-        const reader = new FileReader();
-        reader.onload = e => {
-            const div       = document.createElement('div');
-            div.className   = 'photo-preview-item';
-            div.innerHTML   = `<img src="${e.target.result}" alt="Photo ${i+1}" style="width:100%;height:100%;object-fit:cover;">`;
-            grid.appendChild(div);
-        };
-        reader.readAsDataURL(file);
-    });
+function showSubProgress(idx, type, pct, text, done) {
+    const prog  = document.getElementById(`sub_${type}_prog_${idx}`);
+    const bar   = document.getElementById(`sub_${type}_bar_${idx}`);
+    const label = document.getElementById(`sub_${type}_label_${idx}`);
+    if (!prog) return;
+    prog.classList.add('show');
+    bar.style.width = pct + '%';
+    label.textContent = text;
+    if (done) {
+        bar.style.background = '#27ae60';
+        label.style.color    = '#155724';
+        setTimeout(() => { prog.classList.remove('show'); bar.style.background = ''; label.style.color = ''; }, 2500);
+    }
 }
 
 function removeSubpackage(id) {
@@ -580,8 +608,8 @@ function renumberSubpackages() {
     Object.values(oldSubs).forEach(sub => addSubpackage(sub));
 @endif
 
-// Submit guard
-document.querySelector('form').addEventListener('submit', function () {
+/* ── SUBMIT ── */
+document.getElementById('packageForm').addEventListener('submit', function () {
     const btn    = document.getElementById('submitBtn');
     btn.disabled = true;
     btn.innerHTML = '⏳ Saving…';
