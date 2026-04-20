@@ -11,19 +11,13 @@ use Illuminate\Support\Facades\Storage;
 
 class PackageController extends Controller
 {
-    /**
-     * Display a listing of the resource (Public).
-     */
     public function index()
     {
-        $packages = Package::with('subpackages')->latest()->paginate(12);
+        $packages   = Package::with('subpackages')->latest()->paginate(12);
         $categories = Package::distinct()->pluck('category')->filter();
         return view('packages.index', compact('packages', 'categories'));
     }
 
-    /**
-     * Display the specified resource (Public).
-     */
     public function show($id)
     {
         $package = Package::with('subpackages')->findOrFail($id);
@@ -36,29 +30,19 @@ class PackageController extends Controller
         return view('packages.show', compact('package', 'otherPackages'));
     }
 
-    /**
-     * Display subpackage detail page (Public).
-     */
     public function showSubpackage($packageId, $subpackageId)
     {
         $package    = Package::with('subpackages')->findOrFail($packageId);
         $subpackage = $package->subpackages->firstWhere('id', $subpackageId) ?? abort(404);
-
         return view('packages.subpackage', compact('package', 'subpackage'));
     }
 
-    /**
-     * Display a listing for admin.
-     */
     public function adminIndex()
     {
         $packages = Package::with('subpackages')->latest()->paginate(20);
         return view('admin.packages.index', compact('packages'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         $categories = Package::distinct()->pluck('category')->filter();
@@ -66,7 +50,8 @@ class PackageController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Store a newly created package.
+     * ALL images (main, photos, subpackage images) are compressed + thumbnailed.
      */
     public function store(Request $request)
     {
@@ -83,19 +68,19 @@ class PackageController extends Controller
         ]);
 
         DB::transaction(function () use ($request, $validated) {
-            // Upload main image + buat thumbnail
+
+            // Main image — compress + thumbnail
             if ($request->hasFile('image')) {
                 $result = ImageHelper::storeAndCompress($request->file('image'), 'packages');
                 $validated['image'] = $result['path'];
             }
 
-            // Upload multiple photos + buat thumbnail masing-masing
+            // Additional gallery photos — compress + thumbnail each
             $photos = [];
             if ($request->hasFile('photos')) {
                 foreach ($request->file('photos') as $photo) {
-                    $path = $photo->store('packages/photos', 'public');
-                    ImageHelper::createThumbnail($path);
-                    $photos[] = $path;
+                    $result   = ImageHelper::storeAndCompress($photo, 'packages/photos');
+                    $photos[] = $result['path'];
                 }
             }
 
@@ -104,38 +89,36 @@ class PackageController extends Controller
 
             $package = Package::create($validated);
 
-            // Simpan subpackages
+            // Subpackages
             if ($request->has('subpackages')) {
                 foreach ($request->subpackages as $index => $sub) {
-                    if (!empty($sub['name'])) {
-                        // Upload subpackage main image
-                        $subImage = null;
-                        if (!empty($sub['image']) && $sub['image'] instanceof \Illuminate\Http\UploadedFile) {
-                            $subImagePath = $sub['image']->store('packages/subpackages', 'public');
-                            ImageHelper::createThumbnail($subImagePath);
-                            $subImage = $subImagePath;
-                        }
+                    if (empty($sub['name'])) continue;
 
-                        // Upload subpackage photos
-                        $subPhotos = [];
-                        if (!empty($sub['photos']) && is_array($sub['photos'])) {
-                            foreach ($sub['photos'] as $subPhoto) {
-                                if ($subPhoto instanceof \Illuminate\Http\UploadedFile) {
-                                    $p = $subPhoto->store('packages/subpackages/photos', 'public');
-                                    ImageHelper::createThumbnail($p);
-                                    $subPhotos[] = $p;
-                                }
+                    // Subpackage main image — compress + thumbnail
+                    $subImage = null;
+                    if (!empty($sub['image']) && $sub['image'] instanceof \Illuminate\Http\UploadedFile) {
+                        $result   = ImageHelper::storeAndCompress($sub['image'], 'packages/subpackages');
+                        $subImage = $result['path'];
+                    }
+
+                    // Subpackage additional photos — compress + thumbnail each
+                    $subPhotos = [];
+                    if (!empty($sub['photos']) && is_array($sub['photos'])) {
+                        foreach ($sub['photos'] as $subPhoto) {
+                            if ($subPhoto instanceof \Illuminate\Http\UploadedFile) {
+                                $result      = ImageHelper::storeAndCompress($subPhoto, 'packages/subpackages/photos');
+                                $subPhotos[] = $result['path'];
                             }
                         }
-
-                        Subpackage::create([
-                            'package_id'  => $package->id,
-                            'name'        => $sub['name'],
-                            'description' => $sub['description'] ?? null,
-                            'image'       => $subImage,
-                            'photo'       => $subPhotos,
-                        ]);
                     }
+
+                    Subpackage::create([
+                        'package_id'  => $package->id,
+                        'name'        => $sub['name'],
+                        'description' => $sub['description'] ?? null,
+                        'image'       => $subImage,
+                        'photo'       => $subPhotos,
+                    ]);
                 }
             }
         });
@@ -144,18 +127,12 @@ class PackageController extends Controller
             ->with('success', 'Package created successfully.');
     }
 
-    /**
-     * Display the specified resource (Admin).
-     */
     public function adminShow(Package $package)
     {
         $package->load('subpackages');
         return view('admin.packages.show', compact('package'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(Package $package)
     {
         $package->load('subpackages');
@@ -164,7 +141,8 @@ class PackageController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update an existing package.
+     * All NEW images are compressed + thumbnailed.
      */
     public function update(Request $request, Package $package)
     {
@@ -181,7 +159,8 @@ class PackageController extends Controller
         ]);
 
         DB::transaction(function () use ($request, $validated, $package) {
-            // Update main image jika ada file baru
+
+            // Replace main image if new file provided
             if ($request->hasFile('image')) {
                 if ($package->image) {
                     Storage::disk('public')->delete($package->image);
@@ -191,10 +170,9 @@ class PackageController extends Controller
                 $validated['image'] = $result['path'];
             }
 
-            // Ambil foto-foto yang masih ada
+            // Handle removed existing photos
             $existingPhotos = $package->photo ?? [];
 
-            // Hapus foto yang di-remove oleh admin
             if ($request->has('removed_photos')) {
                 $removedPhotos = json_decode($request->removed_photos, true);
                 if (is_array($removedPhotos)) {
@@ -206,12 +184,11 @@ class PackageController extends Controller
                 }
             }
 
-            // Tambahkan foto baru + buat thumbnail
+            // Add new gallery photos — compress + thumbnail each
             if ($request->hasFile('photos')) {
                 foreach ($request->file('photos') as $photo) {
-                    $path = $photo->store('packages/photos', 'public');
-                    ImageHelper::createThumbnail($path);
-                    $existingPhotos[] = $path;
+                    $result           = ImageHelper::storeAndCompress($photo, 'packages/photos');
+                    $existingPhotos[] = $result['path'];
                 }
             }
 
@@ -220,7 +197,7 @@ class PackageController extends Controller
 
             $package->update($validated);
 
-            // Update subpackages: hapus semua lalu buat ulang
+            // Delete old subpackages (their images too)
             foreach ($package->subpackages as $oldSub) {
                 if ($oldSub->image) {
                     Storage::disk('public')->delete($oldSub->image);
@@ -235,35 +212,34 @@ class PackageController extends Controller
             }
             $package->subpackages()->delete();
 
+            // Re-create subpackages with compressed images
             if ($request->has('subpackages')) {
                 foreach ($request->subpackages as $index => $sub) {
-                    if (!empty($sub['name'])) {
-                        $subImage = $sub['existing_image'] ?? null;
-                        if (!empty($sub['image']) && $sub['image'] instanceof \Illuminate\Http\UploadedFile) {
-                            $subImagePath = $sub['image']->store('packages/subpackages', 'public');
-                            ImageHelper::createThumbnail($subImagePath);
-                            $subImage = $subImagePath;
-                        }
+                    if (empty($sub['name'])) continue;
 
-                        $subPhotos = !empty($sub['existing_photos']) ? (array) $sub['existing_photos'] : [];
-                        if (!empty($sub['photos']) && is_array($sub['photos'])) {
-                            foreach ($sub['photos'] as $subPhoto) {
-                                if ($subPhoto instanceof \Illuminate\Http\UploadedFile) {
-                                    $p = $subPhoto->store('packages/subpackages/photos', 'public');
-                                    ImageHelper::createThumbnail($p);
-                                    $subPhotos[] = $p;
-                                }
+                    $subImage = $sub['existing_image'] ?? null;
+                    if (!empty($sub['image']) && $sub['image'] instanceof \Illuminate\Http\UploadedFile) {
+                        $result   = ImageHelper::storeAndCompress($sub['image'], 'packages/subpackages');
+                        $subImage = $result['path'];
+                    }
+
+                    $subPhotos = !empty($sub['existing_photos']) ? (array) $sub['existing_photos'] : [];
+                    if (!empty($sub['photos']) && is_array($sub['photos'])) {
+                        foreach ($sub['photos'] as $subPhoto) {
+                            if ($subPhoto instanceof \Illuminate\Http\UploadedFile) {
+                                $result      = ImageHelper::storeAndCompress($subPhoto, 'packages/subpackages/photos');
+                                $subPhotos[] = $result['path'];
                             }
                         }
-
-                        Subpackage::create([
-                            'package_id'  => $package->id,
-                            'name'        => $sub['name'],
-                            'description' => $sub['description'] ?? null,
-                            'image'       => $subImage,
-                            'photo'       => $subPhotos,
-                        ]);
                     }
+
+                    Subpackage::create([
+                        'package_id'  => $package->id,
+                        'name'        => $sub['name'],
+                        'description' => $sub['description'] ?? null,
+                        'image'       => $subImage,
+                        'photo'       => $subPhotos,
+                    ]);
                 }
             }
         });
@@ -272,9 +248,6 @@ class PackageController extends Controller
             ->with('success', 'Package updated successfully.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Package $package)
     {
         if ($package->image) {

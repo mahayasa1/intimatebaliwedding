@@ -653,6 +653,9 @@
             @yield('content')
         </div>
     </main>
+    
+
+    <script src="{{ asset('js/image-compressor.js') }}"></script>
 
     <script>
         const sidebar     = document.getElementById('sidebar');

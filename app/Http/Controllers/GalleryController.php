@@ -18,31 +18,15 @@ class GalleryController extends Controller
     }
 
     /**
-     * Display a listing of the resource (Frontend) — FOTO dan VIDEO terpisah.
+     * Display a listing of the resource (Frontend).
      */
     public function index()
     {
-        // Ambil semua foto (type = photo atau video_url kosong)
-        $photos = Gallery::where(function ($q) {
-                        $q->where('type', 'photo')
-                          ->orWhereNull('type')
-                          ->orWhere('type', '');
-                    })
-                    ->whereNull('video_url')
-                    ->orWhere(function ($q) {
-                        $q->where('type', 'photo')->whereNull('video_url');
-                    })
-                    ->orderBy('order')
-                    ->latest()
-                    ->get();
-
-        // Lebih simpel: pisahkan setelah ambil semua
         $allGalleries = Gallery::orderBy('order')->latest()->get();
 
         $photoGalleries = $allGalleries->filter(fn($g) => !$g->isVideo());
         $videoGalleries = $allGalleries->filter(fn($g) => $g->isVideo());
 
-        // Sort foto by aspect ratio (wide first) untuk masonry
         $sortedPhotos = $photoGalleries->sortByDesc(function ($gallery) {
             if (!$gallery->image) return 0;
             $imagePath = storage_path('app/public/' . $gallery->image);
@@ -53,7 +37,6 @@ class GalleryController extends Controller
             return 0;
         });
 
-        // Paginate foto
         $page    = request()->get('page', 1);
         $perPage = 12;
 
@@ -102,9 +85,6 @@ class GalleryController extends Controller
         return view('gallery.show', compact('gallery', 'allPhotos', 'allPhotosUrl', 'totalPhotos'));
     }
 
-    /**
-     * Refresh Google Maps reviews cache.
-     */
     public function refreshReviews()
     {
         $this->googleMapsService->clearCache();
@@ -112,18 +92,12 @@ class GalleryController extends Controller
             ->with('success', 'Google Maps reviews refreshed successfully!');
     }
 
-    /**
-     * Display a listing for admin.
-     */
     public function adminIndex()
     {
         $galleries = Gallery::orderBy('order')->latest()->paginate(20);
         return view('admin.galleries.index', compact('galleries'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         return view('admin.galleries.create');
@@ -131,6 +105,7 @@ class GalleryController extends Controller
 
     /**
      * Store a newly created resource in storage.
+     * All images are compressed + thumbnailed via ImageHelper::storeAndCompress().
      */
     public function store(Request $request)
     {
@@ -145,7 +120,7 @@ class GalleryController extends Controller
                 'order'       => 'nullable|integer',
             ]);
 
-            $validated['type'] = 'video';
+            $validated['type']  = 'video';
             $validated['image'] = '';
             $validated['photo'] = [];
 
@@ -162,18 +137,17 @@ class GalleryController extends Controller
 
             $validated['type'] = 'photo';
 
-            // Upload main image + thumbnail
+            // Upload main image: compress + create thumbnail
             if ($request->hasFile('foto')) {
-                $path = $request->file('foto')->store('gallery', 'public');
-                ImageHelper::createThumbnail($path);
-                $validated['image'] = $path;
+                $result = ImageHelper::storeAndCompress($request->file('foto'), 'gallery');
+                $validated['image'] = $result['path'];
             }
 
-            // Upload additional photos + thumbnails
+            // Upload additional photos: compress + create thumbnail each
             $photos = [];
             if ($request->hasFile('photos')) {
                 foreach ($request->file('photos') as $photo) {
-                    $result  = ImageHelper::storeAndCompress($photo, 'gallery/photos');
+                    $result   = ImageHelper::storeAndCompress($photo, 'gallery/photos');
                     $photos[] = $result['path'];
                 }
             }
@@ -187,17 +161,11 @@ class GalleryController extends Controller
             ->with('success', 'Gallery item created successfully.');
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function adminShow(Gallery $gallery)
     {
         return view('admin.galleries.show', compact('gallery'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(Gallery $gallery)
     {
         return view('admin.galleries.edit', compact('gallery'));
@@ -205,6 +173,7 @@ class GalleryController extends Controller
 
     /**
      * Update the specified resource in storage.
+     * All new images are compressed + thumbnailed.
      */
     public function update(Request $request, Gallery $gallery)
     {
@@ -233,21 +202,19 @@ class GalleryController extends Controller
 
             $validated['type'] = 'photo';
 
-            // Update main image jika ada file baru
+            // Replace main image if new file provided
             if ($request->hasFile('foto')) {
                 if ($gallery->image) {
                     Storage::disk('public')->delete($gallery->image);
                     ImageHelper::deleteThumb($gallery->image);
                 }
-                $path = $request->file('foto')->store('gallery', 'public');
-                ImageHelper::createThumbnail($path);
-                $validated['image'] = $path;
+                $result = ImageHelper::storeAndCompress($request->file('foto'), 'gallery');
+                $validated['image'] = $result['path'];
             }
 
-            // Ambil foto-foto yang masih ada
+            // Handle removed existing photos
             $existingPhotos = $gallery->photo ?? [];
 
-            // Hapus foto yang di-remove oleh admin
             if ($request->has('removed_photos')) {
                 $removedPhotos = json_decode($request->removed_photos, true);
                 if (is_array($removedPhotos)) {
@@ -259,12 +226,11 @@ class GalleryController extends Controller
                 }
             }
 
-            // Upload foto baru + buat thumbnail
-            $photos = [];
+            // Add new photos: compress + create thumbnail
             if ($request->hasFile('photos')) {
                 foreach ($request->file('photos') as $photo) {
-                    $result  = ImageHelper::storeAndCompress($photo, 'gallery/photos');
-                    $photos[] = $result['path'];
+                    $result           = ImageHelper::storeAndCompress($photo, 'gallery/photos');
+                    $existingPhotos[] = $result['path'];
                 }
             }
 
@@ -278,9 +244,6 @@ class GalleryController extends Controller
             ->with('success', 'Gallery item updated successfully.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Gallery $gallery)
     {
         if ($gallery->image) {

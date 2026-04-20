@@ -51,7 +51,7 @@ class HomeController extends Controller
         // Get hero slider images from gallery
         $heroSlides = Gallery::where('category', 'Hero')
                         ->orderBy('order')
-                        ->take(3)
+                        ->take(5)
                         ->get();
 
         // If no hero slides, use default images
