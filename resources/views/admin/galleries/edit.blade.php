@@ -293,29 +293,21 @@
             @if($gallery->image)
             <div class="current-image-box">
                 <span>Foto saat ini:</span>
-                <img src="{{ asset('storage/' . $gallery->image) }}" alt="{{ $gallery->title }}">
+                <x-image :src="$gallery->image" :thumb="false" alt="$gallery->title" />
             </div>
             @endif
 
             <div class="form-group">
-                <label class="form-label">{{ $gallery->image ? 'Ganti Foto (opsional)' : 'Upload Foto Utama' }}</label>
-                <div class="upload-area" id="mainUploadArea">
-                    <input type="file" id="foto" name="foto"
-                        accept="image/jpeg,image/png,image/jpg,image/webp">
-                    <div class="upload-icon"><i class="fa-solid fa-cloud-arrow-up"></i></div>
-                    <div class="upload-text"><strong>Klik atau drag & drop</strong><br><small>Dikompres otomatis — max 1920px</small></div>
-                </div>
-                <div class="compress-progress" id="mainProgress">
-                    <div class="progress-label" id="mainProgressLabel">Mengompres…</div>
-                    <div class="progress-bar-wrap"><div class="progress-bar" id="mainProgressBar"></div></div>
-                </div>
-                <div class="main-preview-wrapper" id="mainPreview">
-                    <img src="" alt="Preview" id="mainPreviewImg">
-                    <button type="button" class="remove-new-main" onclick="removeMainPreview()">
-                        <i class="fa-solid fa-xmark"></i>
-                    </button>
-                </div>
-                @error('foto')<div class="error-message">{{ $message }}</div>@enderror
+                <x-upload-image
+                    name="foto"
+                    label="{{ $gallery->image ? 'Ganti Foto Utama' : 'Upload Foto Utama' }}"
+                    :maxWidth="1920"
+                    :quality="0.82"
+                    hint="Kosongkan jika tidak ingin mengganti gambar"
+                />
+                @error('foto')
+                    <div class="error-message">{{ $message }}</div>
+                @enderror
             </div>
         </div>
 
@@ -332,11 +324,14 @@
                 <div class="photos-grid" id="existingPhotosGrid">
                     @foreach($gallery->photo as $index => $photoPath)
                     <div class="photo-item" id="existing_{{ $index }}" data-path="{{ $photoPath }}">
-                        <img src="{{ asset('storage/' . $photoPath) }}" alt="Photo {{ $index + 1 }}">
-                        <button type="button" class="remove-photo"
+                        <x-image :src="$photoPath" alt="Gallery photo" />
+                        <button
+                            type="button"
+                            class="remove-photo"
                             onclick="removeExistingPhoto('{{ $photoPath }}', 'existing_{{ $index }}')">
                             <i class="fa-solid fa-xmark"></i>
                         </button>
+                    
                     </div>
                     @endforeach
                 </div>
@@ -345,19 +340,17 @@
 
             <div class="form-group">
                 <label class="form-label">Tambah foto baru</label>
-                <div class="upload-area" id="photosUploadArea">
-                    <input type="file" id="photos" name="photos[]"
-                        accept="image/jpeg,image/png,image/jpg,image/webp" multiple>
-                    <div class="upload-icon"><i class="fa-solid fa-cloud-arrow-up"></i></div>
-                    <div class="upload-text"><strong>Klik atau drag & drop</strong> — bisa banyak sekaligus</div>
-                </div>
-                <div class="compress-progress" id="photosProgress">
-                    <div class="progress-label" id="photosProgressLabel">Mengompres…</div>
-                    <div class="progress-bar-wrap"><div class="progress-bar" id="photosProgressBar"></div></div>
-                </div>
-                <div id="newPhotosGrid" class="photos-grid" style="display:none;"></div>
-                @error('photos.*')<div class="error-message">{{ $message }}</div>@enderror
-            </div>
+                <x-upload-image
+                    name="photos"
+                    label="Tambah Foto Baru"
+                    :multiple="true"
+                    :maxWidth="1920"
+                    :quality="0.82"
+                    hint="Bisa pilih banyak gambar"
+                />
+                @error('photos.*')
+                <div class="error-message">{{ $message }}</div>
+                @enderror
         </div>
 
         {{-- Actions --}}
@@ -377,32 +370,28 @@
 
 @push('scripts')
 <script>
-/* ── TYPE TOGGLE ── */
 const typeRadios    = document.querySelectorAll('input[name="type"]');
 const videoSection  = document.getElementById('videoSection');
 const photoSection  = document.getElementById('photoSection');
 const photosSection = document.getElementById('photosSection');
-const fotoInput     = document.getElementById('foto');
 const videoUrlInput = document.getElementById('video_url');
 
 typeRadios.forEach(radio => {
     radio.addEventListener('change', function () {
         if (this.value === 'video') {
-            videoSection.style.display  = 'block';
-            photoSection.style.display  = 'none';
+            videoSection.style.display = 'block';
+            photoSection.style.display = 'none';
             photosSection.style.display = 'none';
-            fotoInput.removeAttribute('required');
-            videoUrlInput.setAttribute('required', 'required');
+            videoUrlInput.setAttribute('required','required');
         } else {
-            videoSection.style.display  = 'none';
-            photoSection.style.display  = 'block';
+            videoSection.style.display = 'none';
+            photoSection.style.display = 'block';
             photosSection.style.display = 'block';
             videoUrlInput.removeAttribute('required');
         }
     });
 });
 
-/* ── YOUTUBE PREVIEW ── */
 function extractYoutubeId(url) {
     const m = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
     return m ? m[1] : null;
@@ -410,14 +399,13 @@ function extractYoutubeId(url) {
 
 function previewYoutube(url) {
     const id = extractYoutubeId(url);
-    const preview  = document.getElementById('videoPreview');
-    const iframe   = document.getElementById('videoIframe');
-    const info     = document.getElementById('youtubeInfo');
-    const infoText = document.getElementById('youtubeInfoText');
+    const preview = document.getElementById('videoPreview');
+    const iframe  = document.getElementById('videoIframe');
+    const info    = document.getElementById('youtubeInfo');
+
     if (id) {
-        iframe.src = `https://www.youtube.com/embed/${id}?rel=0&modestbranding=1`;
+        iframe.src = `https://www.youtube.com/embed/${id}`;
         preview.classList.add('show');
-        infoText.textContent = `Video ID: ${id}`;
         info.classList.add('show');
     } else {
         iframe.src = '';
@@ -426,148 +414,19 @@ function previewYoutube(url) {
     }
 }
 
-/* ── MAIN IMAGE ── */
-function showMainProgress(pct, text, done) {
-    const prog  = document.getElementById('mainProgress');
-    const bar   = document.getElementById('mainProgressBar');
-    const label = document.getElementById('mainProgressLabel');
-    prog.classList.add('show');
-    bar.style.width = pct + '%';
-    label.textContent = text;
-    if (done) {
-        bar.style.background = '#27ae60';
-        label.style.color    = '#155724';
-        setTimeout(() => {
-            prog.classList.remove('show');
-            bar.style.background = '';
-            label.style.color    = '';
-        }, 2500);
-    }
-}
-
-fotoInput.addEventListener('change', async function () {
-    const raw = this.files[0];
-    if (!raw) return;
-    showMainProgress(40, 'Mengompres foto…', false);
-    const result = await ImageCompressor.compress(raw, { maxWidth: 1920, maxHeight: 1920, quality: 0.82 });
-    ImageCompressor.replaceFiles(fotoInput, [result]);
-    showMainProgress(100, '✓ Foto siap diupload', true);
-
-    const reader = new FileReader();
-    reader.onload = e => {
-        document.getElementById('mainPreviewImg').src = e.target.result;
-        document.getElementById('mainPreview').classList.add('show');
-        document.getElementById('mainUploadArea').style.display = 'none';
-    };
-    reader.readAsDataURL(result);
-});
-
-function removeMainPreview() {
-    fotoInput.value = '';
-    document.getElementById('mainPreview').classList.remove('show');
-    document.getElementById('mainPreviewImg').src = '';
-    document.getElementById('mainUploadArea').style.display = 'block';
-}
-
-/* ── EXISTING PHOTOS ── */
 let removedPaths = [];
 
-function removeExistingPhoto(photoPath, elementId) {
-    if (!confirm('Hapus foto ini?')) return;
-    removedPaths.push(photoPath);
+function removeExistingPhoto(path,id){
+    if(!confirm('Hapus foto ini?')) return;
+    removedPaths.push(path);
     document.getElementById('removed_photos').value = JSON.stringify(removedPaths);
-    document.getElementById(elementId).remove();
-    const grid = document.getElementById('existingPhotosGrid');
-    if (grid && grid.children.length === 0) grid.closest('.form-group').style.display = 'none';
+    document.getElementById(id).remove();
 }
 
-/* ── NEW PHOTOS ── */
-let newFiles = [];
-const photosInput = document.getElementById('photos');
-
-photosInput.addEventListener('change', async function () {
-    const rawFiles = Array.from(this.files);
-    if (!rawFiles.length) return;
-
-    const prog  = document.getElementById('photosProgress');
-    const bar   = document.getElementById('photosProgressBar');
-    const label = document.getElementById('photosProgressLabel');
-    prog.classList.add('show');
-    bar.style.width = '0%';
-    bar.style.background = '';
-    label.style.color = '';
-    label.textContent = `Mengompres 0 / ${rawFiles.length} foto…`;
-
-    const compressed = [];
-    for (let i = 0; i < rawFiles.length; i++) {
-        const result = await ImageCompressor.compress(rawFiles[i], { maxWidth: 1920, maxHeight: 1920, quality: 0.82 });
-        compressed.push(result);
-        const pct = Math.round(((i + 1) / rawFiles.length) * 100);
-        bar.style.width  = pct + '%';
-        label.textContent = `Mengompres ${i + 1} / ${rawFiles.length} foto…`;
-    }
-
-    newFiles = [...newFiles, ...compressed];
-    ImageCompressor.replaceFiles(photosInput, newFiles);
-
-    bar.style.width    = '100%';
-    bar.style.background = '#27ae60';
-    label.style.color  = '#155724';
-    label.textContent  = `✓ ${newFiles.length} foto siap diupload`;
-    setTimeout(() => { prog.classList.remove('show'); bar.style.background = ''; label.style.color = ''; }, 2500);
-
-    renderNewPhotos();
-});
-
-function removeNewPhoto(index) {
-    newFiles.splice(index, 1);
-    ImageCompressor.replaceFiles(photosInput, newFiles);
-    renderNewPhotos();
-}
-
-function renderNewPhotos() {
-    const grid = document.getElementById('newPhotosGrid');
-    grid.innerHTML = '';
-    if (!newFiles.length) { grid.style.display = 'none'; return; }
-    grid.style.display = 'grid';
-    newFiles.forEach((file, i) => {
-        const reader = new FileReader();
-        reader.onload = e => {
-            const div = document.createElement('div');
-            div.className = 'photo-item';
-            div.innerHTML = `
-                <img src="${e.target.result}" alt="New photo ${i + 1}">
-                <button type="button" class="remove-photo" onclick="removeNewPhoto(${i})">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>`;
-            grid.appendChild(div);
-        };
-        reader.readAsDataURL(file);
-    });
-}
-
-/* ── DRAG & DROP ── */
-['mainUploadArea', 'photosUploadArea'].forEach(id => {
-    const area = document.getElementById(id);
-    if (!area) return;
-    area.addEventListener('dragover',  e => { e.preventDefault(); area.classList.add('drag-over'); });
-    area.addEventListener('dragleave', ()  => area.classList.remove('drag-over'));
-    area.addEventListener('drop', e => {
-        e.preventDefault(); area.classList.remove('drag-over');
-        const inputId = id === 'mainUploadArea' ? 'foto' : 'photos';
-        const input   = document.getElementById(inputId);
-        const dt = new DataTransfer();
-        Array.from(e.dataTransfer.files).forEach(f => dt.items.add(f));
-        input.files = dt.files;
-        input.dispatchEvent(new Event('change'));
-    });
-});
-
-/* ── SUBMIT ── */
 document.getElementById('editForm').addEventListener('submit', function () {
     const btn = document.getElementById('submitBtn');
     btn.disabled = true;
-    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan…';
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...';
 });
 </script>
 @endpush

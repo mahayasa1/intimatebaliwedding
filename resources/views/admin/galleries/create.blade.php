@@ -299,24 +299,17 @@
                 Foto Utama <span style="font-size:0.8rem;color:#999;font-weight:400;">(Cover / Grid)</span>
             </h3>
             <div class="form-group">
-                <div class="upload-area" id="mainUploadArea">
-                    <input type="file" id="foto" name="foto"
-                        accept="image/jpeg,image/png,image/jpg,image/webp">
-                    <div class="upload-icon"><i class="fa-solid fa-camera-retro"></i></div>
-                    <div class="upload-text"><strong>Klik atau drag & drop</strong></div>
-                    <div class="upload-hint">JPG, PNG, WEBP — max 20MB — dikompres otomatis</div>
-                </div>
-                <div class="compress-progress" id="mainProgress">
-                    <div class="progress-label" id="mainProgressLabel">Mengompres…</div>
-                    <div class="progress-bar-wrap"><div class="progress-bar" id="mainProgressBar"></div></div>
-                </div>
-                <div class="main-preview-wrapper" id="mainPreview">
-                    <img src="" alt="Preview" id="mainPreviewImg">
-                    <button type="button" class="remove-main" onclick="removeMainImage()">
-                        <i class="fa-solid fa-xmark"></i>
-                    </button>
-                </div>
-                @error('foto')<div class="error-message">{{ $message }}</div>@enderror
+                <x-upload-image
+                    name="foto"
+                    label="Foto Utama"
+                    :required="true"
+                    :maxWidth="1920"
+                    :quality="0.82"
+                    hint="Cover gallery / grid utama"
+                />
+                @error('foto')
+                    <div class="error-message">{{ $message }}</div>
+                @enderror
             </div>
         </div>
 
@@ -327,19 +320,18 @@
                 Foto Tambahan <span style="font-size:0.8rem;color:#999;font-weight:400;">(Opsional)</span>
             </h3>
             <div class="form-group">
-                <div class="upload-area" id="photosUploadArea">
-                    <input type="file" id="photos" name="photos[]"
-                        accept="image/jpeg,image/png,image/jpg,image/webp" multiple>
-                    <div class="upload-icon"><i class="fa-solid fa-cloud-arrow-up"></i></div>
-                    <div class="upload-text"><strong>Klik atau drag & drop</strong> beberapa foto sekaligus</div>
-                    <div class="upload-hint">JPG, PNG, WEBP — dikompres otomatis</div>
-                </div>
-                <div class="compress-progress" id="photosProgress">
-                    <div class="progress-label" id="photosProgressLabel">Mengompres…</div>
-                    <div class="progress-bar-wrap"><div class="progress-bar" id="photosProgressBar"></div></div>
-                </div>
-                <div id="photosGrid" class="photos-grid" style="display:none;"></div>
-                @error('photos.*')<div class="error-message">{{ $message }}</div>@enderror
+                <x-upload-image
+                    name="photos"
+                    label="Foto Tambahan"
+                    :multiple="true"
+                    :required="false"
+                    :maxWidth="1920"
+                    :quality="0.82"
+                    hint="Bisa pilih banyak foto sekaligus"
+                />
+                @error('photos.*')
+                    <div class="error-message">{{ $message }}</div>
+                @enderror
             </div>
         </div>
 
@@ -410,18 +402,6 @@ function previewYoutube(url) {
     }
 }
 
-/* ── MAIN IMAGE ── */
-ImageCompressor.attachTo(fotoInput, { maxWidth: 1920, maxHeight: 1920, quality: 0.82 }, function (files) {
-    const file = files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = e => {
-        document.getElementById('mainPreviewImg').src = e.target.result;
-        document.getElementById('mainPreview').classList.add('show');
-        document.getElementById('mainUploadArea').style.display = 'none';
-    };
-    reader.readAsDataURL(file);
-});
 
 // Show progress manually via event
 fotoInput.addEventListener('change', function () {
@@ -445,95 +425,7 @@ fotoInput.addEventListener('compressed', function () {
     setTimeout(() => { prog.classList.remove('show'); bar.style.background = ''; label.style.color = ''; }, 2500);
 });
 
-function removeMainImage() {
-    fotoInput.value = '';
-    document.getElementById('mainPreview').classList.remove('show');
-    document.getElementById('mainPreviewImg').src = '';
-    document.getElementById('mainUploadArea').style.display = 'block';
-}
 
-/* ── ADDITIONAL PHOTOS ── */
-let additionalFiles = [];
-const photosInput   = document.getElementById('photos');
-
-photosInput.addEventListener('change', async function () {
-    const rawFiles = Array.from(this.files);
-    if (!rawFiles.length) return;
-
-    const prog  = document.getElementById('photosProgress');
-    const bar   = document.getElementById('photosProgressBar');
-    const label = document.getElementById('photosProgressLabel');
-    prog.classList.add('show');
-    bar.style.width  = '0%';
-    bar.style.background = '';
-    label.style.color = '';
-    label.textContent = `Mengompres 0 / ${rawFiles.length} foto…`;
-
-    const compressed = [];
-    for (let i = 0; i < rawFiles.length; i++) {
-        const result = await ImageCompressor.compress(rawFiles[i], { maxWidth: 1920, maxHeight: 1920, quality: 0.82 });
-        compressed.push(result);
-        const pct = Math.round(((i + 1) / rawFiles.length) * 100);
-        bar.style.width  = pct + '%';
-        label.textContent = `Mengompres ${i + 1} / ${rawFiles.length} foto…`;
-    }
-
-    additionalFiles = [...additionalFiles, ...compressed];
-    ImageCompressor.replaceFiles(photosInput, additionalFiles);
-
-    bar.style.width    = '100%';
-    bar.style.background = '#27ae60';
-    label.style.color  = '#155724';
-    label.textContent  = `✓ ${additionalFiles.length} foto siap diupload`;
-    setTimeout(() => { prog.classList.remove('show'); bar.style.background = ''; label.style.color = ''; }, 2500);
-
-    renderPhotoGrid();
-});
-
-function removeAdditionalPhoto(index) {
-    additionalFiles.splice(index, 1);
-    ImageCompressor.replaceFiles(photosInput, additionalFiles);
-    renderPhotoGrid();
-}
-
-function renderPhotoGrid() {
-    const grid = document.getElementById('photosGrid');
-    grid.innerHTML = '';
-    if (!additionalFiles.length) { grid.style.display = 'none'; return; }
-    grid.style.display = 'grid';
-    additionalFiles.forEach((file, i) => {
-        const reader = new FileReader();
-        reader.onload = e => {
-            const div = document.createElement('div');
-            div.className = 'photo-preview-item';
-            div.innerHTML = `
-                <img src="${e.target.result}" alt="Photo ${i + 1}">
-                <button type="button" class="remove-photo" onclick="removeAdditionalPhoto(${i})">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-                <span class="photo-size-badge">${ImageCompressor.formatBytes(file.size)}</span>`;
-            grid.appendChild(div);
-        };
-        reader.readAsDataURL(file);
-    });
-}
-
-/* ── DRAG & DROP ── */
-['mainUploadArea', 'photosUploadArea'].forEach(id => {
-    const area = document.getElementById(id);
-    if (!area) return;
-    area.addEventListener('dragover',  e => { e.preventDefault(); area.classList.add('drag-over'); });
-    area.addEventListener('dragleave', ()  => area.classList.remove('drag-over'));
-    area.addEventListener('drop', e => {
-        e.preventDefault(); area.classList.remove('drag-over');
-        const inputId = id === 'mainUploadArea' ? 'foto' : 'photos';
-        const input   = document.getElementById(inputId);
-        const dt = new DataTransfer();
-        Array.from(e.dataTransfer.files).forEach(f => dt.items.add(f));
-        input.files = dt.files;
-        input.dispatchEvent(new Event('change'));
-    });
-});
 
 /* ── SUBMIT ── */
 document.getElementById('galleryForm').addEventListener('submit', function () {
