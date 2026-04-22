@@ -254,21 +254,17 @@
             </div>
 
             <div class="form-group">
-                <label for="image" class="form-label">Main Package Image <span class="required">*</span></label>
-                <div class="upload-area" id="imageUploadArea">
-                    <input type="file" id="image" name="image" accept="image/jpeg,image/png,image/jpg,image/webp" required>
-                    <div class="upload-icon"><i class="fas fa-cloud-upload-alt"></i></div>
-                    <div class="upload-text"><strong>Click to upload</strong> or drag and drop<br><small>PNG, JPG, WEBP — dikompres otomatis sebelum upload</small></div>
-                </div>
-                <div class="compress-progress" id="imageProgress">
-                    <div class="progress-label" id="imageProgressLabel">Mengompres…</div>
-                    <div class="progress-bar-wrap"><div class="progress-bar" id="imageProgressBar"></div></div>
-                </div>
-                <div class="image-preview" id="imagePreview">
-                    <button type="button" class="remove-image" onclick="removeMainImage()"><i class="fas fa-times"></i></button>
-                    <img id="imagePreviewImg" src="" alt="Preview">
-                </div>
-                @error('image')<div class="error-message">{{ $message }}</div>@enderror
+                <x-upload-image
+                    name="image"
+                    label="Main Package Image"
+                    :required="true"
+                    hint="PNG, JPG, WEBP — dikompres otomatis sebelum upload"
+                    :maxWidth="1920"
+                    :quality="0.82"
+                />
+                @error('image')
+                    <div class="error-message">{{ $message }}</div>
+                @enderror
             </div>
 
             <div class="form-group">
@@ -297,17 +293,17 @@
         <div class="form-card">
             <h3 class="section-title">Package Gallery Photos</h3>
             <div class="form-group">
-                <label for="photos" class="form-label">Additional Photos</label>
-                <div class="upload-area" id="photosUploadArea">
-                    <input type="file" id="photos" name="photos[]" accept="image/jpeg,image/png,image/jpg,image/webp" multiple>
-                    <div class="upload-icon"><i class="fas fa-images"></i></div>
-                    <div class="upload-text"><strong>Click to upload</strong> or drag and drop<br><small>PNG, JPG, WEBP — Multiple files — dikompres otomatis</small></div>
-                </div>
-                <div class="compress-progress" id="photosProgress">
-                    <div class="progress-label" id="photosProgressLabel">Mengompres…</div>
-                    <div class="progress-bar-wrap"><div class="progress-bar" id="photosProgressBar"></div></div>
-                </div>
-                @error('photos.*')<div class="error-message">{{ $message }}</div>@enderror
+                <x-upload-image
+                    name="photos"
+                    label="Additional Photos"
+                    :multiple="true"
+                    hint="Upload multiple photos — dikompres otomatis"
+                    :maxWidth="1920"
+                    :quality="0.82"
+                />
+                @error('photos.*')
+                    <div class="error-message">{{ $message }}</div>
+                @enderror
             </div>
             <div id="photosGrid" class="photos-grid" style="display:none;"></div>
         </div>
@@ -351,75 +347,7 @@ if (categoryInput && categorySuggestions) {
     });
 }
 
-/* ── MAIN IMAGE ── */
-const imageInput = document.getElementById('image');
 
-imageInput.addEventListener('change', async function () {
-    const raw = this.files[0];
-    if (!raw) return;
-    showProgress('image', 40, 'Mengompres gambar…', false);
-    const result = await ImageCompressor.compress(raw, { maxWidth: 1920, maxHeight: 1920, quality: 0.82 });
-    ImageCompressor.replaceFiles(imageInput, [result]);
-    showProgress('image', 100, '✓ Gambar siap diupload', true);
-
-    const reader = new FileReader();
-    reader.onload = e => {
-        document.getElementById('imagePreviewImg').src = e.target.result;
-        document.getElementById('imagePreview').style.display = 'block';
-        document.getElementById('imageUploadArea').style.display = 'none';
-    };
-    reader.readAsDataURL(result);
-});
-
-function removeMainImage() {
-    imageInput.value = '';
-    document.getElementById('imagePreview').style.display = 'none';
-    document.getElementById('imagePreviewImg').src = '';
-    document.getElementById('imageUploadArea').style.display = 'block';
-}
-
-/* ── GALLERY PHOTOS ── */
-let photoFiles    = [];
-const photosInput = document.getElementById('photos');
-
-photosInput.addEventListener('change', async function () {
-    const rawFiles = Array.from(this.files);
-    if (!rawFiles.length) return;
-    showProgress('photos', 0, `Mengompres 0 / ${rawFiles.length}…`, false);
-
-    const compressed = [];
-    for (let i = 0; i < rawFiles.length; i++) {
-        const result = await ImageCompressor.compress(rawFiles[i], { maxWidth: 1920, maxHeight: 1920, quality: 0.82 });
-        compressed.push(result);
-        showProgress('photos', Math.round(((i + 1) / rawFiles.length) * 100), `Mengompres ${i + 1} / ${rawFiles.length}…`, false);
-    }
-
-    photoFiles = [...photoFiles, ...compressed];
-    ImageCompressor.replaceFiles(photosInput, photoFiles);
-    showProgress('photos', 100, `✓ ${photoFiles.length} foto siap diupload`, true);
-    renderPhotos();
-});
-
-function renderPhotos() {
-    const grid = document.getElementById('photosGrid');
-    grid.innerHTML = '';
-    if (!photoFiles.length) { grid.style.display = 'none'; return; }
-    grid.style.display = 'grid';
-    photoFiles.forEach((file, index) => {
-        const reader = new FileReader();
-        reader.onload = e => {
-            const div = document.createElement('div');
-            div.className = 'photo-preview-item';
-            div.innerHTML = `
-                <img src="${e.target.result}" alt="Photo ${index + 1}">
-                <button type="button" class="remove-photo" onclick="removePhoto(${index})">
-                    <i class="fas fa-times"></i>
-                </button>`;
-            grid.appendChild(div);
-        };
-        reader.readAsDataURL(file);
-    });
-}
 
 function removePhoto(index) {
     photoFiles.splice(index, 1);
@@ -427,38 +355,6 @@ function removePhoto(index) {
     renderPhotos();
 }
 
-/* ── PROGRESS HELPER ── */
-function showProgress(prefix, pct, text, done) {
-    const prog  = document.getElementById(prefix + 'Progress');
-    const bar   = document.getElementById(prefix + 'ProgressBar');
-    const label = document.getElementById(prefix + 'ProgressLabel');
-    if (!prog) return;
-    prog.classList.add('show');
-    bar.style.width = pct + '%';
-    label.textContent = text;
-    if (done) {
-        bar.style.background = '#27ae60';
-        label.style.color    = '#155724';
-        setTimeout(() => { prog.classList.remove('show'); bar.style.background = ''; label.style.color = ''; }, 2500);
-    }
-}
-
-/* ── DRAG & DROP ── */
-['imageUploadArea', 'photosUploadArea'].forEach(id => {
-    const area = document.getElementById(id);
-    if (!area) return;
-    area.addEventListener('dragover',  e => { e.preventDefault(); area.classList.add('drag-over'); });
-    area.addEventListener('dragleave', ()  => area.classList.remove('drag-over'));
-    area.addEventListener('drop', e => {
-        e.preventDefault(); area.classList.remove('drag-over');
-        const inputId = id === 'imageUploadArea' ? 'image' : 'photos';
-        const input   = document.getElementById(inputId);
-        const dt = new DataTransfer();
-        Array.from(e.dataTransfer.files).forEach(f => dt.items.add(f));
-        input.files = dt.files;
-        input.dispatchEvent(new Event('change'));
-    });
-});
 
 /* ── SUBPACKAGES ── */
 let subIndex = 0;

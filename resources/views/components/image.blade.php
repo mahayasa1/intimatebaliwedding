@@ -23,20 +23,50 @@
     $eager  = $eager  ?? false;
 
     if ($src === '') {
+
         $url     = asset('assets/placeholder.jpg');
         $urlFull = $url;
-    } elseif (str_starts_with($src, 'http://') || str_starts_with($src, 'https://')) {
-        $url     = $src;
-        $urlFull = $src;
-    } else {
-        $thumbPath = $thumb ? ImageHelper::thumb($src) : $src;
-        $url       = asset('storage/' . $thumbPath);
-        $urlFull   = asset('storage/' . $src);
+
     }
 
-    $loading  = $eager ? 'eager'  : 'lazy';
-    $decoding = $eager ? 'sync'   : 'async';
-    $fetchpri = $eager ? 'high'   : 'low';
+    // URL external
+    elseif (str_starts_with($src, 'http://') || str_starts_with($src, 'https://')) {
+
+        $url     = $src;
+        $urlFull = $src;
+
+    }
+
+    // file di public/assets
+    elseif (str_starts_with($src, 'assets/')) {
+
+        $url     = asset($src);
+        $urlFull = asset($src);
+
+    }
+
+    elseif (file_exists(public_path($src))) {
+
+        $url     = asset($src);
+        $urlFull = $url;
+        
+    }
+
+    // file di storage
+    else {
+
+        $thumbPath = $thumb ? ImageHelper::thumb($src) : $src;
+
+        $url     = asset('storage/' . $thumbPath);
+        $urlFull = asset('storage/' . $src);
+
+    }
+
+    
+
+    $loading  = $eager ? 'eager' : 'lazy';
+    $decoding = $eager ? 'sync' : 'async';
+    $fetchpri = $eager ? 'high' : 'low';
 @endphp
 
 <img

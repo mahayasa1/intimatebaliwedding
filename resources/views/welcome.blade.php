@@ -589,17 +589,17 @@
             : $slide->image;
         $thumbPath = ImageHelper::thumb($rawPath);
     @endphp
+
+    {{-- {{ dd($rawPath) }} --}}
     <div class="hero-slide {{ $index === 0 ? 'active' : '' }}">
-        <img
-            src="{{ asset('storage/' . $thumbPath) }}"
+        <x-image
+            :src="$rawPath"
             alt="Wedding Venue Bali"
+            :thumb="true"
+            :eager="$index === 0"
             width="1920"
             height="1080"
-            loading="{{ $index === 0 ? 'eager' : 'lazy' }}"
-            decoding="async"
-            fetchpriority="{{ $index === 0 ? 'high' : 'low' }}"
-            onerror="this.onerror=null; this.src='{{ asset($slide->image) }}';"
-        >
+        />
     </div>
     @endforeach
 
@@ -634,11 +634,11 @@
             @foreach($packages->take(4) as $package)
             @php $pkgThumb = $package->image ? ImageHelper::thumb($package->image) : null; @endphp
             <a href="{{ route('packages.public') }}" class="package-card">
-                @if($pkgThumb)
-                    <img src="{{ asset('storage/' . $pkgThumb) }}" alt="{{ $package->name }}" loading="lazy" decoding="async">
-                @else
-                    <img src="https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=800&q=80" alt="{{ $package->name }}" loading="lazy" decoding="async">
-                @endif
+                <x-image
+                    :src="$package->image ?? 'https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=800&q=80'"
+                    :alt="$package->name"
+                    class=""
+                />
                 <div class="package-overlay">
                     <div class="package-content">
                         <div class="package-type">Wedding Package</div>
@@ -667,12 +667,10 @@
             @foreach($galleries as $gallery)
             @php $galThumb = ImageHelper::thumb($gallery->image); @endphp
             <div class="gallery-preview-item">
-                <img
-                    src="{{ asset('storage/' . $galThumb) }}"
-                    alt="{{ $gallery->title ?? 'Gallery' }}"
-                    loading="lazy"
-                    decoding="async"
-                >
+                <x-image
+                    :src="$gallery->image"
+                    :alt="$gallery->title ?? 'Gallery'"
+                />
             </div>
             @endforeach
         </div>
@@ -772,11 +770,11 @@
                 <div class="testimonial-card">
                     <div class="testimonial-header-content">
                         @if(isset($review['author_photo']) && $review['author_photo'])
-                        <img src="{{ $review['author_photo'] }}"
-                             alt="{{ $review['author_name'] }}"
-                             class="testimonial-avatar"
-                             loading="lazy"
-                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <x-image
+                            :src="$review['author_photo']"
+                            :alt="$review['author_name']"
+                            class="testimonial-avatar"
+                        />
                         @endif
                         <div class="testimonial-avatar" style="background:#D4AF37; display:{{ isset($review['author_photo']) && $review['author_photo'] ? 'none' : 'flex' }}; align-items:center; justify-content:center; color:white; font-weight:bold; font-size:1.3rem;">
                             {{ strtoupper(substr($review['author_name'], 0, 1)) }}

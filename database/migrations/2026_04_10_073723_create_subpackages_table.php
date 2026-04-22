@@ -13,7 +13,7 @@ return new class extends Migration
             $table->foreignUuid('package_id')->constrained('packages')->onDelete('cascade');
             $table->string('name');
             $table->text('image')->nullable();
-            $table->string('photo')->nullable();
+            $table->json('photo')->nullable();
             $table->text('description')->nullable();
             $table->timestamps();
         });

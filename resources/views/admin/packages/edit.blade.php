@@ -260,24 +260,21 @@
                 @if($package->image)
                 <div class="current-image">
                     <span class="current-image-label">Current Image:</span>
-                    <img src="{{ asset('storage/' . $package->image) }}" alt="{{ $package->name }}">
+                    <x-image
+                        :src="$package->image"
+                        :alt="$package->name"
+                        width="300"
+                        height="200"
+                        style="object-fit:cover;"
+                    />
                 </div>
                 @endif
-                <div class="upload-area" id="imageUploadArea">
-                    <input type="file" id="image" name="image" accept="image/jpeg,image/png,image/jpg,image/webp">
-                    <div class="upload-icon"><i class="fas fa-cloud-upload-alt"></i></div>
-                    <div class="upload-text">
-                        <strong>Click to upload</strong> or drag and drop<br>
-                        <small>PNG, JPG, WEBP — dikompres otomatis — kosongkan untuk pertahankan gambar sekarang</small>
-                    </div>
-                </div>
-                <div class="compress-progress" id="imageProgress">
-                    <div class="progress-label" id="imageProgressLabel">Mengompres…</div>
-                    <div class="progress-bar-wrap"><div class="progress-bar" id="imageProgressBar"></div></div>
-                </div>
-                <div class="image-new-preview" id="imageNewPreview">
-                    <img id="imageNewPreviewImg" src="" alt="Preview">
-                </div>
+                <x-upload-image
+                    name="image"
+                    label="Upload New Image"
+                    :required="false"
+                    hint="Kosongkan jika tidak ingin mengganti gambar"
+                />
             </div>
 
             <div class="form-group">
@@ -303,11 +300,17 @@
         <div class="form-card">
             <h3 class="section-title">Package Gallery Photos</h3>
 
-            @if($package->photo && count($package->photo) > 0)
+            @php
+                $photos = is_array($package->photo) 
+                    ? $package->photo 
+                    : json_decode($package->photo, true);
+            @endphp
+
+            @if(!empty($photos))
             <div class="form-group">
                 <label class="form-label">Existing Photos</label>
                 <div class="existing-photos-grid" id="existingPhotosGrid">
-                    @foreach($package->photo as $index => $photoPath)
+                    @foreach($photos as $index => $photoPath)
                     <div class="existing-photo-item" data-photo="{{ $photoPath }}">
                         <img src="{{ asset('storage/' . $photoPath) }}" alt="Photo {{ $index + 1 }}">
                         <button type="button" class="remove-existing-photo" onclick="removeExistingPhoto('{{ $photoPath }}', this)">
@@ -322,20 +325,13 @@
 
             <div class="form-group">
                 <label for="photos" class="form-label">Add New Photos</label>
-                <div class="upload-area" id="photosUploadArea">
-                    <input type="file" id="photos" name="photos[]" accept="image/jpeg,image/png,image/jpg,image/webp" multiple>
-                    <div class="upload-icon"><i class="fas fa-images"></i></div>
-                    <div class="upload-text">
-                        <strong>Click to upload</strong> or drag and drop<br>
-                        <small>PNG, JPG, WEBP — Multiple files — dikompres otomatis</small>
-                    </div>
-                </div>
-                <div class="compress-progress" id="photosProgress">
-                    <div class="progress-label" id="photosProgressLabel">Mengompres…</div>
-                    <div class="progress-bar-wrap"><div class="progress-bar" id="photosProgressBar"></div></div>
-                </div>
+                <x-upload-image
+                    name="photos"
+                    label="Upload Gallery Photos"
+                    :multiple="true"
+                    hint="Bisa upload banyak gambar sekaligus"
+                />
             </div>
-            <div id="photosGrid" class="photos-grid" style="display:none;"></div>
         </div>
 
         {{-- Actions --}}
@@ -393,35 +389,6 @@ function showProgress(prefix, pct, text, done) {
     }
 }
 
-/* ── MAIN IMAGE ── */
-const imageInput = document.getElementById('image');
-
-imageInput.addEventListener('change', async function () {
-    const raw = this.files[0];
-    if (!raw) return;
-    showProgress('image', 40, 'Mengompres gambar…', false);
-    const result = await ImageCompressor.compress(raw, { maxWidth: 1920, maxHeight: 1920, quality: 0.82 });
-    ImageCompressor.replaceFiles(imageInput, [result]);
-    showProgress('image', 100, '✓ Gambar siap diupload (' + ImageCompressor.formatBytes(result.size) + ')', true);
-
-    const reader = new FileReader();
-    reader.onload = e => {
-        document.getElementById('imageNewPreviewImg').src = e.target.result;
-        document.getElementById('imageNewPreview').classList.add('show');
-        document.getElementById('imageUploadArea').style.display = 'none';
-    };
-    reader.readAsDataURL(result);
-});
-
-document.getElementById('imageUploadArea').addEventListener('dragover',  e => { e.preventDefault(); });
-document.getElementById('imageUploadArea').addEventListener('drop', e => {
-    e.preventDefault();
-    const dt = new DataTransfer();
-    Array.from(e.dataTransfer.files).forEach(f => dt.items.add(f));
-    imageInput.files = dt.files;
-    imageInput.dispatchEvent(new Event('change'));
-});
-
 /* ── EXISTING PHOTOS ── */
 let removedPhotos = [];
 
@@ -435,27 +402,6 @@ function removeExistingPhoto(photoPath, button) {
     }
 }
 
-/* ── NEW PHOTOS ── */
-let photoFiles    = [];
-const photosInput = document.getElementById('photos');
-
-photosInput.addEventListener('change', async function () {
-    const rawFiles = Array.from(this.files);
-    if (!rawFiles.length) return;
-    showProgress('photos', 0, `Mengompres 0 / ${rawFiles.length}…`, false);
-
-    const compressed = [];
-    for (let i = 0; i < rawFiles.length; i++) {
-        const result = await ImageCompressor.compress(rawFiles[i], { maxWidth: 1920, maxHeight: 1920, quality: 0.82 });
-        compressed.push(result);
-        showProgress('photos', Math.round(((i + 1) / rawFiles.length) * 100), `Mengompres ${i + 1} / ${rawFiles.length}…`, false);
-    }
-
-    photoFiles = [...photoFiles, ...compressed];
-    ImageCompressor.replaceFiles(photosInput, photoFiles);
-    showProgress('photos', 100, `✓ ${photoFiles.length} foto siap diupload`, true);
-    renderPhotos();
-});
 
 function renderPhotos() {
     const grid = document.getElementById('photosGrid');
