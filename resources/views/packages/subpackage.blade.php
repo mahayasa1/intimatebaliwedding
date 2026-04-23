@@ -56,6 +56,7 @@
         font-size: clamp(2rem, 5vw, 3.5rem);
         font-weight: 700; color: white;
         line-height: 1.15; text-transform: uppercase; letter-spacing: 2px;
+        text-align: center;
     }
 
     /* ===== MAIN CONTENT ===== */
@@ -277,14 +278,14 @@
     "></div>
     <div class="sub-hero-overlay"></div>
     <div class="sub-hero-content">
-        <div class="sub-breadcrumb">
+        {{-- <div class="sub-breadcrumb">
             <a href="{{ route('packages.public') }}">Packages</a>
             <span class="sep">›</span>
             <a href="{{ route('packages.show', $package->id) }}">{{ $package->name }}</a>
             <span class="sep">›</span>
             <span class="current">{{ $subpackage->name }}</span>
-        </div>
-        <div class="sub-hero-label">{{ $package->name }}</div>
+        </div> --}}
+        {{-- <div class="sub-hero-label">{{ $package->name }}</div> --}}
         <h1 class="sub-hero-title">{{ $subpackage->name }}</h1>
     </div>
 </section>

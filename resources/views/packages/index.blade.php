@@ -378,7 +378,7 @@
             
             <div class="package-overlay">
                 <div class="package-content">
-                    <div class="package-type">{{ $package->category ?? 'Wedding Package' }}</div>
+                    {{-- <div class="package-type">{{ $package->category ?? 'Wedding Package' }}</div> --}}
                     <h3 class="package-title">{{ $package->name }}</h3>
                     @if($package->description)
                     <p class="package-description">{{ Str::limit($package->description, 150) }}</p>

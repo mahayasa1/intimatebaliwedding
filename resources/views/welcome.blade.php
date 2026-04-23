@@ -641,7 +641,7 @@
                 />
                 <div class="package-overlay">
                     <div class="package-content">
-                        <div class="package-type">Wedding Package</div>
+                        {{-- <div class="package-type">Wedding Package</div> --}}
                         <h3 class="package-title">{{ $package->name }}</h3>
                         <p>{{ Str::limit($package->description, 80) }}</p>
                     </div>

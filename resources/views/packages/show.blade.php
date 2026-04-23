@@ -45,11 +45,6 @@
     }
 
     /* ===================== SUBPACKAGES SELECTOR ===================== */
-.subpackages-section {
-    margin: 3.5rem 0 0;
-    padding: 3.5rem 0;
-    border-top: 1px solid #e8e8e8;
-}
 
 .subpackages-section .section-title {
     font-family: 'Playfair Display', serif;
@@ -300,6 +295,31 @@
 
     .other-package-description { color: #666; font-size: 0.9rem; line-height: 1.5; }
 
+    .btn-enquire {
+        display: inline-flex; align-items: center; gap: 0.6rem;
+        background: linear-gradient(135deg, #D4AF37 0%, #AA8B2A 100%);
+        color: white; padding: 1rem 2.75rem;
+        border-radius: 30px; text-decoration: none;
+        font-weight: 700; font-size: 0.95rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 18px rgba(212,175,55,0.35);
+    }
+
+    .btn-enquire:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 28px rgba(212,175,55,0.45);
+        color: white;
+    }
+
+    .btn-back {
+        display: inline-flex; align-items: center; gap: 0.5rem;
+        color: #AA8B2A; font-weight: 600; font-size: 0.9rem;
+        text-decoration: none; margin-bottom: 1.5rem;
+        transition: gap 0.2s ease;
+    }
+
+    .btn-back:hover { gap: 0.8rem; color: #D4AF37; }
+
     /* ===================== RESPONSIVE ===================== */
     @media (max-width: 768px) {
         .package-detail-hero { height: 30vh; }
@@ -341,7 +361,7 @@
 
 <!-- Package Detail Content -->
 <section class="package-detail-container">
-    @if($package->image)
+    {{-- @if($package->image)
     <img src="{{ asset('storage/' . ImageHelper::thumb($package->image)) }}"
          alt="{{ $package->name }}" class="package-main-image">
     @endif
@@ -354,11 +374,14 @@
     <div class="package-description">
         {!! nl2br(e($package->description)) !!}
     </div>
-    @endif
+    @endif --}}
 
     {{-- ============ SUBPACKAGES SECTION ============ --}}
     @if($package->subpackages && $package->subpackages->count() > 0)
     <div class="subpackages-section">
+        <a href="{{ route('packages.public') }}" class="btn-back">
+        <i class="fas fa-arrow-left"></i> Back to Packages
+        </a>
         <h3 class="section-title">What's Available</h3>
         <p class="section-subtitle">Choose the option that best fits your dream wedding</p>
     
@@ -374,7 +397,7 @@
                 </div>
                 <div class="subpackage-overlay">
                     <div class="subpackage-content">
-                        <div class="subpackage-type">{{ $package->name }}</div>
+                        {{-- <div class="subpackage-type">{{ $package->name }}</div> --}}
                         <div class="subpackage-title">{{ $sub->name }}</div>
                         @if($sub->description)
                         <div class="subpackage-desc-hover">{{ Str::limit($sub->description, 120) }}</div>
