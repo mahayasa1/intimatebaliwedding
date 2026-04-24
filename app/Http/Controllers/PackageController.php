@@ -160,15 +160,24 @@ class PackageController extends Controller
 
         DB::transaction(function () use ($request, $validated, $package) {
 
-            // Replace main image if new file provided
-            if ($request->hasFile('image')) {
-                if ($package->image) {
-                    Storage::disk('public')->delete($package->image);
-                    ImageHelper::deleteThumb($package->image);
-                }
-                $result = ImageHelper::storeAndCompress($request->file('image'), 'packages');
-                $validated['image'] = $result['path'];
+        // Replace main image if new file provided
+        if ($request->hasFile('image')) {
+            if ($package->image) {
+                Storage::disk('public')->delete($package->image);
+                ImageHelper::deleteThumb($package->image);
             }
+    
+            $result = ImageHelper::storeAndCompress(
+                $request->file('image'),
+                'packages'
+            );
+    
+            $validated['image'] = $result['path'];
+    
+        } else {
+            // IMPORTANT FIX:
+            unset($validated['image']);
+        }
 
             // Handle removed existing photos
             $existingPhotos = $package->photo ?? [];
