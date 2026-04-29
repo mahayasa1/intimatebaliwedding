@@ -350,88 +350,161 @@
 </div>
 @endsection
 
+{{-- GANTI BAGIAN SCRIPT ANDA DENGAN INI --}}
 @push('scripts')
 <script>
-/* ── TYPE TOGGLE ── */
-const typeRadios    = document.querySelectorAll('input[name="type"]');
-const videoSection  = document.getElementById('videoSection');
-const photoSection  = document.getElementById('photoSection');
-const photosSection = document.getElementById('photosSection');
-const fotoInput     = document.getElementById('foto');
-const videoUrlInput = document.getElementById('video_url');
+document.addEventListener('DOMContentLoaded', function () {
 
-typeRadios.forEach(radio => {
-    radio.addEventListener('change', function () {
-        if (this.value === 'video') {
-            videoSection.style.display  = 'block';
-            photoSection.style.display  = 'none';
+    const form          = document.getElementById('galleryForm');
+    const submitBtn     = document.getElementById('submitBtn');
+
+    const typeRadios    = document.querySelectorAll('input[name="type"]');
+    const videoSection  = document.getElementById('videoSection');
+    const photoSection  = document.getElementById('photoSection');
+    const photosSection = document.getElementById('photosSection');
+    const photosInput = document.querySelector('input[name="photos[]"], input[name="photos"]');
+
+    const fotoInput = document.querySelector('input[name="foto"]');
+    const videoUrlInput = document.getElementById('video_url');
+
+    const previewBox = document.getElementById('videoPreview');
+    const iframe     = document.getElementById('videoIframe');
+    const infoBox    = document.getElementById('youtubeInfo');
+
+    /*
+    ==========================================
+    TYPE TOGGLE
+    ==========================================
+    */
+    function setType(type)
+    {
+        if (type === 'video') {
+        
+            videoSection.style.display = 'block';
+            photoSection.style.display = 'none';
             photosSection.style.display = 'none';
-            fotoInput.removeAttribute('required');
-            videoUrlInput.setAttribute('required', 'required');
+        
+            if (fotoInput) {
+                fotoInput.required = false;
+                fotoInput.removeAttribute('required');
+            }
+        
+            if (photosInput) {
+                photosInput.required = false;
+                photosInput.removeAttribute('required');
+            }
+        
+            if (videoUrlInput) {
+                videoUrlInput.required = true;
+            }
+        
         } else {
-            videoSection.style.display  = 'none';
-            photoSection.style.display  = 'block';
+        
+            videoSection.style.display = 'none';
+            photoSection.style.display = 'block';
             photosSection.style.display = 'block';
-            fotoInput.setAttribute('required', 'required');
-            videoUrlInput.removeAttribute('required');
+        
+            if (fotoInput) {
+                fotoInput.required = true;
+            }
+        
+            if (videoUrlInput) {
+                videoUrlInput.required = false;
+            }
         }
-    });
-});
-
-/* ── YOUTUBE PREVIEW ── */
-function extractYoutubeId(url) {
-    const m = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
-    return m ? m[1] : null;
-}
-
-function previewYoutube(url) {
-    const id = extractYoutubeId(url);
-    const preview  = document.getElementById('videoPreview');
-    const iframe   = document.getElementById('videoIframe');
-    const info     = document.getElementById('youtubeInfo');
-    const infoText = document.getElementById('youtubeInfoText');
-    if (id) {
-        iframe.src = `https://www.youtube.com/embed/${id}?rel=0&modestbranding=1`;
-        preview.classList.add('show');
-        infoText.textContent = `Video ID: ${id}`;
-        info.classList.add('show');
-    } else {
-        iframe.src = '';
-        preview.classList.remove('show');
-        info.classList.remove('show');
     }
-}
+
+    typeRadios.forEach(function(radio){
+        radio.addEventListener('change', function(){
+            setType(this.value);
+        });
+    });
+
+    const checked = document.querySelector('input[name="type"]:checked');
+    setType(checked ? checked.value : 'photo');
 
 
-// Show progress manually via event
-fotoInput.addEventListener('change', function () {
-    if (!this.files.length) return;
-    const prog  = document.getElementById('mainProgress');
-    const bar   = document.getElementById('mainProgressBar');
-    const label = document.getElementById('mainProgressLabel');
-    prog.classList.add('show');
-    bar.style.width = '60%';
-    label.textContent = 'Mengompres foto…';
-});
+    /*
+    ==========================================
+    YOUTUBE PREVIEW
+    ==========================================
+    */
+    function getYoutubeId(url)
+    {
+        if (!url) return null;
 
-fotoInput.addEventListener('compressed', function () {
-    const prog  = document.getElementById('mainProgress');
-    const bar   = document.getElementById('mainProgressBar');
-    const label = document.getElementById('mainProgressLabel');
-    bar.style.width = '100%';
-    bar.style.background = '#27ae60';
-    label.style.color = '#155724';
-    label.textContent = '✓ Foto siap diupload';
-    setTimeout(() => { prog.classList.remove('show'); bar.style.background = ''; label.style.color = ''; }, 2500);
-});
+        const reg =
+        /(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
+
+        const match = url.match(reg);
+
+        return match ? match[1] : null;
+    }
+
+    function previewYoutube(url)
+    {
+        const id = getYoutubeId(url);
+
+        if (id) {
+            iframe.src =
+                'https://www.youtube.com/embed/' +
+                id +
+                '?rel=0';
+
+            previewBox.classList.add('show');
+            infoBox.classList.add('show');
+
+        } else {
+            iframe.src = '';
+            previewBox.classList.remove('show');
+            infoBox.classList.remove('show');
+        }
+    }
+
+    if (videoUrlInput) {
+        videoUrlInput.addEventListener('input', function(){
+            previewYoutube(this.value);
+        });
+    }
 
 
+    /*
+    ==========================================
+    FORM SUBMIT (FIX TOTAL)
+    ==========================================
+    */
+    form.addEventListener('submit', function(e){
 
-/* ── SUBMIT ── */
-document.getElementById('galleryForm').addEventListener('submit', function () {
-    const btn = document.getElementById('submitBtn');
-    btn.disabled = true;
-    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan…';
+        const selected =
+            document.querySelector('input[name="type"]:checked').value;
+
+        if (selected === 'video') {
+
+            const url = videoUrlInput.value.trim();
+
+            if (url === '') {
+                e.preventDefault();
+                alert('Masukkan URL YouTube.');
+                videoUrlInput.focus();
+                return;
+            }
+
+            if (!getYoutubeId(url)) {
+                e.preventDefault();
+                alert('URL YouTube tidak valid.');
+                videoUrlInput.focus();
+                return;
+            }
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.innerHTML =
+            '<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...';
+
+        // JANGAN return false
+        // BIARKAN FORM SUBMIT NORMAL
+    });
+
 });
 </script>
 @endpush
