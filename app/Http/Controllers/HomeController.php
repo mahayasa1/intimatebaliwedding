@@ -7,17 +7,14 @@ use App\Models\Blog;
 use App\Models\Gallery;
 use App\Models\Package;
 use App\Services\GoogleMapsService;
-use App\Services\InstagramFeedService;
 
 class HomeController extends Controller
 {
     protected $googleMapsService;
-    protected $instagramService;
 
-    public function __construct(GoogleMapsService $googleMapsService, InstagramFeedService $instagramService)
+    public function __construct(GoogleMapsService $googleMapsService)
     {
         $this->googleMapsService = $googleMapsService;
-        $this->instagramService = $instagramService;
     }
 
     /**
@@ -65,10 +62,6 @@ class HomeController extends Controller
             ]);
         }
 
-        // Fetch Instagram posts
-        $instagramPosts = $this->instagramService->getFeed(9);
-        $instagramProfile = $this->instagramService->getProfile();
-
         return view('welcome', compact(
             'packages',
             'galleries',
@@ -76,8 +69,6 @@ class HomeController extends Controller
             'googleReviews',
             'businessStats',
             'heroSlides',
-            'instagramPosts',
-            'instagramProfile',
         ));
     }
 }

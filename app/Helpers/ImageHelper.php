@@ -255,11 +255,17 @@ class ImageHelper
      * @param  string $storagePath
      * @return string
      */
-    public static function thumb(string $storagePath): string
+    public static function thumb(?string $storagePath): string
     {
+        if (empty($storagePath)) {
+            return 'defaults/no-image.webp';
+        }
+    
         $thumbPath = self::buildThumbPath($storagePath);
-
-        return Storage::disk('public')->exists($thumbPath) ? $thumbPath : $storagePath;
+    
+        return Storage::disk('public')->exists($thumbPath)
+            ? $thumbPath
+            : $storagePath;
     }
 
     /**
