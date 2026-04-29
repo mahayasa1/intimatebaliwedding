@@ -362,10 +362,24 @@
 
     {{-- ===== TAB VIDEO ===== --}}
     <div class="tab-panel" id="tab-videos">
+        @php
+            $videoCategories = $videoGalleries->pluck('category')->filter()->unique()->values();
+        @endphp
+
+        @if($videoCategories->count() > 0)
+        <div class="gallery-filters" id="videoFilters">
+            <button class="filter-btn active" data-category="all">All</button>
+            @foreach($videoCategories as $category)
+            <button class="filter-btn" data-category="{{ $category }}">{{ $category }}</button>
+            @endforeach
+        </div>
+        @endif
+
         @if($videoGalleries->count() > 0)
-        <div class="video-grid">
+        <div class="video-grid" id="videoGrid">
             @foreach($videoGalleries as $video)
             <div class="video-grid-item"
+                 data-category="{{ $video->category ?? 'Other' }}"
                  onclick="openVideoModal('{{ $video->youtube_embed_url }}', '{{ addslashes($video->title) }}')">
 
                 @if($video->youtube_thumbnail)
@@ -379,7 +393,6 @@
                 </div>
                 @endif
 
-                {{-- Play button mengambang di tengah --}}
                 <div class="video-play-icon">
                     <i class="fas fa-play" style="margin-left:4px;"></i>
                 </div>
@@ -513,7 +526,6 @@ function switchTab(tab, btn) {
     history.replaceState(null, '', '#' + tab);
 }
 
-// Restore tab dari hash
 const hash = location.hash.replace('#', '');
 if (hash === 'videos') {
     const videoBtn = document.querySelector('[data-tab="videos"]');
@@ -521,12 +533,24 @@ if (hash === 'videos') {
 }
 
 // ── FILTER FOTO ──
-document.querySelectorAll('.filter-btn').forEach(btn => {
+document.querySelectorAll('#tab-photos .filter-btn').forEach(btn => {
     btn.addEventListener('click', function() {
-        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('#tab-photos .filter-btn').forEach(b => b.classList.remove('active'));
         this.classList.add('active');
         const cat = this.dataset.category;
-        document.querySelectorAll('.gallery-item').forEach(item => {
+        document.querySelectorAll('#galleryGrid .gallery-item').forEach(item => {
+            item.style.display = (cat === 'all' || item.dataset.category === cat) ? '' : 'none';
+        });
+    });
+});
+
+// ── FILTER VIDEO ──
+document.querySelectorAll('#tab-videos .filter-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.querySelectorAll('#tab-videos .filter-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        const cat = this.dataset.category;
+        document.querySelectorAll('#videoGrid .video-grid-item').forEach(item => {
             item.style.display = (cat === 'all' || item.dataset.category === cat) ? '' : 'none';
         });
     });
