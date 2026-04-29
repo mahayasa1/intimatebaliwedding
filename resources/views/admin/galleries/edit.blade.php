@@ -352,6 +352,7 @@
                 <div class="error-message">{{ $message }}</div>
                 @enderror
         </div>
+    </div>
 
         {{-- Actions --}}
         <div class="action-section">
