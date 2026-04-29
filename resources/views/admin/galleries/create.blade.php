@@ -47,7 +47,6 @@
         box-shadow: 0 0 0 4px rgba(139, 115, 85, 0.1); transform: translateY(-2px);
     }
 
-    .form-control.error { border-color: #e74c3c; background: #fff5f5; }
     textarea.form-control { min-height: 120px; resize: vertical; line-height: 1.6; }
 
     .error-message {
@@ -103,71 +102,13 @@
     }
     .youtube-info.show { display: flex; }
 
-    /* Upload area */
-    .upload-area {
-        border: 2px dashed #e0e0e0; border-radius: 12px;
-        padding: 2rem; text-align: center; cursor: pointer;
-        transition: all 0.3s ease; background: #fafafa;
-        position: relative; overflow: hidden;
+    /* Server badge */
+    .server-badge {
+        display: inline-flex; align-items: center; gap: 0.4rem;
+        background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7;
+        border-radius: 20px; padding: 0.3rem 0.75rem; font-size: 0.75rem;
+        font-family: 'Work Sans', sans-serif; font-weight: 600; margin-top: 0.5rem;
     }
-    .upload-area:hover, .upload-area.drag-over { border-color: #8B7355; background: #f5f0eb; }
-    .upload-area input[type="file"] {
-        position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
-    }
-    .upload-icon { font-size: 2.75rem; margin-bottom: 0.75rem; opacity: 0.45; }
-    .upload-text { color: #555; font-size: 0.95rem; font-family: 'Work Sans', sans-serif; margin-bottom: 0.25rem; }
-    .upload-hint { color: #aaa; font-size: 0.82rem; font-family: 'Work Sans', sans-serif; }
-
-    /* Preview */
-    .main-preview-wrapper { display: none; margin-top: 1rem; position: relative; max-width: 400px; margin-left: auto; margin-right: auto; }
-    .main-preview-wrapper img { width: 100%; height: auto; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.12); display: block; }
-    .main-preview-wrapper.show { display: block; }
-
-    .remove-main {
-        position: absolute; top: 8px; right: 8px;
-        background: rgba(231,76,60,0.9); color: white; border: none;
-        border-radius: 50%; width: 32px; height: 32px; cursor: pointer;
-        display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;
-    }
-    .remove-main:hover { background: #e74c3c; transform: scale(1.1); }
-
-    .photos-grid {
-        display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-        gap: 1rem; margin-top: 1rem;
-    }
-
-    .photo-preview-item {
-        position: relative; aspect-ratio: 1; border-radius: 10px; overflow: hidden;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-
-    .photo-preview-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
-
-    .remove-photo {
-        position: absolute; top: 5px; right: 5px;
-        background: rgba(231,76,60,0.9); color: white; border: none;
-        border-radius: 50%; width: 28px; height: 28px; cursor: pointer;
-        display: flex; align-items: center; justify-content: center;
-        font-size: 0.8rem; transition: all 0.3s ease;
-    }
-    .remove-photo:hover { background: #e74c3c; transform: scale(1.1); }
-
-    .photo-size-badge {
-        position: absolute; bottom: 5px; left: 5px;
-        background: rgba(0,0,0,0.6); color: white;
-        font-size: 0.65rem; padding: 2px 6px; border-radius: 4px;
-        font-family: 'Work Sans', sans-serif;
-    }
-
-    /* Progress bar */
-    .compress-progress {
-        display: none; margin-top: 0.75rem; padding: 0.75rem 1rem;
-        background: #f0f7ff; border: 1px solid #90caf9; border-radius: 8px;
-    }
-    .compress-progress.show { display: block; }
-    .progress-bar-wrap { background: #dde; border-radius: 4px; height: 6px; overflow: hidden; margin-top: 6px; }
-    .progress-bar { height: 100%; background: linear-gradient(90deg, #8B7355, #D4AF37); border-radius: 4px; transition: width 0.2s ease; width: 0%; }
-    .progress-label { font-family: 'Work Sans', sans-serif; font-size: 0.82rem; color: #1565c0; }
 
     /* Action */
     .action-section {
@@ -194,7 +135,6 @@
         .type-toggle { grid-template-columns: 1fr; }
         .action-buttons { flex-direction: column; }
         .btn { width: 100%; justify-content: center; }
-        .photos-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); }
     }
 </style>
 @endpush
@@ -305,11 +245,15 @@
                     :required="true"
                     :maxWidth="1920"
                     :quality="0.82"
-                    hint="Cover gallery / grid utama"
+                    hint="Cover gallery / grid utama — dikompres & dikonversi ke WebP otomatis oleh server"
                 />
                 @error('foto')
                     <div class="error-message">{{ $message }}</div>
                 @enderror
+                <div class="server-badge" style="margin-top:0.75rem;">
+                    <i class="fas fa-server"></i>
+                    Gambar dikompres &amp; dikonversi ke WebP otomatis oleh server
+                </div>
             </div>
         </div>
 
@@ -327,11 +271,15 @@
                     :required="false"
                     :maxWidth="1920"
                     :quality="0.82"
-                    hint="Bisa pilih banyak foto sekaligus"
+                    hint="Bisa pilih banyak foto sekaligus — dikompres & dikonversi ke WebP otomatis oleh server"
                 />
                 @error('photos.*')
                     <div class="error-message">{{ $message }}</div>
                 @enderror
+                <div class="server-badge" style="margin-top:0.75rem;">
+                    <i class="fas fa-server"></i>
+                    Semua foto dikompres &amp; dikonversi ke WebP otomatis oleh server
+                </div>
             </div>
         </div>
 
@@ -350,7 +298,6 @@
 </div>
 @endsection
 
-{{-- GANTI BAGIAN SCRIPT ANDA DENGAN INI --}}
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function () {
@@ -362,133 +309,79 @@ document.addEventListener('DOMContentLoaded', function () {
     const videoSection  = document.getElementById('videoSection');
     const photoSection  = document.getElementById('photoSection');
     const photosSection = document.getElementById('photosSection');
-    const photosInput = document.querySelector('input[name="photos[]"], input[name="photos"]');
 
-    const fotoInput = document.querySelector('input[name="foto"]');
+    const fotoInput     = document.querySelector('input[name="foto"]');
+    const photosInput   = document.querySelector('input[name="photos[]"], input[name="photos"]');
     const videoUrlInput = document.getElementById('video_url');
 
     const previewBox = document.getElementById('videoPreview');
     const iframe     = document.getElementById('videoIframe');
     const infoBox    = document.getElementById('youtubeInfo');
 
-    /*
-    ==========================================
-    TYPE TOGGLE
-    ==========================================
-    */
-    function setType(type)
-    {
+    /* ── TYPE TOGGLE ── */
+    function setType(type) {
         if (type === 'video') {
-        
-            videoSection.style.display = 'block';
-            photoSection.style.display = 'none';
+            videoSection.style.display  = 'block';
+            photoSection.style.display  = 'none';
             photosSection.style.display = 'none';
-        
-            if (fotoInput) {
-                fotoInput.required = false;
-                fotoInput.removeAttribute('required');
-            }
-        
-            if (photosInput) {
-                photosInput.required = false;
-                photosInput.removeAttribute('required');
-            }
-        
-            if (videoUrlInput) {
-                videoUrlInput.required = true;
-            }
-        
+
+            if (fotoInput)     { fotoInput.required = false; fotoInput.removeAttribute('required'); }
+            if (photosInput)   { photosInput.required = false; photosInput.removeAttribute('required'); }
+            if (videoUrlInput) { videoUrlInput.required = true; }
         } else {
-        
-            videoSection.style.display = 'none';
-            photoSection.style.display = 'block';
+            videoSection.style.display  = 'none';
+            photoSection.style.display  = 'block';
             photosSection.style.display = 'block';
-        
-            if (fotoInput) {
-                fotoInput.required = true;
-            }
-        
-            if (videoUrlInput) {
-                videoUrlInput.required = false;
-            }
+
+            if (fotoInput)     { fotoInput.required = true; }
+            if (videoUrlInput) { videoUrlInput.required = false; }
         }
     }
 
-    typeRadios.forEach(function(radio){
-        radio.addEventListener('change', function(){
-            setType(this.value);
-        });
+    typeRadios.forEach(function(radio) {
+        radio.addEventListener('change', function() { setType(this.value); });
     });
 
     const checked = document.querySelector('input[name="type"]:checked');
     setType(checked ? checked.value : 'photo');
 
-
-    /*
-    ==========================================
-    YOUTUBE PREVIEW
-    ==========================================
-    */
-    function getYoutubeId(url)
-    {
+    /* ── YOUTUBE PREVIEW ── */
+    function getYoutubeId(url) {
         if (!url) return null;
-
-        const reg =
-        /(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
-
+        const reg = /(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
         const match = url.match(reg);
-
         return match ? match[1] : null;
     }
 
-    function previewYoutube(url)
-    {
+    window.previewYoutube = function(url) {
         const id = getYoutubeId(url);
-
         if (id) {
-            iframe.src =
-                'https://www.youtube.com/embed/' +
-                id +
-                '?rel=0';
-
+            iframe.src = 'https://www.youtube.com/embed/' + id + '?rel=0';
             previewBox.classList.add('show');
             infoBox.classList.add('show');
-
         } else {
             iframe.src = '';
             previewBox.classList.remove('show');
             infoBox.classList.remove('show');
         }
-    }
+    };
 
     if (videoUrlInput) {
-        videoUrlInput.addEventListener('input', function(){
-            previewYoutube(this.value);
-        });
+        videoUrlInput.addEventListener('input', function() { previewYoutube(this.value); });
     }
 
-
-    /*
-    ==========================================
-    FORM SUBMIT (FIX TOTAL)
-    ==========================================
-    */
-    form.addEventListener('submit', function(e){
-
-        const selected =
-            document.querySelector('input[name="type"]:checked').value;
+    /* ── FORM SUBMIT ── */
+    form.addEventListener('submit', function(e) {
+        const selected = document.querySelector('input[name="type"]:checked').value;
 
         if (selected === 'video') {
-
             const url = videoUrlInput.value.trim();
-
             if (url === '') {
                 e.preventDefault();
                 alert('Masukkan URL YouTube.');
                 videoUrlInput.focus();
                 return;
             }
-
             if (!getYoutubeId(url)) {
                 e.preventDefault();
                 alert('URL YouTube tidak valid.');
@@ -498,11 +391,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         submitBtn.disabled = true;
-        submitBtn.innerHTML =
-            '<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...';
-
-        // JANGAN return false
-        // BIARKAN FORM SUBMIT NORMAL
+        submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...';
     });
 
 });

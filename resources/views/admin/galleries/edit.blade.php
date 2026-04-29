@@ -371,63 +371,135 @@
 
 @push('scripts')
 <script>
-const typeRadios    = document.querySelectorAll('input[name="type"]');
-const videoSection  = document.getElementById('videoSection');
-const photoSection  = document.getElementById('photoSection');
-const photosSection = document.getElementById('photosSection');
-const videoUrlInput = document.getElementById('video_url');
+document.addEventListener('DOMContentLoaded', function () {
 
-typeRadios.forEach(radio => {
-    radio.addEventListener('change', function () {
-        if (this.value === 'video') {
-            videoSection.style.display = 'block';
-            photoSection.style.display = 'none';
+    const form          = document.getElementById('editForm');
+    const submitBtn     = document.getElementById('submitBtn');
+
+    const typeRadios    = document.querySelectorAll('input[name="type"]');
+    const videoSection  = document.getElementById('videoSection');
+    const photoSection  = document.getElementById('photoSection');
+    const photosSection = document.getElementById('photosSection');
+
+    const fotoInput     = document.querySelector('input[name="foto"]');
+    const photosInput   = document.querySelector('input[name="photos[]"], input[name="photos"]');
+    const videoUrlInput = document.getElementById('video_url');
+
+    const previewBox = document.getElementById('videoPreview');
+    const iframe     = document.getElementById('videoIframe');
+    const infoBox    = document.getElementById('youtubeInfo');
+
+    let removedPaths = [];
+
+    /* ==========================
+       TYPE TOGGLE
+    ========================== */
+    function setType(type) {
+        if (type === 'video') {
+            videoSection.style.display  = 'block';
+            photoSection.style.display  = 'none';
             photosSection.style.display = 'none';
-            videoUrlInput.setAttribute('required','required');
+
+            if (fotoInput) fotoInput.required = false;
+            if (photosInput) photosInput.required = false;
+            if (videoUrlInput) videoUrlInput.required = true;
+
         } else {
-            videoSection.style.display = 'none';
-            photoSection.style.display = 'block';
+            videoSection.style.display  = 'none';
+            photoSection.style.display  = 'block';
             photosSection.style.display = 'block';
-            videoUrlInput.removeAttribute('required');
+
+            if (videoUrlInput) videoUrlInput.required = false;
         }
-    });
-});
-
-function extractYoutubeId(url) {
-    const m = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
-    return m ? m[1] : null;
-}
-
-function previewYoutube(url) {
-    const id = extractYoutubeId(url);
-    const preview = document.getElementById('videoPreview');
-    const iframe  = document.getElementById('videoIframe');
-    const info    = document.getElementById('youtubeInfo');
-
-    if (id) {
-        iframe.src = `https://www.youtube.com/embed/${id}`;
-        preview.classList.add('show');
-        info.classList.add('show');
-    } else {
-        iframe.src = '';
-        preview.classList.remove('show');
-        info.classList.remove('show');
     }
-}
 
-let removedPaths = [];
+    typeRadios.forEach(radio => {
+        radio.addEventListener('change', function () {
+            setType(this.value);
+        });
+    });
 
-function removeExistingPhoto(path,id){
-    if(!confirm('Hapus foto ini?')) return;
-    removedPaths.push(path);
-    document.getElementById('removed_photos').value = JSON.stringify(removedPaths);
-    document.getElementById(id).remove();
-}
+    const checked = document.querySelector('input[name="type"]:checked');
+    setType(checked ? checked.value : 'photo');
 
-document.getElementById('editForm').addEventListener('submit', function () {
-    const btn = document.getElementById('submitBtn');
-    btn.disabled = true;
-    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...';
+    /* ==========================
+       YOUTUBE PREVIEW
+    ========================== */
+    function getYoutubeId(url) {
+        if (!url) return null;
+
+        const reg = /(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
+        const match = url.match(reg);
+
+        return match ? match[1] : null;
+    }
+
+    window.previewYoutube = function(url) {
+        const id = getYoutubeId(url);
+
+        if (id) {
+            iframe.src = 'https://www.youtube.com/embed/' + id + '?rel=0';
+            previewBox.classList.add('show');
+            infoBox.classList.add('show');
+        } else {
+            iframe.src = '';
+            previewBox.classList.remove('show');
+            infoBox.classList.remove('show');
+        }
+    };
+
+    if (videoUrlInput && videoUrlInput.value.trim() !== '') {
+        previewYoutube(videoUrlInput.value);
+    }
+
+    videoUrlInput?.addEventListener('input', function () {
+        previewYoutube(this.value);
+    });
+
+    /* ==========================
+       REMOVE EXISTING PHOTO
+    ========================== */
+    window.removeExistingPhoto = function(path,id){
+        if(!confirm('Hapus foto ini?')) return;
+
+        removedPaths.push(path);
+
+        document.getElementById('removed_photos').value =
+            JSON.stringify(removedPaths);
+
+        document.getElementById(id)?.remove();
+    }
+
+    /* ==========================
+       SUBMIT
+    ========================== */
+    form.addEventListener('submit', function(e){
+
+        const selected = document.querySelector('input[name="type"]:checked').value;
+
+        if (selected === 'video') {
+            const url = videoUrlInput.value.trim();
+
+            if (url === '') {
+                e.preventDefault();
+                alert('Masukkan URL YouTube.');
+                videoUrlInput.focus();
+                return;
+            }
+
+            if (!getYoutubeId(url)) {
+                e.preventDefault();
+                alert('URL YouTube tidak valid.');
+                videoUrlInput.focus();
+                return;
+            }
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.innerHTML =
+            '<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...';
+    });
+
 });
 </script>
 @endpush
