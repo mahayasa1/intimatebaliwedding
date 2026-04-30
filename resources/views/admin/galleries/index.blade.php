@@ -5,532 +5,406 @@
 
 @push('styles')
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Work+Sans:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Work+Sans:wght@400;500;600&display=swap');
 
-    .header-section {
-        display: flex; justify-content: space-between; align-items: center;
-        margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;
+body{
+    font-family:'Work Sans',sans-serif;
+    background:#f8f8f8;
+}
+
+/* HEADER */
+.header-section{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:1rem;
+    flex-wrap:wrap;
+    margin-bottom:2rem;
+}
+
+.header-title{
+    font-family:'Playfair Display',serif;
+    font-size:1.8rem;
+    font-weight:700;
+    margin:0;
+}
+
+.btn-add{
+    display:inline-flex;
+    align-items:center;
+    gap:.5rem;
+    padding:.9rem 1.4rem;
+    border-radius:12px;
+    text-decoration:none;
+    color:#fff;
+    font-weight:600;
+    background:linear-gradient(135deg,#8B7355,#6B5644);
+}
+
+.btn-add:hover{
+    color:#fff;
+    opacity:.95;
+}
+
+/* SEARCH */
+.filter-box{
+    background:#fff;
+    padding:16px;
+    border-radius:14px;
+    box-shadow:0 4px 18px rgba(0,0,0,.05);
+    margin-bottom:20px;
+}
+
+.search-input{
+    width:100%;
+    height:46px;
+    border-radius:10px;
+    padding:0 16px;
+    border:1px solid #ddd;
+    font-size:14px;
+}
+
+/* GRID */
+.gallery-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+    gap:1.5rem;
+}
+
+.gallery-card{
+    background:#fff;
+    border-radius:18px;
+    overflow:hidden;
+    box-shadow:0 4px 20px rgba(0,0,0,.06);
+}
+
+.gallery-thumb{
+    height:260px;
+    position:relative;
+    overflow:hidden;
+    background:#f2f2f2;
+}
+
+.gallery-thumb img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+
+.badge-type{
+    position:absolute;
+    top:12px;
+    left:12px;
+    z-index:5;
+    background:rgba(0,0,0,.65);
+    color:#fff;
+    padding:.35rem .7rem;
+    font-size:.72rem;
+    border-radius:8px;
+    font-weight:600;
+}
+
+.video-play{
+    position:absolute;
+    inset:0;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:rgba(0,0,0,.25);
+}
+
+.video-play i{
+    width:55px;
+    height:55px;
+    border-radius:50%;
+    background:#fff;
+    color:#e74c3c;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+/* CONTENT */
+.gallery-content{
+    padding:1.2rem;
+}
+
+.gallery-title{
+    font-family:'Playfair Display',serif;
+    font-size:1.1rem;
+    font-weight:700;
+    margin-bottom:.5rem;
+}
+
+.gallery-desc{
+    font-size:.9rem;
+    color:#777;
+    margin-bottom:1rem;
+    min-height:42px;
+}
+
+.meta{
+    display:flex;
+    gap:.5rem;
+    flex-wrap:wrap;
+    margin-bottom:1rem;
+}
+
+.meta span{
+    background:#f3f3f3;
+    padding:.35rem .65rem;
+    border-radius:8px;
+    font-size:.75rem;
+}
+
+/* ACTIONS */
+.actions{
+    display:flex;
+    gap:.5rem;
+}
+
+.btn-action{
+    flex:1;
+    border:none;
+    text-decoration:none;
+    padding:.7rem;
+    border-radius:10px;
+    color:#fff;
+    font-size:.85rem;
+    font-weight:600;
+    text-align:center;
+}
+
+.btn-view{background:#3498db;}
+.btn-edit{background:#8B7355;}
+.btn-delete{background:#e74c3c;}
+
+.btn-action:hover{
+    color:#fff;
+    opacity:.95;
+}
+
+/* EMPTY */
+.empty-box{
+    background:#fff;
+    padding:4rem 2rem;
+    text-align:center;
+    border-radius:18px;
+    box-shadow:0 4px 20px rgba(0,0,0,.06);
+}
+
+/* SIMPLE PAGINATION */
+.simple-pagination{
+    margin-top:20px;
+    display:flex;
+    justify-content:center;
+}
+
+.simple-pagination .btn-page{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    padding:8px 14px;
+    border-radius:8px;
+    background:#fff;
+    border:1px solid #ddd;
+    text-decoration:none;
+    color:#6B5644;
+    font-size:13px;
+    font-weight:600;
+}
+
+.simple-pagination .btn-page:hover{
+    background:#f4f4f4;
+}
+
+.simple-pagination .page-info{
+    margin:0 10px;
+    display:flex;
+    align-items:center;
+    font-size:13px;
+    color:#777;
+}
+
+/* MOBILE */
+@media(max-width:768px){
+
+    .gallery-grid{
+        grid-template-columns:1fr;
     }
 
-    .header-title {
-        font-family: 'Playfair Display', serif; font-size: 1.75rem; font-weight: 700; color: #1a1a1a;
+    .actions{
+        flex-direction:column;
     }
 
-    .btn-add {
-        font-family: 'Work Sans', sans-serif; display: inline-flex; align-items: center;
-        gap: 0.5rem; padding: 0.875rem 1.75rem;
-        background: linear-gradient(135deg, #8B7355 0%, #6B5644 100%);
-        color: white; text-decoration: none; border-radius: 12px; font-weight: 600;
-        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        box-shadow: 0 2px 8px rgba(139, 115, 85, 0.2);
+    .btn-action{
+        width:100%;
     }
 
-    .btn-add:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(139, 115, 85, 0.3); }
-
-    /* Filter */
-    .filter-section {
-        background: white; padding: 1.5rem; border-radius: 16px; margin-bottom: 2rem;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.06); border: 1px solid #e8e8e8;
+    .simple-pagination{
+        justify-content:center;
+        flex-wrap:wrap;
+        gap:8px;
     }
 
-    .filter-grid { display: grid; grid-template-columns: 1fr auto; gap: 1rem; align-items: center; }
-
-    .search-box { position: relative; }
-
-    .search-input {
-        font-family: 'Work Sans', sans-serif; width: 100%;
-        padding: 0.875rem 1.25rem 0.875rem 3rem;
-        border: 2px solid #e0e0e0; border-radius: 12px; font-size: 0.95rem;
-        transition: all 0.3s ease;
+    .page-info{
+        width:100%;
+        justify-content:center;
+        margin:0;
     }
-
-    .search-input:focus { outline: none; border-color: #8B7355; box-shadow: 0 0 0 4px rgba(139, 115, 85, 0.1); }
-
-    .search-icon { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: #999; }
-
-    .view-toggle { display: flex; gap: 0.5rem; }
-
-    .view-btn {
-        width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
-        border: 2px solid #e0e0e0; background: white; border-radius: 8px; cursor: pointer;
-        transition: all 0.3s ease; color: #666;
-    }
-
-    .view-btn:hover, .view-btn.active {
-        border-color: #8B7355;
-        background: linear-gradient(135deg, #8B7355 0%, #6B5644 100%); color: white;
-    }
-
-    /* Gallery Grid */
-    .gallery-grid {
-        display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-        gap: 2rem; margin-bottom: 2rem;
-    }
-
-    .gallery-card {
-        background: white; border-radius: 16px; overflow: hidden;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.06); border: 1px solid #e8e8e8;
-        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-
-    .gallery-card:hover { transform: translateY(-8px); box-shadow: 0 8px 30px rgba(0,0,0,0.12); }
-
-    .gallery-image-wrapper {
-        position: relative; width: 100%; padding-bottom: 100%; overflow: hidden; background: #f5f5f5;
-    }
-
-    .gallery-image {
-        position: absolute; inset: 0; width: 100%; height: 100%;
-        object-fit: cover; transition: transform 0.3s ease;
-    }
-
-    .gallery-card:hover .gallery-image { transform: scale(1.05); }
-
-    /* Video overlay play button */
-    .video-play-overlay {
-        position: absolute; inset: 0;
-        display: flex; align-items: center; justify-content: center;
-        background: rgba(0,0,0,0.25);
-        transition: background 0.3s ease;
-        z-index: 2;
-    }
-
-    .gallery-card:hover .video-play-overlay { background: rgba(0,0,0,0.4); }
-
-    .video-play-btn {
-        width: 52px; height: 52px; background: rgba(255,255,255,0.95);
-        border-radius: 50%; display: flex; align-items: center; justify-content: center;
-        color: #e74c3c; font-size: 1.3rem;
-        box-shadow: 0 4px 16px rgba(0,0,0,0.3);
-        transition: transform 0.3s ease;
-        padding-left: 3px; /* optical centering for play icon */
-    }
-
-    .gallery-card:hover .video-play-btn { transform: scale(1.12); }
-
-    /* Type badge (top-left) */
-    .type-badge {
-        position: absolute; top: 10px; left: 10px; z-index: 3;
-        display: inline-flex; align-items: center; gap: 0.3rem;
-        padding: 3px 9px; border-radius: 6px;
-        font-family: 'Work Sans', sans-serif; font-size: 0.7rem; font-weight: 700;
-        letter-spacing: 0.3px; text-transform: uppercase;
-    }
-
-    .type-badge.video {
-        background: rgba(231,76,60,0.92); color: white;
-    }
-
-    .type-badge.photo {
-        background: rgba(139,115,85,0.85); color: white;
-    }
-
-    /* Photo count badge */
-    .photo-count-badge {
-        position: absolute; bottom: 8px; right: 8px;
-        background: rgba(0,0,0,0.65); color: white;
-        font-size: 0.72rem; font-weight: 600;
-        padding: 3px 8px; border-radius: 6px;
-        display: flex; align-items: center; gap: 4px;
-        font-family: 'Work Sans', sans-serif; z-index: 3;
-    }
-
-    /* No image placeholder */
-    .gallery-placeholder {
-        position: absolute; inset: 0;
-        background: linear-gradient(135deg, #f5f0eb, #ede5d8);
-        display: flex; align-items: center; justify-content: center;
-        color: #D4AF37; font-size: 3rem;
-    }
-
-    /* Video placeholder (no thumbnail) */
-    .gallery-placeholder.video-ph {
-        background: linear-gradient(135deg, #2c1a1a, #3d1f1f);
-        color: #e74c3c;
-    }
-
-    .gallery-content { padding: 1.25rem; }
-
-    .gallery-title {
-        font-family: 'Playfair Display', serif; font-size: 1.15rem; font-weight: 700;
-        color: #1a1a1a; margin-bottom: 0.5rem;
-        display: -webkit-box; -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical; overflow: hidden;
-    }
-
-    .gallery-description {
-        font-family: 'Work Sans', sans-serif; color: #666; font-size: 0.85rem; line-height: 1.5;
-        margin-bottom: 1rem;
-        display: -webkit-box; -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical; overflow: hidden;
-    }
-
-    .gallery-meta { display: flex; gap: 0.75rem; margin-bottom: 1rem; flex-wrap: wrap; }
-
-    .meta-badge {
-        font-family: 'Work Sans', sans-serif; display: inline-flex; align-items: center;
-        gap: 0.35rem; padding: 0.3rem 0.65rem; background: #f0f0f0;
-        border-radius: 6px; font-size: 0.75rem; font-weight: 500; color: #666;
-    }
-
-    .meta-badge.category {
-        background: linear-gradient(135deg, rgba(139,115,85,0.12), rgba(107,86,68,0.12));
-        color: #8B7355; border: 1px solid rgba(139,115,85,0.2);
-    }
-
-    .meta-badge.video-badge {
-        background: linear-gradient(135deg, rgba(231,76,60,0.1), rgba(192,57,43,0.1));
-        color: #c0392b; border: 1px solid rgba(231,76,60,0.2);
-    }
-
-    .gallery-actions {
-        display: flex; gap: 0.5rem; padding-top: 1rem; border-top: 1px solid #f0f0f0;
-    }
-
-    .btn-icon {
-        flex: 1; display: flex; align-items: center; justify-content: center;
-        gap: 0.35rem; padding: 0.65rem; border-radius: 8px; text-decoration: none;
-        transition: all 0.3s ease; border: none; cursor: pointer;
-        font-size: 0.85rem; font-weight: 600; font-family: 'Work Sans', sans-serif;
-    }
-
-    .btn-view { background: linear-gradient(135deg, #3498db 0%, #2980b9 100%); color: white; }
-    .btn-view:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(52,152,219,0.3); }
-    .btn-edit { background: linear-gradient(135deg, #8B7355 0%, #6B5644 100%); color: white; }
-    .btn-edit:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(139,115,85,0.3); }
-    .btn-delete { background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); color: white; }
-    .btn-delete:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(231,76,60,0.3); }
-
-    /* List View */
-    .gallery-list { display: none; }
-    .gallery-list.active { display: block; }
-
-    .gallery-list-item {
-        background: white; padding: 1.5rem; border-radius: 16px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.06); border: 1px solid #e8e8e8;
-        margin-bottom: 1.5rem; display: flex; gap: 1.5rem; align-items: center;
-        transition: all 0.3s ease;
-    }
-
-    .gallery-list-item:hover { transform: translateX(8px); box-shadow: 0 6px 25px rgba(0,0,0,0.1); }
-
-    .list-thumb {
-        width: 120px; height: 120px; border-radius: 12px; flex-shrink: 0;
-        position: relative; overflow: hidden; background: #f5f5f5;
-    }
-
-    .list-thumb img {
-        width: 100%; height: 100%; object-fit: cover; display: block;
-    }
-
-    .list-thumb .video-play-overlay {
-        border-radius: 0;
-    }
-
-    .list-thumb-placeholder {
-        width: 100%; height: 100%;
-        background: linear-gradient(135deg, #f5f0eb, #ede5d8);
-        display: flex; align-items: center; justify-content: center;
-        color: #D4AF37; font-size: 2rem;
-    }
-
-    .list-thumb-placeholder.video-ph {
-        background: linear-gradient(135deg, #2c1a1a, #3d1f1f);
-        color: #e74c3c;
-    }
-
-    .list-content { flex: 1; }
-
-    .list-actions { display: flex; gap: 0.5rem; flex-shrink: 0; }
-    .list-actions .btn-icon { flex: initial; width: 40px; height: 40px; }
-
-    /* Empty State */
-    .empty-state {
-        text-align: center; padding: 4rem 2rem; background: white;
-        border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.06);
-    }
-
-    .empty-icon { font-size: 4rem; margin-bottom: 1rem; opacity: 0.3; color: #8B7355; }
-    .empty-title { font-family: 'Playfair Display', serif; font-size: 1.5rem; color: #666; margin-bottom: 0.5rem; }
-    .empty-text { font-family: 'Work Sans', sans-serif; color: #999; margin-bottom: 2rem; }
-
-    @media (max-width: 768px) {
-        .gallery-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; }
-        .filter-grid { grid-template-columns: 1fr; }
-        .header-section { flex-direction: column; align-items: stretch; }
-        .btn-add { width: 100%; justify-content: center; }
-        .gallery-list-item { flex-direction: column; }
-        .list-thumb { width: 100%; height: 200px; }
-        .list-actions { width: 100%; }
-        .list-actions .btn-icon { flex: 1; }
-    }
+}
 </style>
 @endpush
 
 @section('content')
-<!-- Header -->
+
 <div class="header-section">
     <h2 class="header-title">Gallery Collection</h2>
+
     <a href="{{ route('admin.galleries.create') }}" class="btn-add">
-        <i class="fa-solid fa-plus"></i> Add New Item
+        <i class="fa-solid fa-plus"></i>
+        Add New Item
     </a>
 </div>
 
-<!-- Search and Filter -->
-<div class="filter-section">
-    <form action="{{ route('admin.galleries.index') }}" method="GET">
-        <div class="filter-grid">
-            <div class="search-box">
-                <i class="fa-solid fa-search search-icon"></i>
-                <input type="text" name="search" class="search-input"
-                    placeholder="Search gallery..." value="{{ request('search') }}">
-            </div>
-            <div class="view-toggle">
-                <button type="button" class="view-btn active" id="grid-view-btn" title="Grid View">
-                    <i class="fa-solid fa-grip"></i>
-                </button>
-                <button type="button" class="view-btn" id="list-view-btn" title="List View">
-                    <i class="fa-solid fa-list"></i>
-                </button>
-            </div>
-        </div>
+<div class="filter-box">
+    <form method="GET" action="{{ route('admin.galleries.index') }}">
+        <input
+            type="text"
+            name="search"
+            value="{{ request('search') }}"
+            class="search-input"
+            placeholder="Search gallery..."
+        >
     </form>
 </div>
 
-<!-- Gallery Grid View -->
-@if($galleries->count() > 0)
-<div class="gallery-grid" id="gallery-grid">
-    @foreach($galleries as $gallery)
-    @php $isVideo = $gallery->isVideo(); @endphp
-    <div class="gallery-card">
-        <div class="gallery-image-wrapper">
+@if($galleries->count())
 
-            {{-- Type badge --}}
-            <span class="type-badge {{ $isVideo ? 'video' : 'photo' }}">
-                <i class="fa-solid {{ $isVideo ? 'fa-play' : 'fa-image' }}"></i>
-                {{ $isVideo ? 'Video' : 'Photo' }}
+<div class="gallery-grid">
+
+@foreach($galleries as $gallery)
+
+@php $isVideo = $gallery->isVideo(); @endphp
+
+<div class="gallery-card">
+
+    <div class="gallery-thumb">
+
+        <span class="badge-type">
+            {{ $isVideo ? 'VIDEO' : 'PHOTO' }}
+        </span>
+
+        @if($isVideo)
+
+            @if($gallery->youtube_thumbnail)
+                <img src="{{ $gallery->youtube_thumbnail }}">
+            @endif
+
+            <div class="video-play">
+                <i class="fa-solid fa-play"></i>
+            </div>
+
+        @else
+
+            @if($gallery->image)
+                <img src="{{ asset('storage/'.$gallery->image) }}">
+            @endif
+
+        @endif
+
+    </div>
+
+    <div class="gallery-content">
+
+        <div class="gallery-title">
+            {{ $gallery->title }}
+        </div>
+
+        <div class="gallery-desc">
+            {{ Str::limit($gallery->description,80) }}
+        </div>
+
+        <div class="meta">
+            <span>
+                {{ $gallery->created_at->format('d M Y') }}
             </span>
 
-            @if($isVideo)
-                {{-- YouTube thumbnail --}}
-                @if($gallery->youtube_thumbnail)
-                    <img src="{{ $gallery->youtube_thumbnail }}"
-                         alt="{{ $gallery->title }}" class="gallery-image"
-                         onerror="this.style.display='none'; this.closest('.gallery-image-wrapper').querySelector('.gallery-placeholder').style.display='flex';">
-                    <div class="gallery-placeholder video-ph" style="display:none;">
-                        <i class="fa-brands fa-youtube"></i>
-                    </div>
-                @else
-                    <div class="gallery-placeholder video-ph">
-                        <i class="fa-brands fa-youtube"></i>
-                    </div>
-                @endif
-                <div class="video-play-overlay">
-                    <div class="video-play-btn">
-                        <i class="fa-solid fa-play"></i>
-                    </div>
-                </div>
-            @else
-                @if($gallery->image)
-                    <img src="{{ asset('storage/' . $gallery->image) }}"
-                         alt="{{ $gallery->title }}" class="gallery-image"
-                         onerror="this.style.display='none'; this.closest('.gallery-image-wrapper').querySelector('.gallery-placeholder').style.display='flex';">
-                    <div class="gallery-placeholder" style="display:none;">
-                        <i class="fa-solid fa-image"></i>
-                    </div>
-                @else
-                    <div class="gallery-placeholder">
-                        <i class="fa-solid fa-image"></i>
-                    </div>
-                @endif
-
-                @php $photoCount = is_array($gallery->photo) ? count($gallery->photo) : 0; @endphp
-                @if($photoCount > 0)
-                <div class="photo-count-badge">
-                    <i class="fa-solid fa-images"></i> +{{ $photoCount }}
-                </div>
-                @endif
+            @if($gallery->category)
+            <span>{{ $gallery->category }}</span>
             @endif
         </div>
 
-        <div class="gallery-content">
-            <h3 class="gallery-title">{{ $gallery->title }}</h3>
+        <div class="actions">
 
-            @if($gallery->description)
-            <p class="gallery-description">{{ $gallery->description }}</p>
-            @endif
-
-            <div class="gallery-meta">
-                <span class="meta-badge">
-                    <i class="fa-solid fa-calendar"></i>
-                    {{ $gallery->created_at->format('M d, Y') }}
-                </span>
-                @if($gallery->category)
-                <span class="meta-badge category">
-                    <i class="fa-solid fa-tag"></i>
-                    {{ $gallery->category }}
-                </span>
-                @endif
-                @if($isVideo)
-                <span class="meta-badge video-badge">
-                    <i class="fa-brands fa-youtube"></i> YouTube
-                </span>
-                @elseif($gallery->order)
-                <span class="meta-badge">
-                    <i class="fa-solid fa-sort"></i> Order: {{ $gallery->order }}
-                </span>
-                @endif
-            </div>
-
-            <div class="gallery-actions">
-                <a href="{{ route('admin.galleries.show', $gallery) }}" class="btn-icon btn-view">
-                    <i class="fa-solid fa-eye"></i> View
-                </a>
-                <a href="{{ route('admin.galleries.edit', $gallery) }}" class="btn-icon btn-edit">
-                    <i class="fa-solid fa-pen"></i> Edit
-                </a>
-                <form action="{{ route('admin.galleries.destroy', $gallery) }}" method="POST"
-                    style="flex: 1;" onsubmit="return confirm('Hapus item ini?');">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="btn-icon btn-delete" style="width: 100%;">
-                        <i class="fa-solid fa-trash"></i> Delete
-                    </button>
-                </form>
-            </div>
-        </div>
-    </div>
-    @endforeach
-</div>
-
-<!-- Gallery List View -->
-<div class="gallery-list" id="gallery-list">
-    @foreach($galleries as $gallery)
-    @php $isVideo = $gallery->isVideo(); @endphp
-    <div class="gallery-list-item">
-        <div class="list-thumb">
-            @if($isVideo)
-                @if($gallery->youtube_thumbnail)
-                    <img src="{{ $gallery->youtube_thumbnail }}" alt="{{ $gallery->title }}"
-                         onerror="this.style.display='none';">
-                @else
-                    <div class="list-thumb-placeholder video-ph">
-                        <i class="fa-brands fa-youtube"></i>
-                    </div>
-                @endif
-                <div class="video-play-overlay">
-                    <div class="video-play-btn" style="width:38px;height:38px;font-size:1rem;">
-                        <i class="fa-solid fa-play"></i>
-                    </div>
-                </div>
-            @elseif($gallery->image)
-                <img src="{{ asset('storage/' . $gallery->image) }}"
-                     alt="{{ $gallery->title }}"
-                     onerror="this.style.display='none';">
-            @else
-                <div class="list-thumb-placeholder">
-                    <i class="fa-solid fa-image"></i>
-                </div>
-            @endif
-        </div>
-
-        <div class="list-content">
-            <h3 class="gallery-title">{{ $gallery->title }}</h3>
-            @if($gallery->description)
-            <p class="gallery-description">{{ $gallery->description }}</p>
-            @endif
-            <div class="gallery-meta">
-                <span class="meta-badge">
-                    <i class="fa-solid fa-calendar"></i>
-                    {{ $gallery->created_at->format('M d, Y') }}
-                </span>
-                @if($gallery->category)
-                <span class="meta-badge category">
-                    <i class="fa-solid fa-tag"></i> {{ $gallery->category }}
-                </span>
-                @endif
-                @if($isVideo)
-                <span class="meta-badge video-badge">
-                    <i class="fa-brands fa-youtube"></i> YouTube
-                </span>
-                @else
-                    @php $pc = is_array($gallery->photo) ? count($gallery->photo) : 0; @endphp
-                    @if($pc > 0)
-                    <span class="meta-badge">
-                        <i class="fa-solid fa-images"></i> {{ $pc }} additional photo{{ $pc > 1 ? 's' : '' }}
-                    </span>
-                    @endif
-                @endif
-            </div>
-        </div>
-
-        <div class="list-actions">
-            <a href="{{ route('admin.galleries.show', $gallery) }}" class="btn-icon btn-view" title="View">
-                <i class="fa-solid fa-eye"></i>
+            <a href="{{ route('admin.galleries.show',$gallery) }}" class="btn-action btn-view">
+                View
             </a>
-            <a href="{{ route('admin.galleries.edit', $gallery) }}" class="btn-icon btn-edit" title="Edit">
-                <i class="fa-solid fa-pen"></i>
+
+            <a href="{{ route('admin.galleries.edit',$gallery) }}" class="btn-action btn-edit">
+                Edit
             </a>
-            <form action="{{ route('admin.galleries.destroy', $gallery) }}" method="POST"
-                style="display: inline;" onsubmit="return confirm('Hapus item ini?');">
+
+            <form action="{{ route('admin.galleries.destroy',$gallery) }}"
+                  method="POST"
+                  style="flex:1"
+                  onsubmit="return confirm('Delete this item?')">
                 @csrf
                 @method('DELETE')
-                <button type="submit" class="btn-icon btn-delete" title="Delete">
-                    <i class="fa-solid fa-trash"></i>
+
+                <button class="btn-action btn-delete w-100">
+                    Delete
                 </button>
             </form>
+
         </div>
+
     </div>
-    @endforeach
+
 </div>
 
-<!-- Pagination -->
-<div style="margin-top: 2rem;">
-    {{ $galleries->links() }}
+@endforeach
+
 </div>
+
+{{-- SIMPLE PAGINATION --}}
+<div class="simple-pagination">
+
+    @if ($galleries->onFirstPage())
+        <span class="btn-page" style="opacity:.5;">Previous</span>
+    @else
+        <a href="{{ $galleries->previousPageUrl() }}" class="btn-page">
+            <i class="fa-solid fa-angle-left"></i> Previous
+        </a>
+    @endif
+
+    <div class="page-info">
+        Page {{ $galleries->currentPage() }} / {{ $galleries->lastPage() }}
+    </div>
+
+    @if ($galleries->hasMorePages())
+        <a href="{{ $galleries->nextPageUrl() }}" class="btn-page">
+            Next <i class="fa-solid fa-angle-right"></i>
+        </a>
+    @else
+        <span class="btn-page" style="opacity:.5;">Next</span>
+    @endif
+
+</div>
+
 @else
-<div class="empty-state">
-    <div class="empty-icon"><i class="fa-solid fa-photo-film"></i></div>
-    <h3 class="empty-title">No Items Found</h3>
-    <p class="empty-text">
-        @if(request('search'))
-            No gallery items match your search criteria.
-        @else
-            Start building your gallery by adding your first photo or video.
-        @endif
-    </p>
+
+<div class="empty-box">
+    <h3>No Gallery Found</h3>
+    <p>Create your first gallery item now.</p>
+
     <a href="{{ route('admin.galleries.create') }}" class="btn-add">
-        <i class="fa-solid fa-plus"></i> Add First Item
+        Add First Item
     </a>
 </div>
+
 @endif
+
 @endsection
-
-@push('scripts')
-<script>
-    const gridViewBtn = document.getElementById('grid-view-btn');
-    const listViewBtn = document.getElementById('list-view-btn');
-    const galleryGrid = document.getElementById('gallery-grid');
-    const galleryList = document.getElementById('gallery-list');
-
-    gridViewBtn?.addEventListener('click', function() {
-        gridViewBtn.classList.add('active');
-        listViewBtn.classList.remove('active');
-        galleryGrid.style.display = 'grid';
-        galleryList.classList.remove('active');
-        localStorage.setItem('galleryView', 'grid');
-    });
-
-    listViewBtn?.addEventListener('click', function() {
-        listViewBtn.classList.add('active');
-        gridViewBtn.classList.remove('active');
-        galleryGrid.style.display = 'none';
-        galleryList.classList.add('active');
-        localStorage.setItem('galleryView', 'list');
-    });
-
-    const savedView = localStorage.getItem('galleryView');
-    if (savedView === 'list') listViewBtn?.click();
-</script>
-@endpush
