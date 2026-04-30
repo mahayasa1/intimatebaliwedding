@@ -188,6 +188,30 @@
     margin: 2rem auto;
 }
 
+.gallery-preview-item video,
+.gallery-preview-item img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+
+.video-play-icon{
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    width:55px;
+    height:55px;
+    border-radius:50%;
+    background:rgba(255,255,255,.9);
+    color:#e74c3c;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:22px;
+    font-weight:bold;
+}
+
 .gallery-preview-item {
     position: relative;
     overflow: hidden;
@@ -665,12 +689,49 @@
         @if($galleries->count() > 0)
         <div class="gallery-preview-grid">
             @foreach($galleries as $gallery)
-            @php $galThumb = ImageHelper::thumb($gallery->image); @endphp
             <div class="gallery-preview-item">
-                <x-image
-                    :src="$gallery->image"
-                    :alt="$gallery->title ?? 'Gallery'"
-                />
+            
+                @if($gallery->type === 'video')
+            
+                    {{-- YOUTUBE --}}
+                    @if(Str::contains($gallery->video_url, ['youtube.com', 'youtu.be']))
+                        @php
+                            preg_match('/(youtu\.be\/|v=)([^&]+)/', $gallery->video_url, $match);
+                            $youtubeId = $match[2] ?? null;
+                        @endphp
+
+                        <img src="https://img.youtube.com/vi/{{ $youtubeId }}/hqdefault.jpg"
+                             alt="{{ $gallery->title }}"
+                             loading="lazy">
+            
+                    {{-- VIMEO --}}
+                    @elseif(Str::contains($gallery->video_url, 'vimeo.com'))
+            
+                        <img src="{{ asset('images/video-placeholder.jpg') }}"
+                             alt="{{ $gallery->title }}">
+            
+                    {{-- LOCAL VIDEO --}}
+                    @else
+            
+                        <video muted playsinline preload="metadata">
+                            <source src="{{ asset('storage/'.$gallery->video_url) }}">
+                        </video>
+                    
+                    @endif
+                    
+                    <div class="video-play-icon">
+                        ▶
+                    </div>
+                
+                @else
+                
+                    <x-image
+                        :src="$gallery->image"
+                        :alt="$gallery->title ?? 'Gallery'"
+                    />
+                
+                @endif
+                
             </div>
             @endforeach
         </div>
