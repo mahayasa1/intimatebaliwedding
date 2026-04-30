@@ -34,12 +34,14 @@ body{
 .btn-add{
     display:inline-flex;
     align-items:center;
+    justify-content:center;
     gap:.5rem;
     padding:.9rem 1.4rem;
     border-radius:12px;
     text-decoration:none;
     color:#fff;
     font-weight:600;
+    border:none;
     background:linear-gradient(135deg,#8B7355,#6B5644);
 }
 
@@ -48,13 +50,19 @@ body{
     opacity:.95;
 }
 
-/* SEARCH */
+/* FILTER */
 .filter-box{
     background:#fff;
     padding:16px;
     border-radius:14px;
     box-shadow:0 4px 18px rgba(0,0,0,.05);
     margin-bottom:20px;
+}
+
+.filter-grid{
+    display:grid;
+    grid-template-columns:1fr 180px 120px;
+    gap:12px;
 }
 
 .search-input{
@@ -64,6 +72,7 @@ body{
     padding:0 16px;
     border:1px solid #ddd;
     font-size:14px;
+    outline:none;
 }
 
 /* GRID */
@@ -122,8 +131,8 @@ body{
     background:#fff;
     color:#e74c3c;
     display:flex;
-    align-items:center;
     justify-content:center;
+    align-items:center;
 }
 
 /* CONTENT */
@@ -159,7 +168,7 @@ body{
     font-size:.75rem;
 }
 
-/* ACTIONS */
+/* ACTION */
 .actions{
     display:flex;
     gap:.5rem;
@@ -186,23 +195,17 @@ body{
     opacity:.95;
 }
 
-/* EMPTY */
-.empty-box{
-    background:#fff;
-    padding:4rem 2rem;
-    text-align:center;
-    border-radius:18px;
-    box-shadow:0 4px 20px rgba(0,0,0,.06);
-}
-
-/* SIMPLE PAGINATION */
+/* PAGINATION */
 .simple-pagination{
-    margin-top:20px;
+    margin-top:24px;
     display:flex;
     justify-content:center;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
 }
 
-.simple-pagination .btn-page{
+.btn-page{
     display:inline-flex;
     align-items:center;
     gap:6px;
@@ -216,20 +219,30 @@ body{
     font-weight:600;
 }
 
-.simple-pagination .btn-page:hover{
+.btn-page:hover{
     background:#f4f4f4;
 }
 
-.simple-pagination .page-info{
-    margin:0 10px;
-    display:flex;
-    align-items:center;
+.page-info{
     font-size:13px;
     color:#777;
 }
 
+/* EMPTY */
+.empty-box{
+    background:#fff;
+    padding:4rem 2rem;
+    text-align:center;
+    border-radius:18px;
+    box-shadow:0 4px 20px rgba(0,0,0,.06);
+}
+
 /* MOBILE */
 @media(max-width:768px){
+
+    .filter-grid{
+        grid-template-columns:1fr;
+    }
 
     .gallery-grid{
         grid-template-columns:1fr;
@@ -245,14 +258,6 @@ body{
 
     .simple-pagination{
         justify-content:center;
-        flex-wrap:wrap;
-        gap:8px;
-    }
-
-    .page-info{
-        width:100%;
-        justify-content:center;
-        margin:0;
     }
 }
 </style>
@@ -269,16 +274,43 @@ body{
     </a>
 </div>
 
+{{-- FILTER --}}
 <div class="filter-box">
+
     <form method="GET" action="{{ route('admin.galleries.index') }}">
-        <input
-            type="text"
-            name="search"
-            value="{{ request('search') }}"
-            class="search-input"
-            placeholder="Search gallery..."
-        >
+
+        <div class="filter-grid">
+
+            {{-- SEARCH --}}
+            <input
+                type="text"
+                name="search"
+                value="{{ request('search') }}"
+                class="search-input"
+                placeholder="Search gallery..."
+            >
+
+            {{-- TYPE --}}
+            <select name="type" class="search-input">
+                <option value="">All Type</option>
+                <option value="photo" {{ request('type') == 'photo' ? 'selected' : '' }}>
+                    Photo
+                </option>
+                <option value="video" {{ request('type') == 'video' ? 'selected' : '' }}>
+                    Video
+                </option>
+            </select>
+
+            {{-- BUTTON --}}
+            <button type="submit" class="btn-add">
+                <i class="fa-solid fa-filter"></i>
+                Filter
+            </button>
+
+        </div>
+
     </form>
+
 </div>
 
 @if($galleries->count())
@@ -328,35 +360,38 @@ body{
         </div>
 
         <div class="meta">
-            <span>
-                {{ $gallery->created_at->format('d M Y') }}
-            </span>
+            <span>{{ $gallery->created_at->format('d M Y') }}</span>
 
             @if($gallery->category)
-            <span>{{ $gallery->category }}</span>
+                <span>{{ $gallery->category }}</span>
             @endif
         </div>
 
         <div class="actions">
 
-            <a href="{{ route('admin.galleries.show',$gallery) }}" class="btn-action btn-view">
+            <a href="{{ route('admin.galleries.show',$gallery) }}"
+               class="btn-action btn-view">
                 View
             </a>
 
-            <a href="{{ route('admin.galleries.edit',$gallery) }}" class="btn-action btn-edit">
+            <a href="{{ route('admin.galleries.edit',$gallery) }}"
+               class="btn-action btn-edit">
                 Edit
             </a>
 
-            <form action="{{ route('admin.galleries.destroy',$gallery) }}"
-                  method="POST"
-                  style="flex:1"
-                  onsubmit="return confirm('Delete this item?')">
+            <form
+                action="{{ route('admin.galleries.destroy',$gallery) }}"
+                method="POST"
+                style="flex:1"
+                onsubmit="return confirm('Delete this item?')"
+            >
                 @csrf
                 @method('DELETE')
 
                 <button class="btn-action btn-delete w-100">
                     Delete
                 </button>
+
             </form>
 
         </div>
@@ -369,14 +404,15 @@ body{
 
 </div>
 
-{{-- SIMPLE PAGINATION --}}
+{{-- PAGINATION --}}
 <div class="simple-pagination">
 
     @if ($galleries->onFirstPage())
         <span class="btn-page" style="opacity:.5;">Previous</span>
     @else
         <a href="{{ $galleries->previousPageUrl() }}" class="btn-page">
-            <i class="fa-solid fa-angle-left"></i> Previous
+            <i class="fa-solid fa-angle-left"></i>
+            Previous
         </a>
     @endif
 
@@ -386,7 +422,8 @@ body{
 
     @if ($galleries->hasMorePages())
         <a href="{{ $galleries->nextPageUrl() }}" class="btn-page">
-            Next <i class="fa-solid fa-angle-right"></i>
+            Next
+            <i class="fa-solid fa-angle-right"></i>
         </a>
     @else
         <span class="btn-page" style="opacity:.5;">Next</span>

@@ -106,12 +106,42 @@ class GalleryController extends Controller
             ->with('success', 'Google Maps reviews refreshed successfully!');
     }
 
-    public function adminIndex()
-    {
-        $galleries = Gallery::orderBy('order')->latest()->paginate(20);
+    public function adminIndex(Request $request)
+{
+    $query = Gallery::query();
 
-        return view('admin.galleries.index', compact('galleries'));
+    /* SEARCH */
+    if ($request->filled('search')) {
+        $query->where(function ($q) use ($request) {
+            $q->where('title', 'like', '%' . $request->search . '%')
+              ->orWhere('description', 'like', '%' . $request->search . '%')
+              ->orWhere('category', 'like', '%' . $request->search . '%');
+        });
     }
+
+    /* FILTER TYPE */
+    if ($request->filled('type')) {
+
+        if ($request->type === 'photo') {
+            $query->where(function ($q) {
+                $q->whereNull('type')
+                  ->orWhere('type', 'photo');
+            });
+        }
+
+        if ($request->type === 'video') {
+            $query->where('type', 'video');
+        }
+    }
+
+    $galleries = $query
+        ->orderBy('order')
+        ->orderByDesc('created_at')
+        ->paginate(20)
+        ->withQueryString();
+
+    return view('admin.galleries.index', compact('galleries'));
+}
 
     public function create()
     {
