@@ -279,6 +279,7 @@
 <section class="gallery-hero">
     <div>
         <h1>GALLERY & TESTIMONIALS</h1>
+        <p>Relive The Previous Beautiful Moments And Kind Words</p>
     </div>
 </section>
 

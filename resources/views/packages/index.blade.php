@@ -334,7 +334,7 @@
 <section class="packages-hero">
     <div>
         <h1>Packages</h1>
-        <p>Choose Your Perfect Wedding Package</p>
+        <p>Choose Your Way To Happiness</p>
     </div>
 </section>
 
