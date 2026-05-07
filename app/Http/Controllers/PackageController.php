@@ -13,8 +13,8 @@ class PackageController extends Controller
 {
     public function index()
     {
-        $packages   = Package::with('subpackages')->latest()->paginate(12);
-        $categories = Package::distinct()->pluck('category')->filter();
+        $packages   = Package::with('subpackages')->orderBy('name', 'asc')->paginate(12);
+        $categories = Package::orderBy('category')->distinct()->pluck('category')->filter()->sort()->values();
         return view('packages.index', compact('packages', 'categories'));
     }
 
@@ -23,7 +23,7 @@ class PackageController extends Controller
         $package = Package::with('subpackages')->findOrFail($id);
 
         $otherPackages = Package::where('id', '!=', $id)
-            ->latest()
+            ->orderBy('name', 'asc')
             ->take(3)
             ->get();
 
@@ -39,20 +39,16 @@ class PackageController extends Controller
 
     public function adminIndex()
     {
-        $packages = Package::with('subpackages')->latest()->paginate(20);
+        $packages = Package::with('subpackages')->orderBy('name', 'asc')->paginate(20);
         return view('admin.packages.index', compact('packages'));
     }
 
     public function create()
     {
-        $categories = Package::distinct()->pluck('category')->filter();
+        $categories = Package::orderBy('category')->distinct()->pluck('category')->filter()->sort()->values();
         return view('admin.packages.create', compact('categories'));
     }
 
-    /**
-     * Store a newly created package.
-     * ALL images (main, photos, subpackage images) are compressed + thumbnailed.
-     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -69,13 +65,11 @@ class PackageController extends Controller
 
         DB::transaction(function () use ($request, $validated) {
 
-            // Main image — compress + thumbnail
             if ($request->hasFile('image')) {
                 $result = ImageHelper::storeAndCompress($request->file('image'), 'packages');
                 $validated['image'] = $result['path'];
             }
 
-            // Additional gallery photos — compress + thumbnail each
             $photos = [];
             if ($request->hasFile('photos')) {
                 foreach ($request->file('photos') as $photo) {
@@ -89,19 +83,16 @@ class PackageController extends Controller
 
             $package = Package::create($validated);
 
-            // Subpackages
             if ($request->has('subpackages')) {
                 foreach ($request->subpackages as $index => $sub) {
                     if (empty($sub['name'])) continue;
 
-                    // Subpackage main image — compress + thumbnail
                     $subImage = null;
                     if (!empty($sub['image']) && $sub['image'] instanceof \Illuminate\Http\UploadedFile) {
                         $result   = ImageHelper::storeAndCompress($sub['image'], 'packages/subpackages');
                         $subImage = $result['path'];
                     }
 
-                    // Subpackage additional photos — compress + thumbnail each
                     $subPhotos = [];
                     if (!empty($sub['photos']) && is_array($sub['photos'])) {
                         foreach ($sub['photos'] as $subPhoto) {
@@ -136,14 +127,10 @@ class PackageController extends Controller
     public function edit(Package $package)
     {
         $package->load('subpackages');
-        $categories = Package::distinct()->pluck('category')->filter();
+        $categories = Package::orderBy('category')->distinct()->pluck('category')->filter()->sort()->values();
         return view('admin.packages.edit', compact('package', 'categories'));
     }
 
-    /**
-     * Update an existing package.
-     * All NEW images are compressed + thumbnailed.
-     */
     public function update(Request $request, Package $package)
     {
         $validated = $request->validate([
@@ -160,26 +147,17 @@ class PackageController extends Controller
 
         DB::transaction(function () use ($request, $validated, $package) {
 
-        // Replace main image if new file provided
-        if ($request->hasFile('image')) {
-            if ($package->image) {
-                Storage::disk('public')->delete($package->image);
-                ImageHelper::deleteThumb($package->image);
+            if ($request->hasFile('image')) {
+                if ($package->image) {
+                    Storage::disk('public')->delete($package->image);
+                    ImageHelper::deleteThumb($package->image);
+                }
+                $result = ImageHelper::storeAndCompress($request->file('image'), 'packages');
+                $validated['image'] = $result['path'];
+            } else {
+                unset($validated['image']);
             }
-    
-            $result = ImageHelper::storeAndCompress(
-                $request->file('image'),
-                'packages'
-            );
-    
-            $validated['image'] = $result['path'];
-    
-        } else {
-            // IMPORTANT FIX:
-            unset($validated['image']);
-        }
 
-            // Handle removed existing photos
             $existingPhotos = $package->photo ?? [];
 
             if ($request->has('removed_photos')) {
@@ -193,7 +171,6 @@ class PackageController extends Controller
                 }
             }
 
-            // Add new gallery photos — compress + thumbnail each
             if ($request->hasFile('photos')) {
                 foreach ($request->file('photos') as $photo) {
                     $result           = ImageHelper::storeAndCompress($photo, 'packages/photos');
@@ -206,7 +183,6 @@ class PackageController extends Controller
 
             $package->update($validated);
 
-            // Delete old subpackages (their images too)
             foreach ($package->subpackages as $oldSub) {
                 if ($oldSub->image) {
                     Storage::disk('public')->delete($oldSub->image);
@@ -221,7 +197,6 @@ class PackageController extends Controller
             }
             $package->subpackages()->delete();
 
-            // Re-create subpackages with compressed images
             if ($request->has('subpackages')) {
                 foreach ($request->subpackages as $index => $sub) {
                     if (empty($sub['name'])) continue;

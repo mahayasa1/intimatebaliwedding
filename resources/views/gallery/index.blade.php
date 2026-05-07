@@ -5,199 +5,371 @@
 
 @push('styles')
 <style>
+    /* ── SHARED DESIGN TOKENS ── */
+    :root {
+        --gold:        #D4AF37;
+        --gold-dark:   #AA8B2A;
+        --gold-light:  rgba(212,175,55,0.15);
+        --text-dark:   #1a1a1a;
+        --text-mid:    #555;
+        --text-muted:  #999;
+        --radius-card: 12px;
+        --font-serif:  'Playfair Display', serif;
+        --font-sans:   'Inter', sans-serif;
+        --transition:  all 0.5s cubic-bezier(0.4,0,0.2,1);
+    }
+
+    /* ── HERO ── */
     .gallery-hero {
-        background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), 
+        background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)),
                     url('/assets/background/bg_template.jpg');
-        background-size: cover; background-position: center;
-        height: 50vh; display: flex; align-items: center; justify-content: center;
-        color: white; text-align: center; margin-top: -80px; padding-top: 80px;
+        background-size: cover;
+        background-position: center;
+        height: 50vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        text-align: center;
+        margin-top: -80px;
+        padding-top: 80px;
     }
 
     .gallery-hero h1 {
-        font-family: 'Playfair Display', serif; font-size: 3.5rem; font-weight: 700;
+        font-family: var(--font-serif);
+        font-size: clamp(2rem, 5vw, 3.5rem);
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 3px;
+        margin-bottom: 0.5rem;
+    }
+
+    .gallery-hero p {
+        font-size: clamp(0.85rem, 2vw, 1.1rem);
+        font-weight: 300;
+        letter-spacing: 2px;
+        opacity: 0.9;
+    }
+
+    /* ── SECTION WRAPPER ── */
+    .gallery-section {
+        padding: 4rem 2rem;
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    /* ── INTRO ── */
+    .gallery-intro {
+        text-align: center;
+        margin-bottom: 2.5rem;
+    }
+
+    .gallery-intro h2 {
+        font-family: var(--font-serif);
+        color: var(--gold);
+        font-size: clamp(1.5rem, 3vw, 2rem);
+        font-weight: 700;
+        margin-bottom: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+    }
+
+    .gallery-intro p {
+        color: var(--text-mid);
+        font-size: 1rem;
+        line-height: 1.7;
+        max-width: 600px;
+        margin: 0 auto;
     }
 
     /* ── TAB SWITCHER ── */
-    .gallery-section {
-        padding: 4rem 2rem; max-width: 1400px; margin: 0 auto;
-    }
-
-    .gallery-intro { text-align: center; margin-bottom: 2.5rem; }
-    .gallery-intro h2 { font-family: 'Playfair Display', serif; color: #D4AF37; font-size: 2rem; margin-bottom: 1rem; }
-
     .tab-switcher {
         display: flex;
         justify-content: center;
         gap: 0;
         margin-bottom: 2.5rem;
-        border: 2px solid #D4AF37;
+        border: 2px solid var(--gold);
         border-radius: 30px;
         overflow: hidden;
-        max-width: 400px;
+        max-width: 360px;
         margin-left: auto;
         margin-right: auto;
     }
 
     .tab-btn {
         flex: 1;
-        padding: 0.75rem 1.5rem;
+        padding: 0.7rem 1.25rem;
         background: white;
-        color: #D4AF37;
+        color: var(--gold);
         border: none;
         cursor: pointer;
         font-weight: 600;
-        font-size: 0.9rem;
+        font-size: 0.82rem;
         text-transform: uppercase;
         letter-spacing: 1px;
-        transition: all 0.3s ease;
+        transition: background 0.25s, color 0.25s;
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 0.5rem;
-        font-family: 'Inter', sans-serif;
+        gap: 0.4rem;
+        font-family: var(--font-sans);
     }
 
     .tab-btn:first-child { border-radius: 28px 0 0 28px; }
     .tab-btn:last-child  { border-radius: 0 28px 28px 0; }
-
-    .tab-btn.active {
-        background: #D4AF37;
-        color: white;
-    }
+    .tab-btn.active      { background: var(--gold); color: white; }
 
     .tab-btn .tab-count {
         background: rgba(255,255,255,0.3);
         border-radius: 10px;
-        padding: 1px 7px;
-        font-size: 0.75rem;
+        padding: 1px 6px;
+        font-size: 0.7rem;
+        font-weight: 700;
     }
 
     .tab-btn:not(.active) .tab-count {
-        background: rgba(212,175,55,0.15);
+        background: var(--gold-light);
     }
 
-    /* ── FILTER KATEGORI (foto) ── */
+    /* ── FILTER PILLS ── */
     .gallery-filters {
-        display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; margin-bottom: 3rem;
+        display: flex;
+        justify-content: center;
+        gap: 0.6rem;
+        flex-wrap: wrap;
+        margin-bottom: 2.5rem;
     }
 
     .filter-btn {
-        padding: 0.6rem 1.5rem; border: 2px solid #D4AF37; background: white; color: #D4AF37;
-        border-radius: 25px; cursor: pointer; transition: all 0.3s; font-weight: 600;
-        text-transform: uppercase; letter-spacing: 1px; font-size: 0.85rem;
+        padding: 0.5rem 1.25rem;
+        border: 2px solid var(--gold);
+        background: white;
+        color: var(--gold);
+        border-radius: 25px;
+        cursor: pointer;
+        transition: background 0.25s, color 0.25s, transform 0.2s;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-size: 0.78rem;
+        font-family: var(--font-sans);
     }
 
-    .filter-btn:hover, .filter-btn.active { background: #D4AF37; color: white; }
+    .filter-btn:hover,
+    .filter-btn.active {
+        background: var(--gold);
+        color: white;
+        transform: translateY(-2px);
+    }
 
-    /* ── SHARED GRID (foto & video) ── */
+    /* ── SHARED GRID ── */
     .gallery-grid,
     .video-grid {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
-        gap: 2rem;
+        gap: 1.25rem;
     }
 
-    /* ── PHOTO ITEM ── */
-    .gallery-item {
-        position: relative; overflow: hidden; aspect-ratio: 1/1;
-        border-radius: 12px; cursor: pointer;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        transition: all 0.3s ease; background: #f0f0f0;
-        display: block; text-decoration: none;
-    }
-
-    .gallery-item:hover { transform: translateY(-8px); box-shadow: 0 8px 25px rgba(0,0,0,0.2); }
-
-    .gallery-item img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
-    .gallery-item:hover img { transform: scale(1.05); }
-
-    /* ── VIDEO ITEM (sama persis dengan foto) ── */
+    /* ── SHARED CARD BASE ── */
+    .gallery-item,
     .video-grid-item {
-        position: relative; overflow: hidden; aspect-ratio: 1/1;
-        border-radius: 12px; cursor: pointer;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        transition: all 0.3s ease; background: #1a1a1a;
+        position: relative;
+        overflow: hidden;
+        aspect-ratio: 1 / 1;
+        border-radius: var(--radius-card);
+        cursor: pointer;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        display: block;
+        text-decoration: none;
+        background: #f0f0f0;
     }
 
-    .video-grid-item:hover { transform: translateY(-8px); box-shadow: 0 8px 25px rgba(0,0,0,0.2); }
+    .gallery-item:hover,
+    .video-grid-item:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 12px 30px rgba(0,0,0,0.18);
+    }
 
-    .video-grid-item img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
-    .video-grid-item:hover img { transform: scale(1.05); }
+    .gallery-item img,
+    .video-grid-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+    }
 
-    /* Play button di tengah */
-    .video-play-icon {
-        position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-        width: 64px; height: 64px; background: rgba(255,255,255,0.92);
-        border-radius: 50%; display: flex; align-items: center; justify-content: center;
-        color: #e74c3c; font-size: 1.6rem; z-index: 3;
+    .gallery-item:hover img,
+    .video-grid-item:hover img {
+        transform: scale(1.05);
+    }
+
+    /* ── OVERLAY ── */
+    .card-overlay {
+        position: absolute;
+        inset: 0;
+        padding: 1.5rem;
+        background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 55%);
+        color: white;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        text-align: center;
+        pointer-events: none;
+    }
+
+    /* Dark wash on hover */
+    .card-overlay::before {
+        content: '';
+        position: absolute;
+        bottom: 0; left: 0; right: 0;
+        height: 0;
+        background: rgba(0,0,0,0.35);
+        transition: height 0.5s cubic-bezier(0.4,0,0.2,1);
+        z-index: 1;
+    }
+
+    .gallery-item:hover .card-overlay::before,
+    .video-grid-item:hover .card-overlay::before {
+        height: 100%;
+    }
+
+    /* ── CARD CONTENT ── */
+    .card-content {
+        position: relative;
+        z-index: 2;
+        transition: var(--transition);
+    }
+
+    .gallery-item:hover .card-content,
+    .video-grid-item:hover .card-content {
+        transform: translateY(-28%);
+    }
+
+    /* Category tag — same style as packages */
+    .card-category-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        padding: 0.3rem 0.8rem;
+        background: rgba(212,175,55,0.92);
+        border-radius: 20px;
+        font-size: 0.68rem;
+        font-weight: 700;
+        color: white;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        margin-bottom: 0.5rem;
+        font-family: var(--font-sans);
+    }
+
+    .card-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.8rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: all 0.3s ease;
+        color: white;
+    }
+
+    /* Description — hidden until hover */
+    .card-description {
+        font-size: 0.88rem;
+        line-height: 1.6;
+        color: rgba(255,255,255,0.9);
+        margin: 0.75rem 0 0;
+        max-height: 0;
+        opacity: 0;
+        overflow: hidden;
+        transform: translateY(16px);
+        transition: max-height 0.5s ease 0.15s, opacity 0.5s ease 0.15s, transform 0.5s ease 0.15s;
+    }
+
+    .gallery-item:hover .card-description,
+    .video-grid-item:hover .card-description {
+        max-height: 120px;
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    /* CTA badge — same as package */
+    .card-cta-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.4rem 1rem;
+        background: rgba(212,175,55,0.9);
+        border-radius: 20px;
+        font-size: 0.78rem;
+        font-weight: 600;
+        color: white;
+        margin-top: 0.6rem;
+        opacity: 0;
+        transform: translateY(16px);
+        transition: opacity 0.5s ease 0.25s, transform 0.5s ease 0.25s;
+    }
+
+    .video-grid-item .card-cta-badge {
+        background: rgba(231,76,60,0.9);
+    }
+
+    .gallery-item:hover .card-cta-badge,
+    .video-grid-item:hover .card-cta-badge {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    /* Top-left category badge (always visible) */
+    .top-badge {
+        position: absolute;
+        top: 0.75rem;
+        left: 0.75rem;
+        z-index: 5;
+        background: var(--gold);          /* ← ganti jadi gold */
+        color: white;
+        padding: 0.3rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.68rem;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        font-family: var(--font-sans);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+    }
+
+    /* Play button for video */
+    .video-play-btn {
+        position: absolute;
+        top: 50%; left: 50%;
+        transform: translate(-50%, -50%);
+        width: 60px; height: 60px;
+        background: rgba(255,255,255,0.92);
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        color: #e74c3c;
+        font-size: 1.5rem;
+        z-index: 3;
         transition: transform 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.4s ease;
         pointer-events: none;
         box-shadow: 0 4px 20px rgba(0,0,0,0.25);
     }
 
-    .video-grid-item:hover .video-play-icon {
+    .video-play-btn i { margin-left: 3px; }
+
+    .video-grid-item:hover .video-play-btn {
         transform: translate(-50%, -50%) scale(0);
         opacity: 0;
     }
 
-    /* ── SHARED OVERLAY (foto & video) ── */
-    .gallery-overlay,
-    .video-grid-overlay {
-        position: absolute; bottom: 0; left: 0; right: 0; height: 100%;
-        padding: 2rem;
-        background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 50%);
-        color: white; display: flex; flex-direction: column; justify-content: flex-end;
-        text-align: center; pointer-events: none;
-    }
-
-    .gallery-overlay::before,
-    .video-grid-overlay::before {
-        content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 0;
-        background: rgba(0,0,0,0.356);
-        transition: height 0.5s cubic-bezier(0.4,0,0.2,1); z-index: 1;
-    }
-
-    .gallery-item:hover .gallery-overlay::before,
-    .video-grid-item:hover .video-grid-overlay::before { height: 100%; }
-
-    .gallery-content,
-    .video-grid-content { position: relative; z-index: 2; transition: all 0.5s cubic-bezier(0.4,0,0.2,1); }
-
-    .gallery-item:hover .gallery-content,
-    .video-grid-item:hover .video-grid-content { transform: translateY(-30%); }
-
-    .gallery-category-text { font-size: 0.75rem; color: #D4AF37; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 0.5rem; font-weight: 600; }
-    .gallery-title-text { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 600; color: white; }
-
-    .gallery-description,
-    .video-grid-description {
-        font-size: 0.9rem; line-height: 1.6; color: white; margin: 1rem 0;
-        max-height: 0; opacity: 0; overflow: hidden;
-        transform: translateY(20px); transition: all 0.5s ease 0.2s;
-    }
-
-    .gallery-item:hover .gallery-description,
-    .video-grid-item:hover .video-grid-description { max-height: 200px; opacity: 1; transform: translateY(0); }
-
-    .gallery-view-badge,
-    .video-grid-badge {
-        display: inline-flex; align-items: center; gap: 0.4rem;
-        padding: 0.4rem 1rem; border-radius: 20px; font-size: 0.85rem;
-        font-weight: 600; color: white; opacity: 0; transform: translateY(20px);
-        transition: all 0.5s ease 0.3s;
-    }
-
-    .gallery-view-badge { background: rgba(212,175,55,0.9); }
-    .video-grid-badge   { background: rgba(231,76,60,0.9); }
-
-    .gallery-item:hover .gallery-view-badge,
-    .video-grid-item:hover .video-grid-badge { opacity: 1; transform: translateY(0); }
-
-    /* Modal player */
+    /* ── VIDEO MODAL ── */
     .video-modal {
         display: none;
         position: fixed; inset: 0; z-index: 9999;
-        background: rgba(0,0,0,0.92);
+        background: rgba(0,0,0,0.93);
         align-items: center; justify-content: center;
         padding: 2rem;
     }
@@ -212,7 +384,7 @@
         width: 100%;
         aspect-ratio: 16/9;
         border: none;
-        border-radius: 12px;
+        border-radius: var(--radius-card);
     }
 
     .modal-close {
@@ -221,61 +393,204 @@
         border: none; border-radius: 50%;
         width: 48px; height: 48px; font-size: 1.4rem;
         cursor: pointer; display: flex; align-items: center; justify-content: center;
-        transition: all 0.3s ease; z-index: 10001;
+        transition: background 0.3s, transform 0.3s; z-index: 10001;
     }
 
     .modal-close:hover { background: rgba(255,255,255,0.22); transform: rotate(90deg); }
 
-    /* Empty state */
+    /* ── EMPTY STATE ── */
     .empty-state {
         text-align: center; padding: 4rem 2rem; grid-column: 1/-1;
     }
 
-    .empty-icon { font-size: 3.5rem; color: #D4AF37; opacity: 0.3; margin-bottom: 1rem; }
+    .empty-icon { font-size: 3.5rem; color: var(--gold); opacity: 0.25; margin-bottom: 1rem; }
+    .empty-state p { color: var(--text-muted); font-size: 1rem; }
 
-    /* Tab panels */
+    /* ── TAB PANELS ── */
     .tab-panel { display: none; }
     .tab-panel.active { display: block; }
 
-    /* Testimonials */
-    .testimonials-section { background: #f9f9f9; padding: 5rem 2rem; margin-top: 3rem; }
-    .testimonials-header { text-align: center; margin-bottom: 1rem; }
-    .testimonials-header h2 { font-family: 'Playfair Display', serif; color: #D4AF37; font-size: 2.5rem; margin-bottom: 0.5rem; }
-    .testimonials-header p { color: #666; font-size: 1.1rem; }
-    .google-verified { display: inline-flex; align-items: center; gap: 0.5rem; background: white; padding: 0.5rem 1.5rem; border-radius: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-top: 1rem; }
-    .google-stats { display: flex; justify-content: center; align-items: center; gap: 2rem; margin: 2rem 0 3rem; flex-wrap: wrap; }
-    .stat-item { text-align: center; }
-    .stat-number { font-size: 2.5rem; font-weight: bold; color: #D4AF37; font-family: 'Playfair Display', serif; }
-    .stat-label { font-size: 0.9rem; color: #666; text-transform: uppercase; letter-spacing: 1px; }
-    .testimonials-grid { max-width: 1400px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 2rem; }
-    .testimonial-card { background: white; border-radius: 12px; padding: 2rem; box-shadow: 0 4px 15px rgba(0,0,0,0.08); transition: all 0.3s; cursor: pointer; position: relative; }
-    .testimonial-card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.12); }
-    .testimonial-header-content { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; }
-    .testimonial-avatar { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 3px solid #D4AF37; }
-    .testimonial-info h4 { font-family: 'Playfair Display', serif; font-size: 1.2rem; margin: 0; color: #333; }
-    .testimonial-time { font-size: 0.85rem; color: #999; margin-top: 0.2rem; }
-    .testimonial-rating { color: #D4AF37; font-size: 1.2rem; margin-bottom: 1rem; }
-    .testimonial-review { color: #555; line-height: 1.6; font-size: 0.95rem; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
-    .google-maps-badge { position: absolute; top: 1rem; right: 1rem; width: 30px; height: 30px; opacity: 0.6; }
-    .testimonials-cta { text-align: center; margin-top: 3rem; }
-    .btn-google-maps { display: inline-flex; align-items: center; gap: 0.5rem; padding: 1rem 2rem; background: #4285f4; color: white; text-decoration: none; border-radius: 30px; font-weight: 600; transition: all 0.3s; box-shadow: 0 4px 15px rgba(66,133,244,0.3); }
-    .btn-google-maps:hover { background: #3367d6; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(66,133,244,0.4); color: white; }
-    .no-reviews { text-align: center; padding: 3rem; color: #999; }
+    /* ── TESTIMONIALS ── */
+    .testimonials-section {
+        background: #f9f9f9;
+        padding: 5rem 2rem;
+        margin-top: 2rem;
+    }
 
+    .testimonials-header {
+        text-align: center;
+        margin-bottom: 1rem;
+    }
+
+    .testimonials-header h2 {
+        font-family: var(--font-serif);
+        color: var(--gold);
+        font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+        margin-bottom: 0.5rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+    }
+
+    .testimonials-header p {
+        color: var(--text-mid);
+        font-size: 1rem;
+    }
+
+    .google-verified {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: white;
+        padding: 0.4rem 1.25rem;
+        border-radius: 30px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        margin-top: 0.75rem;
+        font-size: 0.88rem;
+        font-weight: 500;
+    }
+
+    .google-stats {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 3rem;
+        margin: 2rem 0 3rem;
+        flex-wrap: wrap;
+    }
+
+    .stat-item { text-align: center; }
+
+    .stat-number {
+        font-size: clamp(2rem, 4vw, 2.75rem);
+        font-weight: 700;
+        color: var(--gold);
+        font-family: var(--font-serif);
+        line-height: 1;
+    }
+
+    .stat-label {
+        font-size: 0.78rem;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        margin-top: 0.25rem;
+    }
+
+    .testimonials-grid {
+        max-width: 1400px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .testimonial-card {
+        background: white;
+        border-radius: var(--radius-card);
+        padding: 1.75rem;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.07);
+        transition: transform 0.3s, box-shadow 0.3s;
+        cursor: pointer;
+        position: relative;
+        border-left: 3px solid var(--gold);
+    }
+
+    .testimonial-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+    }
+
+    .testimonial-header-content {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 0.875rem;
+    }
+
+    .testimonial-avatar {
+        width: 52px; height: 52px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid var(--gold);
+        flex-shrink: 0;
+    }
+
+    .testimonial-info h4 {
+        font-family: var(--font-serif);
+        font-size: 1.05rem;
+        margin: 0 0 0.2rem;
+        color: var(--text-dark);
+    }
+
+    .testimonial-time { font-size: 0.78rem; color: var(--text-muted); }
+
+    .testimonial-rating { color: var(--gold); font-size: 1.1rem; margin-bottom: 0.75rem; letter-spacing: 2px; }
+
+    .testimonial-review {
+        color: var(--text-mid);
+        line-height: 1.7;
+        font-size: 0.9rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 4;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        font-style: italic;
+    }
+
+    .google-maps-badge {
+        position: absolute;
+        top: 1rem; right: 1rem;
+        width: 28px; height: 28px;
+        opacity: 0.5;
+    }
+
+    .testimonials-cta { text-align: center; margin-top: 2.5rem; }
+
+    .btn-google-maps {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.875rem 2rem;
+        background: #4285f4;
+        color: white;
+        text-decoration: none;
+        border-radius: 30px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        transition: background 0.3s, transform 0.3s, box-shadow 0.3s;
+        box-shadow: 0 4px 15px rgba(66,133,244,0.25);
+    }
+
+    .btn-google-maps:hover {
+        background: #3367d6;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(66,133,244,0.4);
+        color: white;
+    }
+
+    .no-reviews { text-align: center; padding: 3rem; color: var(--text-muted); }
+
+    /* ── RESPONSIVE ── */
     @media (max-width: 768px) {
-        .gallery-hero h1 { font-size: 2.5rem; }
+        .gallery-hero h1 { font-size: 2.2rem; }
         .gallery-grid,
-        .video-grid { grid-template-columns: 1fr; gap: 1.5rem; }
+        .video-grid { grid-template-columns: 1fr; gap: 1rem; }
         .gallery-section { padding: 3rem 1rem; }
-        .gallery-item:hover .gallery-content,
-        .video-grid-item:hover .video-grid-content { transform: translateY(-20%); }
         .testimonials-grid { grid-template-columns: 1fr; }
         .testimonials-section { padding: 3rem 1rem; }
+        .gallery-item:hover .card-content,
+        .video-grid-item:hover .card-content { transform: translateY(-20%); }
+    }
+
+    @media (max-width: 480px) {
+        .google-stats { gap: 1.5rem; }
+        .tab-switcher { max-width: 300px; }
     }
 </style>
 @endpush
 
 @section('content')
+<!-- Hero -->
 <section class="gallery-hero">
     <div>
         <h1>GALLERY & TESTIMONIALS</h1>
@@ -284,21 +599,20 @@
 </section>
 
 <section class="gallery-section">
+    <!-- Intro -->
     <div class="gallery-intro">
         <h2>Our Beautiful Moments</h2>
-        <p style="color:#666;max-width:700px;margin:0 auto;">
-            Browse through our collection of beautiful wedding moments captured in paradise
-        </p>
+        <p>Browse through our collection of beautiful wedding moments captured in paradise</p>
     </div>
 
-    {{-- TAB SWITCHER --}}
+    <!-- Tab Switcher -->
     <div class="tab-switcher">
         <button class="tab-btn active" data-tab="photos" onclick="switchTab('photos', this)">
-            <i class="fas fa-images"></i> Foto
+            <i class="fas fa-images"></i> Photos
             <span class="tab-count">{{ $photos->total() }}</span>
         </button>
         <button class="tab-btn" data-tab="videos" onclick="switchTab('videos', this)">
-            <i class="fab fa-youtube"></i> Video
+            <i class="fab fa-youtube"></i> Videos
             <span class="tab-count">{{ $videoGalleries->count() }}</span>
         </button>
     </div>
@@ -306,7 +620,6 @@
     {{-- ===== TAB FOTO ===== --}}
     <div class="tab-panel active" id="tab-photos">
 
-        {{-- Filter Kategori --}}
         @if($categories->count() > 0)
         <div class="gallery-filters">
             <button class="filter-btn active" data-category="all">All</button>
@@ -326,21 +639,27 @@
                class="gallery-item"
                data-category="{{ $gallery->category ?? 'Other' }}">
 
+                {{-- Top badge: category --}}
+                @if($gallery->category)
+                <span class="top-badge"><i class="fas fa-tag"></i> {{ $gallery->category }}</span>
+                @endif
+
                 <img src="{{ asset('storage/' . ImageHelper::thumb($gallery->image)) }}"
                      alt="{{ $gallery->title }}"
                      loading="lazy"
                      onerror="this.onerror=null; this.src='{{ asset('storage/' . $gallery->image) }}';">
 
-                <div class="gallery-overlay">
-                    <div class="gallery-content">
-                        @if($gallery->category)
-                        <div class="gallery-category-text">{{ $gallery->category }}</div>
-                        @endif
-                        <div class="gallery-title-text">{{ $gallery->title }}</div>
+                <div class="card-overlay">
+                    <div class="card-content">
+
+                        <div class="card-title">{{ $gallery->title }}</div>
+
                         @if(!empty($gallery->description))
-                        <div class="gallery-description">{{ Str::limit($gallery->description, 120) }}</div>
+                        <div class="card-description">{{ Str::limit($gallery->description, 100) }}</div>
                         @endif
-                        <div class="gallery-view-badge">
+
+                        <div class="card-cta-badge">
+                            <i class="fas fa-images"></i>
                             View {{ $totalPhotos }} {{ $totalPhotos == 1 ? 'Photo' : 'Photos' }}
                         </div>
                     </div>
@@ -349,7 +668,7 @@
             @empty
             <div class="empty-state">
                 <div class="empty-icon"><i class="fas fa-images"></i></div>
-                <p style="color:#999;">Belum ada foto di gallery.</p>
+                <p>Belum ada foto di gallery.</p>
             </div>
             @endforelse
         </div>
@@ -364,7 +683,7 @@
     {{-- ===== TAB VIDEO ===== --}}
     <div class="tab-panel" id="tab-videos">
         @php
-            $videoCategories = $videoGalleries->pluck('category')->filter()->unique()->values();
+            $videoCategories = $videoGalleries->pluck('category')->filter()->unique()->sort()->values();
         @endphp
 
         @if($videoCategories->count() > 0)
@@ -383,6 +702,9 @@
                  data-category="{{ $video->category ?? 'Other' }}"
                  onclick="openVideoModal('{{ $video->youtube_embed_url }}', '{{ addslashes($video->title) }}')">
 
+                {{-- Top badge --}}
+                <span class="top-badge"><i class="fab fa-youtube"></i> VIDEO</span>
+
                 @if($video->youtube_thumbnail)
                 <img src="{{ $video->youtube_thumbnail }}"
                      alt="{{ $video->title }}"
@@ -390,24 +712,25 @@
                      onerror="this.src='https://img.youtube.com/vi/{{ $video->youtube_id }}/hqdefault.jpg'">
                 @else
                 <div style="width:100%;height:100%;background:#1a1a1a;display:flex;align-items:center;justify-content:center;">
-                    <i class="fab fa-youtube" style="font-size:4rem;color:#e74c3c;opacity:0.4;"></i>
+                    <i class="fab fa-youtube" style="font-size:4rem;color:#e74c3c;opacity:0.35;"></i>
                 </div>
                 @endif
 
-                <div class="video-play-icon">
-                    <i class="fas fa-play" style="margin-left:4px;"></i>
+                {{-- Play button --}}
+                <div class="video-play-btn">
+                    <i class="fas fa-play"></i>
                 </div>
 
-                <div class="video-grid-overlay">
-                    <div class="video-grid-content">
-                        @if($video->category)
-                        <div class="gallery-category-text">{{ $video->category }}</div>
-                        @endif
-                        <div class="gallery-title-text">{{ $video->title }}</div>
+                <div class="card-overlay">
+                    <div class="card-content">
+                    
+                        <div class="card-title">{{ $video->title }}</div>
+
                         @if($video->description)
-                        <div class="video-grid-description">{{ Str::limit($video->description, 120) }}</div>
+                        <div class="card-description">{{ Str::limit($video->description, 100) }}</div>
                         @endif
-                        <div class="video-grid-badge">
+
+                        <div class="card-cta-badge" style="background:rgba(231,76,60,0.9);">
                             <i class="fab fa-youtube"></i> Watch Video
                         </div>
                     </div>
@@ -418,22 +741,19 @@
         @else
         <div class="empty-state">
             <div class="empty-icon"><i class="fab fa-youtube"></i></div>
-            <p style="color:#999;">Belum ada video di gallery.</p>
+            <p>Belum ada video di gallery.</p>
         </div>
         @endif
     </div>
-
 </section>
 
-{{-- Video Modal Player --}}
+{{-- Video Modal --}}
 <div id="videoModal" class="video-modal" onclick="closeVideoModal(event)">
     <button class="modal-close" onclick="closeVideoModal()">
         <i class="fas fa-times"></i>
     </button>
     <div class="video-modal-inner">
-        <iframe id="modalIframe"
-            src=""
-            allowfullscreen
+        <iframe id="modalIframe" src="" allowfullscreen
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture">
         </iframe>
     </div>
@@ -447,7 +767,7 @@
         @if(!empty($businessStats))
         <div class="google-verified">
             <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/39/Google_Maps_icon_%282015-2020%29.svg/512px-Google_Maps_icon_%282015-2020%29.svg.png"
-                 alt="Google" style="width:24px;height:24px;">
+                 alt="Google" style="width:20px;height:20px;">
             <span>Verified by Google</span>
         </div>
         @endif
@@ -458,7 +778,7 @@
         <div class="stat-item">
             <div class="stat-number">{{ number_format($businessStats['rating'], 1) }}</div>
             <div class="stat-label">Average Rating</div>
-            <div class="testimonial-rating">
+            <div class="testimonial-rating" style="margin-top:0.4rem;">
                 @for($i = 1; $i <= 5; $i++)
                     {{ $i <= floor($businessStats['rating']) ? '★' : '☆' }}
                 @endfor
@@ -484,7 +804,7 @@
                      onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
                 @endif
                 <div class="testimonial-avatar"
-                     style="background:#D4AF37;display:{{ isset($review['author_photo']) && $review['author_photo'] ? 'none' : 'flex' }};align-items:center;justify-content:center;color:white;font-weight:bold;font-size:1.5rem;">
+                     style="background:var(--gold);display:{{ isset($review['author_photo']) && $review['author_photo'] ? 'none' : 'flex' }};align-items:center;justify-content:center;color:white;font-weight:700;font-size:1.3rem;">
                     {{ strtoupper(substr($review['author_name'], 0, 1)) }}
                 </div>
                 <div class="testimonial-info">
@@ -507,7 +827,7 @@
 
     <div class="testimonials-cta">
         <a href="{{ $googleReviews['place_url'] ?? '#' }}" target="_blank" class="btn-google-maps">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
             </svg>
             See All Reviews on Google Maps
@@ -560,19 +880,15 @@ document.querySelectorAll('#tab-videos .filter-btn').forEach(btn => {
 // ── VIDEO MODAL ──
 function openVideoModal(embedUrl, title) {
     if (!embedUrl) return;
-    const modal  = document.getElementById('videoModal');
-    const iframe = document.getElementById('modalIframe');
-    iframe.src = embedUrl + '&autoplay=1';
-    modal.classList.add('active');
+    document.getElementById('modalIframe').src = embedUrl + '&autoplay=1';
+    document.getElementById('videoModal').classList.add('active');
     document.body.style.overflow = 'hidden';
 }
 
 function closeVideoModal(e) {
     if (e && e.target !== document.getElementById('videoModal') && !e.target.closest('.modal-close')) return;
-    const modal  = document.getElementById('videoModal');
-    const iframe = document.getElementById('modalIframe');
-    iframe.src   = '';
-    modal.classList.remove('active');
+    document.getElementById('modalIframe').src = '';
+    document.getElementById('videoModal').classList.remove('active');
     document.body.style.overflow = '';
 }
 

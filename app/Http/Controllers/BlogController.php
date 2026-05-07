@@ -20,7 +20,7 @@ class BlogController extends Controller
     {
         $blogs = Blog::where('is_published', true)
                      ->whereNotNull('published_at')
-                     ->orderBy('published_at', 'desc')
+                     ->orderBy('title', 'asc')
                      ->paginate(12);
         return view('blogs.index', compact('blogs'));
     }
@@ -40,7 +40,7 @@ class BlogController extends Controller
 
     public function adminIndex()
     {
-        $blogs = Blog::latest()->paginate(20);
+        $blogs = Blog::orderBy('title', 'asc')->paginate(20);
         return view('admin.blogs.index', compact('blogs'));
     }
 
@@ -78,8 +78,6 @@ class BlogController extends Controller
             $validated['pdf']     = $result['pdf_path'];
             $validated['content'] = $result['content_html'];
 
-            // Auto-fill excerpt from plain text (for SEO / listing preview only)
-            // Text is NOT shown in the blog body — only used for excerpt
             if (empty($validated['excerpt']) && !empty($result['plain_text'])) {
                 $validated['excerpt'] = Str::limit(strip_tags($result['plain_text']), 200);
             }
@@ -91,8 +89,7 @@ class BlogController extends Controller
 
         Blog::create($validated);
 
-        return redirect()->route('admin.blogs.index')
-                         ->with('success', 'Blog post created successfully.');
+        return redirect()->route('admin.blogs.index')->with('success', 'Blog post created successfully.');
     }
 
     public function edit(Blog $blog)
@@ -135,8 +132,7 @@ class BlogController extends Controller
 
         $blog->update($validated);
 
-        return redirect()->route('admin.blogs.index')
-                         ->with('success', 'Blog post updated successfully.');
+        return redirect()->route('admin.blogs.index')->with('success', 'Blog post updated successfully.');
     }
 
     public function destroy(Blog $blog)
@@ -146,39 +142,24 @@ class BlogController extends Controller
         $this->deletePdfImages($blog->slug);
         $blog->delete();
 
-        return redirect()->route('admin.blogs.index')
-                         ->with('success', 'Blog post deleted successfully.');
+        return redirect()->route('admin.blogs.index')->with('success', 'Blog post deleted successfully.');
     }
 
     // =========================================================================
     // PDF PROCESSING
     // =========================================================================
-    //
-    // Alur:
-    //   1. Upload & simpan PDF
-    //   2. Extract plain text → dipakai untuk auto-fill excerpt saja (tidak ditampilkan di blog)
-    //   3. Render setiap halaman PDF → PNG via Ghostscript
-    //   4. Auto-crop white margin tiap halaman → simpan sebagai WebP
-    //   5. content HTML = HANYA deretan <img> halaman (tidak ada teks)
-    //
-    // Hasilnya: blog body hanya menampilkan gambar halaman PDF,
-    // persis seperti membaca PDF tapi di dalam website.
-    // =========================================================================
 
     private function processPdf($file, string $slug): array
     {
-        // 1. Simpan PDF
         $pdfName  = time() . '_' . Str::random(6) . '.pdf';
         $pdfPath  = $file->storeAs('blogs/pdf', $pdfName, 'public');
         $fullPath = $this->normPath(storage_path('app/public/' . $pdfPath));
 
         Log::info('[PDF] Stored: ' . $fullPath);
 
-        // 2. Extract text — untuk excerpt saja, TIDAK masuk ke content HTML
         $plainText = $this->extractText($fullPath);
         Log::info('[PDF] Text extracted: ' . strlen($plainText) . ' chars (for excerpt only)');
 
-        // 3. Siapkan folder output gambar
         $imageDir    = $this->normPath(storage_path('app/public/blogs/pdf-images/' . $slug));
         $imageRelDir = 'blogs/pdf-images/' . $slug;
 
@@ -186,11 +167,9 @@ class BlogController extends Controller
             mkdir($imageDir, 0755, true);
         }
 
-        // 4. Render halaman PDF → gambar (crop white margin → WebP)
         $pageUrls = $this->renderPages($fullPath, $imageDir, $imageRelDir);
         Log::info('[PDF] Page images: ' . count($pageUrls));
 
-        // 5. content HTML = HANYA gambar halaman, tanpa teks apapun
         $contentHtml = '';
         foreach ($pageUrls as $url) {
             $contentHtml .= '<img src="' . htmlspecialchars($url) . '" '
@@ -207,88 +186,54 @@ class BlogController extends Controller
         return [
             'pdf_path'     => $pdfPath,
             'content_html' => $contentHtml,
-            'plain_text'   => $plainText, // hanya untuk excerpt
+            'plain_text'   => $plainText,
         ];
     }
 
-    // -------------------------------------------------------------------------
-    // Text extraction (untuk excerpt saja)
-    // -------------------------------------------------------------------------
-
     private function extractText(string $fullPath): string
     {
-        // Coba smalot dulu
         try {
             $text = (new Parser())->parseFile($fullPath)->getText();
-            if (strlen(trim($text)) > 10) {
-                return $text;
-            }
+            if (strlen(trim($text)) > 10) return $text;
         } catch (\Throwable $e) {
             Log::warning('[PDF] smalot failed: ' . $e->getMessage());
         }
 
-        // Fallback: pdftotext
         if ($bin = $this->findBin('pdftotext')) {
             $tmp = sys_get_temp_dir() . '/pdftext_' . uniqid() . '.txt';
-            shell_exec(sprintf(
-                '%s %s %s 2>&1',
-                escapeshellarg($bin),
-                escapeshellarg($fullPath),
-                escapeshellarg($tmp)
-            ));
+            shell_exec(sprintf('%s %s %s 2>&1', escapeshellarg($bin), escapeshellarg($fullPath), escapeshellarg($tmp)));
             if (file_exists($tmp)) {
                 $text = (string) file_get_contents($tmp);
                 @unlink($tmp);
-                if (strlen(trim($text)) > 10) {
-                    return $text;
-                }
+                if (strlen(trim($text)) > 10) return $text;
             }
         }
 
         return '';
     }
 
-    // -------------------------------------------------------------------------
-    // Render PDF halaman → gambar (Ghostscript + auto-crop + WebP)
-    // -------------------------------------------------------------------------
-
     private function renderPages(string $pdfPath, string $imageDir, string $imageRelDir): array
     {
         $bin = $this->findGsBin();
-
         if (!$bin) {
-            Log::warning('[PDF] Ghostscript not found. Install dari https://ghostscript.com');
+            Log::warning('[PDF] Ghostscript not found.');
             return [];
         }
 
-        // Render semua halaman ke PNG resolusi tinggi
         $pattern = $imageDir . '/raw-%d.png';
 
         if (PHP_OS_FAMILY === 'Windows') {
             $patternArg = str_replace('/', '\\', $pattern);
-            $command = sprintf(
-                '%s -dBATCH -dNOPAUSE -dSAFER -sDEVICE=png16m -r200 '
-                . '-dTextAlphaBits=4 -dGraphicsAlphaBits=4 '
-                . '"-sOutputFile=%s" %s 2>&1',
-                escapeshellarg($bin),
-                $patternArg,
-                escapeshellarg($pdfPath)
-            );
+            $command = sprintf('%s -dBATCH -dNOPAUSE -dSAFER -sDEVICE=png16m -r200 -dTextAlphaBits=4 -dGraphicsAlphaBits=4 "-sOutputFile=%s" %s 2>&1',
+                escapeshellarg($bin), $patternArg, escapeshellarg($pdfPath));
         } else {
-            $command = sprintf(
-                '%s -dBATCH -dNOPAUSE -dSAFER -sDEVICE=png16m -r200 '
-                . '-dTextAlphaBits=4 -dGraphicsAlphaBits=4 '
-                . '-sOutputFile=%s %s 2>&1',
-                escapeshellarg($bin),
-                escapeshellarg($pattern),
-                escapeshellarg($pdfPath)
-            );
+            $command = sprintf('%s -dBATCH -dNOPAUSE -dSAFER -sDEVICE=png16m -r200 -dTextAlphaBits=4 -dGraphicsAlphaBits=4 -sOutputFile=%s %s 2>&1',
+                escapeshellarg($bin), escapeshellarg($pattern), escapeshellarg($pdfPath));
         }
 
         $out = shell_exec($command);
         Log::info('[PDF] GS render: ' . $out);
 
-        // Kumpulkan raw PNG
         $rawFiles = glob($imageDir . '/raw-*.png') ?: [];
         if (empty($rawFiles)) {
             Log::warning('[PDF] Tidak ada PNG dihasilkan.');
@@ -298,28 +243,22 @@ class BlogController extends Controller
 
         $urls = [];
 
-        // GD tersedia → crop + save WebP
         if (extension_loaded('gd')) {
             foreach (array_values($rawFiles) as $i => $rawFile) {
                 $pageNum  = $i + 1;
                 $destFile = $imageDir . '/page-' . $pageNum . '.webp';
                 $destUrl  = '/storage/' . $imageRelDir . '/page-' . $pageNum . '.webp';
-
-                $cropped = $this->autoCrop($rawFile);
-
+                $cropped  = $this->autoCrop($rawFile);
                 if ($cropped) {
                     imagewebp($cropped, $destFile, 88);
                     imagedestroy($cropped);
                 } else {
-                    // GD gagal crop, simpan PNG langsung sebagai WebP via copy
                     copy($rawFile, $destFile);
                 }
-
-                @unlink($rawFile); // hapus raw PNG
+                @unlink($rawFile);
                 $urls[] = $destUrl;
             }
         } else {
-            // GD tidak ada → pakai PNG langsung
             Log::warning('[PDF] GD extension tidak tersedia, menggunakan PNG mentah.');
             foreach (array_values($rawFiles) as $i => $rawFile) {
                 $pageNum  = $i + 1;
@@ -333,14 +272,6 @@ class BlogController extends Controller
         return $urls;
     }
 
-    // -------------------------------------------------------------------------
-    // Auto-crop white/near-white margins via GD
-    // -------------------------------------------------------------------------
-
-    /**
-     * Hapus margin putih dari PNG — hasilnya hanya konten (teks/gambar).
-     * Threshold 245: pixel yang ketiga channel-nya >= 245 dianggap "putih".
-     */
     private function autoCrop(string $filePath)
     {
         $src = @imagecreatefrompng($filePath);
@@ -348,11 +279,10 @@ class BlogController extends Controller
 
         $w = imagesx($src);
         $h = imagesy($src);
-        $t = 245; // threshold warna putih
+        $t = 245;
 
         $top = $bottom = $left = $right = null;
 
-        // Temukan batas konten (bukan putih)
         for ($y = 0; $y < $h && $top === null; $y++) {
             if (!$this->isRowWhite($src, $y, $w, $t)) $top = $y;
         }
@@ -366,13 +296,11 @@ class BlogController extends Controller
             if (!$this->isColWhite($src, $x, $h, $t)) $right = $x;
         }
 
-        // Semua putih (halaman kosong) → kembalikan null
         if ($top === null || $bottom === null || $left === null || $right === null) {
             imagedestroy($src);
             return null;
         }
 
-        // Tambah padding 16px supaya konten tidak mepet tepi
         $pad    = 16;
         $top    = max(0, $top    - $pad);
         $bottom = min($h - 1, $bottom + $pad);
@@ -382,10 +310,7 @@ class BlogController extends Controller
         $cw = $right  - $left + 1;
         $ch = $bottom - $top  + 1;
 
-        if ($cw <= 0 || $ch <= 0) {
-            imagedestroy($src);
-            return null;
-        }
+        if ($cw <= 0 || $ch <= 0) { imagedestroy($src); return null; }
 
         $dst   = imagecreatetruecolor($cw, $ch);
         $white = imagecolorallocate($dst, 255, 255, 255);
@@ -400,11 +325,7 @@ class BlogController extends Controller
     {
         for ($x = 0; $x < $w; $x += 4) {
             $c = imagecolorat($img, $x, $y);
-            if ((($c >> 16) & 0xFF) < $t
-             || (($c >>  8) & 0xFF) < $t
-             || ( $c        & 0xFF) < $t) {
-                return false;
-            }
+            if ((($c >> 16) & 0xFF) < $t || (($c >> 8) & 0xFF) < $t || ($c & 0xFF) < $t) return false;
         }
         return true;
     }
@@ -413,18 +334,10 @@ class BlogController extends Controller
     {
         for ($y = 0; $y < $h; $y += 4) {
             $c = imagecolorat($img, $x, $y);
-            if ((($c >> 16) & 0xFF) < $t
-             || (($c >>  8) & 0xFF) < $t
-             || ( $c        & 0xFF) < $t) {
-                return false;
-            }
+            if ((($c >> 16) & 0xFF) < $t || (($c >> 8) & 0xFF) < $t || ($c & 0xFF) < $t) return false;
         }
         return true;
     }
-
-    // =========================================================================
-    // HELPERS
-    // =========================================================================
 
     private function findGsBin(): ?string
     {

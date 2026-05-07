@@ -19,25 +19,22 @@ class GalleryController extends Controller
 
     public function index()
     {
-        $allGalleries = Gallery::orderBy('order')->latest()->get();
+        $allGalleries = Gallery::orderBy('title', 'asc')->orderBy('order')->get();
 
         $photoGalleries = $allGalleries->filter(fn($g) => !$g->isVideo());
         $videoGalleries = $allGalleries->filter(fn($g) => $g->isVideo());
 
         $sortedPhotos = $photoGalleries->sortByDesc(function ($gallery) {
             if (!$gallery->image) return 0;
-
             $imagePath = storage_path('app/public/' . $gallery->image);
-
             if (file_exists($imagePath)) {
                 [$width, $height] = getimagesize($imagePath);
                 return $height > 0 ? $width / $height : 0;
             }
-
             return 0;
         });
 
-        $page = request()->get('page', 1);
+        $page    = request()->get('page', 1);
         $perPage = 12;
 
         $photos = new \Illuminate\Pagination\LengthAwarePaginator(
@@ -45,10 +42,7 @@ class GalleryController extends Controller
             $sortedPhotos->count(),
             $perPage,
             $page,
-            [
-                'path' => request()->url(),
-                'query' => request()->query()
-            ]
+            ['path' => request()->url(), 'query' => request()->query()]
         );
 
         $categories = Gallery::where(function ($q) {
@@ -56,6 +50,7 @@ class GalleryController extends Controller
         })
         ->where('type', '!=', 'video')
         ->distinct()
+        ->orderBy('category')
         ->pluck('category')
         ->filter();
 
@@ -78,16 +73,13 @@ class GalleryController extends Controller
         $additionalPhotos = is_array($gallery->photo) ? $gallery->photo : [];
 
         $allPhotos = [];
-
         if ($gallery->image) {
             $allPhotos[] = $gallery->image;
         }
-
         $allPhotos = array_merge($allPhotos, $additionalPhotos);
 
         $allPhotosUrl = array_map(fn($p) => asset('storage/' . $p), $allPhotos);
-
-        $totalPhotos = count($allPhotos);
+        $totalPhotos  = count($allPhotos);
 
         return view('gallery.show', compact(
             'gallery',
@@ -100,57 +92,47 @@ class GalleryController extends Controller
     public function refreshReviews()
     {
         $this->googleMapsService->clearCache();
-
-        return redirect()
-            ->route('gallery.index')
-            ->with('success', 'Google Maps reviews refreshed successfully!');
+        return redirect()->route('gallery.index')->with('success', 'Google Maps reviews refreshed successfully!');
     }
 
     public function adminIndex(Request $request)
-{
-    $query = Gallery::query();
+    {
+        $query = Gallery::query();
 
-    /* SEARCH */
-    if ($request->filled('search')) {
-        $query->where(function ($q) use ($request) {
-            $q->where('title', 'like', '%' . $request->search . '%')
-              ->orWhere('description', 'like', '%' . $request->search . '%')
-              ->orWhere('category', 'like', '%' . $request->search . '%');
-        });
-    }
-
-    /* FILTER TYPE */
-    if ($request->filled('type')) {
-
-        if ($request->type === 'photo') {
-            $query->where(function ($q) {
-                $q->whereNull('type')
-                  ->orWhere('type', 'photo');
+        if ($request->filled('search')) {
+            $query->where(function ($q) use ($request) {
+                $q->where('title', 'like', '%' . $request->search . '%')
+                  ->orWhere('description', 'like', '%' . $request->search . '%')
+                  ->orWhere('category', 'like', '%' . $request->search . '%');
             });
         }
 
-        if ($request->type === 'video') {
-            $query->where('type', 'video');
+        if ($request->filled('type')) {
+            if ($request->type === 'photo') {
+                $query->where(function ($q) {
+                    $q->whereNull('type')->orWhere('type', 'photo');
+                });
+            }
+            if ($request->type === 'video') {
+                $query->where('type', 'video');
+            }
         }
+
+        $galleries = $query
+            ->orderBy('title', 'asc')
+            ->orderBy('order')
+            ->orderByDesc('created_at')
+            ->paginate(20)
+            ->withQueryString();
+
+        return view('admin.galleries.index', compact('galleries'));
     }
-
-    $galleries = $query
-        ->orderBy('order')
-        ->orderByDesc('created_at')
-        ->paginate(20)
-        ->withQueryString();
-
-    return view('admin.galleries.index', compact('galleries'));
-}
 
     public function create()
     {
         return view('admin.galleries.create');
     }
 
-    /**
-     * FIXED STORE METHOD
-     */
     public function store(Request $request)
     {
         $type = $request->input('type', 'photo');
@@ -161,15 +143,12 @@ class GalleryController extends Controller
             'description' => 'nullable|string',
             'category'    => 'nullable|string|max:255',
             'order'       => 'nullable|integer',
-
             'foto'        => 'required_if:type,photo|nullable|image|mimes:jpeg,png,jpg,webp|max:20480',
             'photos.*'    => 'nullable|image|mimes:jpeg,png,jpg,webp|max:20480',
-
             'video_url'   => 'required_if:type,video|nullable|url',
         ]);
 
         if ($type === 'video') {
-
             Gallery::create([
                 'type'        => 'video',
                 'title'       => $validated['title'],
@@ -180,29 +159,17 @@ class GalleryController extends Controller
                 'image'       => null,
                 'photo'       => [],
             ]);
-
         } else {
-
             $image = null;
-
             if ($request->hasFile('foto')) {
-                $result = ImageHelper::storeAndCompress(
-                    $request->file('foto'),
-                    'gallery'
-                );
-
-                $image = $result['path'];
+                $result = ImageHelper::storeAndCompress($request->file('foto'), 'gallery');
+                $image  = $result['path'];
             }
 
             $photos = [];
-
             if ($request->hasFile('photos')) {
                 foreach ($request->file('photos') as $photo) {
-                    $result = ImageHelper::storeAndCompress(
-                        $photo,
-                        'gallery/photos'
-                    );
-
+                    $result   = ImageHelper::storeAndCompress($photo, 'gallery/photos');
                     $photos[] = $result['path'];
                 }
             }
@@ -219,9 +186,7 @@ class GalleryController extends Controller
             ]);
         }
 
-        return redirect()
-            ->route('admin.galleries.index')
-            ->with('success', 'Gallery item created successfully.');
+        return redirect()->route('admin.galleries.index')->with('success', 'Gallery item created successfully.');
     }
 
     public function adminShow(Gallery $gallery)
@@ -239,7 +204,6 @@ class GalleryController extends Controller
         $type = $request->input('type', $gallery->type ?? 'photo');
 
         if ($type === 'video') {
-
             $validated = $request->validate([
                 'title'       => 'required|string|max:255',
                 'video_url'   => 'required|url',
@@ -247,13 +211,9 @@ class GalleryController extends Controller
                 'category'    => 'nullable|string|max:255',
                 'order'       => 'nullable|integer',
             ]);
-
             $validated['type'] = 'video';
-
             $gallery->update($validated);
-
         } else {
-
             $validated = $request->validate([
                 'title'       => 'required|string|max:255',
                 'foto'        => 'nullable|image|mimes:jpeg,png,jpg,webp|max:20480',
@@ -262,66 +222,43 @@ class GalleryController extends Controller
                 'category'    => 'nullable|string|max:255',
                 'order'       => 'nullable|integer',
             ]);
-
             $validated['type'] = 'photo';
 
             if ($request->hasFile('foto')) {
-
                 if ($gallery->image) {
                     Storage::disk('public')->delete($gallery->image);
                     ImageHelper::deleteThumb($gallery->image);
                 }
-
-                $result = ImageHelper::storeAndCompress(
-                    $request->file('foto'),
-                    'gallery'
-                );
-
-                $validated['image'] = $result['path'];
+                $result              = ImageHelper::storeAndCompress($request->file('foto'), 'gallery');
+                $validated['image']  = $result['path'];
             }
 
             $existingPhotos = $gallery->photo ?? [];
 
             if ($request->has('removed_photos')) {
-
                 $removedPhotos = json_decode($request->removed_photos, true);
-
                 if (is_array($removedPhotos)) {
                     foreach ($removedPhotos as $photoPath) {
-
                         Storage::disk('public')->delete($photoPath);
                         ImageHelper::deleteThumb($photoPath);
-
-                        $existingPhotos = array_filter(
-                            $existingPhotos,
-                            fn($p) => $p !== $photoPath
-                        );
+                        $existingPhotos = array_filter($existingPhotos, fn($p) => $p !== $photoPath);
                     }
                 }
             }
 
             if ($request->hasFile('photos')) {
                 foreach ($request->file('photos') as $photo) {
-
-                    $result = ImageHelper::storeAndCompress(
-                        $photo,
-                        'gallery/photos'
-                    );
-
+                    $result           = ImageHelper::storeAndCompress($photo, 'gallery/photos');
                     $existingPhotos[] = $result['path'];
                 }
             }
 
             $validated['photo'] = array_values($existingPhotos);
-
             unset($validated['foto'], $validated['photos']);
-
             $gallery->update($validated);
         }
 
-        return redirect()
-            ->route('admin.galleries.index')
-            ->with('success', 'Gallery item updated successfully.');
+        return redirect()->route('admin.galleries.index')->with('success', 'Gallery item updated successfully.');
     }
 
     public function destroy(Gallery $gallery)
@@ -339,9 +276,6 @@ class GalleryController extends Controller
         }
 
         $gallery->delete();
-
-        return redirect()
-            ->route('admin.galleries.index')
-            ->with('success', 'Gallery item deleted successfully.');
+        return redirect()->route('admin.galleries.index')->with('success', 'Gallery item deleted successfully.');
     }
 }
