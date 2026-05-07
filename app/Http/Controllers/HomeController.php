@@ -29,7 +29,6 @@ class HomeController extends Controller
 
         // Fetch gallery images (randomized, exclude hero & video)
         $galleries = Gallery::where('category', '!=', 'Hero')
-                    ->where('type', '!=', 'video')
                     ->inRandomOrder()
                     ->take(6)
                     ->get();
