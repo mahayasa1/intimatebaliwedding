@@ -18,7 +18,8 @@
     position: absolute;
     inset: 0;
     opacity: 0;
-    transition: opacity 1s ease-in-out;
+    transition: opacity 1.5s ease-in-out; /* naikkan dari 1s ke 1.5s */
+    will-change: opacity;
 }
 
 .hero-slide.active { opacity: 1; }
@@ -28,7 +29,6 @@
     height: 100%;
     object-fit: cover;
     object-position: center;
-    will-change: opacity;
 }
 
 .hero-overlay {
@@ -189,27 +189,27 @@
 }
 
 .gallery-preview-item video,
-.gallery-preview-item img{
-    width:100%;
-    height:100%;
-    object-fit:cover;
+.gallery-preview-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
-.video-play-icon{
-    position:absolute;
-    top:50%;
-    left:50%;
-    transform:translate(-50%,-50%);
-    width:55px;
-    height:55px;
-    border-radius:50%;
-    background:rgba(255,255,255,.9);
-    color:#e74c3c;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:22px;
-    font-weight:bold;
+.video-play-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.9);
+    color: #e74c3c;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    font-weight: bold;
 }
 
 .gallery-preview-item {
@@ -593,14 +593,17 @@
 @if($heroSlides->isNotEmpty())
 @php
     $firstSlide = $heroSlides->first();
-    $firstThumb = ImageHelper::thumb(
-        str_contains($firstSlide->image, 'storage/')
-            ? ltrim(str_replace('storage/', '', $firstSlide->image), '/')
-            : $firstSlide->image
-    );
+    $isPublic = isset($firstSlide->is_public) && $firstSlide->is_public;
+    $firstImgUrl = $isPublic
+        ? asset($firstSlide->image)
+        : asset('storage/' . ImageHelper::thumb(
+            str_contains($firstSlide->image, 'storage/')
+                ? ltrim(str_replace('storage/', '', $firstSlide->image), '/')
+                : $firstSlide->image
+          ));
 @endphp
 @push('preload')
-<link rel="preload" as="image" href="{{ asset('storage/' . $firstThumb) }}" fetchpriority="high">
+<link rel="preload" as="image" href="{{ $firstImgUrl }}" fetchpriority="high">
 @endpush
 @endif
 
@@ -608,22 +611,38 @@
 <section id="home" class="hero-section">
     @foreach($heroSlides as $index => $slide)
     @php
-        $rawPath = str_contains($slide->image, 'storage/')
-            ? ltrim(str_replace('storage/', '', $slide->image), '/')
-            : $slide->image;
-        $thumbPath = ImageHelper::thumb($rawPath);
-    @endphp
+        $isPublic = isset($slide->is_public) && $slide->is_public;
 
-    {{-- {{ dd($rawPath) }} --}}
-    <div class="hero-slide {{ $index === 0 ? 'active' : '' }}">
-        <x-image
-            :src="$rawPath"
-            alt="Wedding Venue Bali"
-            :thumb="true"
-            :eager="$index === 0"
-            width="1920"
-            height="1080"
-        />
+        if ($isPublic) {
+            $imgUrl = asset($slide->image);
+        } else {
+            $rawPath = str_contains($slide->image, 'storage/')
+                ? ltrim(str_replace('storage/', '', $slide->image), '/')
+                : $slide->image;
+            $imgUrl = asset('storage/' . ImageHelper::thumb($rawPath));
+        }
+    @endphp
+    <div class="hero-slide {{ $index === 0 ? 'active' : '' }}" data-index="{{ $index }}">
+        @if($index === 0)
+            <img
+                src="{{ $imgUrl }}"
+                alt="Wedding Venue Bali"
+                width="1920"
+                height="1080"
+                fetchpriority="high"
+                style="width:100%;height:100%;object-fit:cover;object-position:center;"
+            />
+        @else
+            <img
+                src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+                data-src="{{ $imgUrl }}"
+                alt="Wedding Venue Bali"
+                width="1920"
+                height="1080"
+                style="width:100%;height:100%;object-fit:cover;object-position:center;"
+                decoding="async"
+            />
+        @endif
     </div>
     @endforeach
 
@@ -656,7 +675,6 @@
 
         <div class="package-grid">
             @foreach($packages->take(4) as $package)
-            @php $pkgThumb = $package->image ? ImageHelper::thumb($package->image) : null; @endphp
             <a href="{{ route('packages.public') }}" class="package-card">
                 <x-image
                     :src="$package->image ?? 'https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=800&q=80'"
@@ -665,7 +683,6 @@
                 />
                 <div class="package-overlay">
                     <div class="package-content">
-                        {{-- <div class="package-type">Wedding Package</div> --}}
                         <h3 class="package-title">{{ $package->name }}</h3>
                         <p>{{ Str::limit($package->description, 80) }}</p>
                     </div>
@@ -690,48 +707,45 @@
         <div class="gallery-preview-grid">
             @foreach($galleries as $gallery)
             <div class="gallery-preview-item">
-            
+
                 @if($gallery->type === 'video')
-            
+
                     {{-- YOUTUBE --}}
                     @if(Str::contains($gallery->video_url, ['youtube.com', 'youtu.be']))
                         @php
                             preg_match('/(youtu\.be\/|v=)([^&]+)/', $gallery->video_url, $match);
                             $youtubeId = $match[2] ?? null;
                         @endphp
-
                         <img src="https://img.youtube.com/vi/{{ $youtubeId }}/hqdefault.jpg"
                              alt="{{ $gallery->title }}"
-                             loading="lazy">
-            
+                             loading="lazy"
+                             decoding="async">
+
                     {{-- VIMEO --}}
                     @elseif(Str::contains($gallery->video_url, 'vimeo.com'))
-            
                         <img src="{{ asset('images/video-placeholder.jpg') }}"
-                             alt="{{ $gallery->title }}">
-            
+                             alt="{{ $gallery->title }}"
+                             loading="lazy"
+                             decoding="async">
+
                     {{-- LOCAL VIDEO --}}
                     @else
-            
-                        <video muted playsinline preload="metadata">
-                            <source src="{{ asset('storage/'.$gallery->video_url) }}">
+                        <video muted playsinline preload="none">
+                            <source src="{{ asset('storage/' . $gallery->video_url) }}">
                         </video>
-                    
                     @endif
-                    
-                    <div class="video-play-icon">
-                        ▶
-                    </div>
-                
+
+                    <div class="video-play-icon">▶</div>
+
                 @else
-                
+
                     <x-image
                         :src="$gallery->image"
                         :alt="$gallery->title ?? 'Gallery'"
                     />
-                
+
                 @endif
-                
+
             </div>
             @endforeach
         </div>
@@ -751,7 +765,7 @@
 
         <div class="instagram-feed-wrapper" style="position: relative; max-width: 1200px; margin: 2rem auto;">
             <div class="instagram-feed-container" style="background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
-                <script src="https://snapwidget.com/js/snapwidget.js"></script>
+                <script src="https://snapwidget.com/js/snapwidget.js" defer></script>
                 <iframe src="https://snapwidget.com/embed/1119589"
                         class="snapwidget-widget"
                         allowtransparency="true"
@@ -821,7 +835,7 @@
 
     @if(isset($googleReviews['success']) && $googleReviews['success'] && !empty($googleReviews['reviews']))
     <div class="testimonials-slider-container">
-        <div class="slider-nav prev" onclick="moveSlider(-1)" aria-label="Previous">
+        <div class="slider-nav prev" onclick="testimonialMoveSlider(-1)" aria-label="Previous">
             <svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
         </div>
 
@@ -836,10 +850,11 @@
                             :alt="$review['author_name']"
                             class="testimonial-avatar"
                         />
-                        @endif
-                        <div class="testimonial-avatar" style="background:#D4AF37; display:{{ isset($review['author_photo']) && $review['author_photo'] ? 'none' : 'flex' }}; align-items:center; justify-content:center; color:white; font-weight:bold; font-size:1.3rem;">
+                        @else
+                        <div class="testimonial-avatar" style="background:#D4AF37; display:flex; align-items:center; justify-content:center; color:white; font-weight:bold; font-size:1.3rem;">
                             {{ strtoupper(substr($review['author_name'], 0, 1)) }}
                         </div>
+                        @endif
                         <div class="testimonial-info">
                             <h4>{{ $review['author_name'] }}</h4>
                             <div class="testimonial-time">{{ $review['relative_time'] }}</div>
@@ -856,7 +871,7 @@
             </div>
         </div>
 
-        <div class="slider-nav next" onclick="moveSlider(1)" aria-label="Next">
+        <div class="slider-nav next" onclick="testimonialMoveSlider(1)" aria-label="Next">
             <svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
         </div>
     </div>
@@ -895,28 +910,66 @@
 <script>
 document.addEventListener('DOMContentLoaded', function () {
 
-    /* ---- Hero Slider ---- */
-    const slides = document.querySelectorAll('.hero-slide');
-    let currentSlide = 0;
+    /* ========================================================
+       HERO SLIDER
+       ======================================================== */
+    const heroSlides = document.querySelectorAll('.hero-slide');
+    let currentHeroSlide = 0;
 
-    function nextHeroSlide() {
-        slides[currentSlide].classList.remove('active');
-        currentSlide = (currentSlide + 1) % slides.length;
-        slides[currentSlide].classList.add('active');
+    function loadHeroSlideImage(slide) {
+        const img = slide.querySelector('img[data-src]');
+        if (!img) return; // slide pertama pakai x-image, tidak ada data-src
+        if (img.dataset.src) {
+            img.src = img.dataset.src;
+            delete img.dataset.src;
+        }
     }
 
-    if (slides.length > 1) setInterval(nextHeroSlide, 4000);
+    function goToHeroSlide(index) {
+        const nextIndex = (index + heroSlides.length) % heroSlides.length;
+        const nextSlide = heroSlides[nextIndex];
+        const img = nextSlide.querySelector('img[data-src]');
 
-    /* ---- Testimonial Slider ---- */
+        function doTransition() {
+            heroSlides[currentHeroSlide].classList.remove('active');
+            currentHeroSlide = nextIndex;
+            heroSlides[currentHeroSlide].classList.add('active');
+        }
+
+        if (img && img.dataset.src) {
+            // Load dulu, baru transisi
+            img.onload = doTransition;
+            img.onerror = doTransition; // tetap lanjut meski gagal
+            img.src = img.dataset.src;
+            delete img.dataset.src;
+        } else {
+            doTransition();
+        }
+    }
+
+    // Preload slide ke-2 saat browser idle agar siap sebelum giliran tampil
+    if (heroSlides.length > 1) {
+        if ('requestIdleCallback' in window) {
+            requestIdleCallback(() => loadHeroSlideImage(heroSlides[1]));
+        } else {
+            setTimeout(() => loadHeroSlideImage(heroSlides[1]), 2000);
+        }
+
+        setInterval(() => goToHeroSlide(currentHeroSlide + 1), 4000);
+    }
+
+    /* ========================================================
+       TESTIMONIAL SLIDER
+       ======================================================== */
     const testimonialSlider = document.getElementById('testimonials-slider');
     if (!testimonialSlider) return;
 
     const testimonialCards = testimonialSlider.querySelectorAll('.testimonial-card');
     if (!testimonialCards.length) return;
 
-    let currentSlideIndex = 0;
-    let cardsPerView = 3;
-    let sliderInterval;
+    let currentTestimonialIndex = 0;
+    let cardsPerView = getCardsPerView();
+    let testimonialInterval;
 
     function getCardsPerView() {
         const w = window.innerWidth;
@@ -925,16 +978,14 @@ document.addEventListener('DOMContentLoaded', function () {
         return 3;
     }
 
-    function updateCardsPerView() { cardsPerView = getCardsPerView(); }
-
     function updateSliderPosition() {
         const card    = testimonialCards[0];
         const gap     = parseInt(getComputedStyle(testimonialSlider).gap) || 24;
         const moveAmt = (card.offsetWidth + gap) * cardsPerView;
-        testimonialSlider.style.transform = `translateX(${-(currentSlideIndex * moveAmt)}px)`;
+        testimonialSlider.style.transform = `translateX(${-(currentTestimonialIndex * moveAmt)}px)`;
     }
 
-    function maxSlideIndex() {
+    function maxTestimonialIndex() {
         return Math.max(0, Math.ceil(testimonialCards.length / cardsPerView) - 1);
     }
 
@@ -945,85 +996,85 @@ document.addEventListener('DOMContentLoaded', function () {
         const total = Math.ceil(testimonialCards.length / cardsPerView);
         for (let i = 0; i < total; i++) {
             const dot = document.createElement('div');
-            dot.className = 'slider-dot' + (i === currentSlideIndex ? ' active' : '');
-            dot.addEventListener('click', () => goToSlide(i));
+            dot.className = 'slider-dot' + (i === currentTestimonialIndex ? ' active' : '');
+            dot.addEventListener('click', () => goToTestimonialSlide(i));
             container.appendChild(dot);
         }
     }
 
     function updateDots() {
         document.querySelectorAll('.slider-dot').forEach((dot, i) => {
-            dot.classList.toggle('active', i === currentSlideIndex);
+            dot.classList.toggle('active', i === currentTestimonialIndex);
         });
     }
 
-    function goToSlide(index) {
-        currentSlideIndex = Math.max(0, Math.min(index, maxSlideIndex()));
+    function goToTestimonialSlide(index) {
+        currentTestimonialIndex = Math.max(0, Math.min(index, maxTestimonialIndex()));
         updateSliderPosition();
         updateDots();
-        restartAutoSlide();
+        restartTestimonialAutoSlide();
     }
 
-    window.moveSlider = function (dir) {
-        let next = currentSlideIndex + dir;
-        if (next < 0) next = maxSlideIndex();
-        else if (next > maxSlideIndex()) next = 0;
-        currentSlideIndex = next;
+    // Dipanggil dari onclick di HTML (harus global)
+    window.testimonialMoveSlider = function (dir) {
+        let next = currentTestimonialIndex + dir;
+        if (next < 0) next = maxTestimonialIndex();
+        else if (next > maxTestimonialIndex()) next = 0;
+        currentTestimonialIndex = next;
         updateSliderPosition();
         updateDots();
-        restartAutoSlide();
+        restartTestimonialAutoSlide();
     };
 
-    function startAutoSlide() {
-        sliderInterval = setInterval(() => moveSlider(1), 5000);
+    function startTestimonialAutoSlide() {
+        testimonialInterval = setInterval(() => testimonialMoveSlider(1), 5000);
     }
 
-    function stopAutoSlide() {
-        if (sliderInterval) clearInterval(sliderInterval);
+    function stopTestimonialAutoSlide() {
+        if (testimonialInterval) clearInterval(testimonialInterval);
     }
 
-    function restartAutoSlide() {
-        stopAutoSlide();
-        startAutoSlide();
+    function restartTestimonialAutoSlide() {
+        stopTestimonialAutoSlide();
+        startTestimonialAutoSlide();
     }
 
-    /* Touch / Swipe support */
+    // Touch / Swipe
     let touchStartX = 0;
     testimonialSlider.addEventListener('touchstart', e => {
         touchStartX = e.changedTouches[0].screenX;
     }, { passive: true });
     testimonialSlider.addEventListener('touchend', e => {
         const diff = touchStartX - e.changedTouches[0].screenX;
-        if (Math.abs(diff) > 50) moveSlider(diff > 0 ? 1 : -1);
+        if (Math.abs(diff) > 50) testimonialMoveSlider(diff > 0 ? 1 : -1);
     }, { passive: true });
 
-    /* Keyboard */
+    // Keyboard
     document.addEventListener('keydown', e => {
-        if (e.key === 'ArrowLeft')  moveSlider(-1);
-        if (e.key === 'ArrowRight') moveSlider(1);
+        if (e.key === 'ArrowLeft')  testimonialMoveSlider(-1);
+        if (e.key === 'ArrowRight') testimonialMoveSlider(1);
     });
 
-    /* Pause on hover */
-    testimonialSlider.addEventListener('mouseenter', stopAutoSlide);
-    testimonialSlider.addEventListener('mouseleave', startAutoSlide);
+    // Pause on hover
+    testimonialSlider.addEventListener('mouseenter', stopTestimonialAutoSlide);
+    testimonialSlider.addEventListener('mouseleave', startTestimonialAutoSlide);
 
-    /* Resize */
+    // Resize
     let resizeTimer;
     window.addEventListener('resize', () => {
         clearTimeout(resizeTimer);
         resizeTimer = setTimeout(() => {
-            updateCardsPerView();
-            currentSlideIndex = Math.min(currentSlideIndex, maxSlideIndex());
+            cardsPerView = getCardsPerView();
+            currentTestimonialIndex = Math.min(currentTestimonialIndex, maxTestimonialIndex());
             updateSliderPosition();
             createDots();
         }, 200);
     });
 
-    /* Init */
-    updateCardsPerView();
+    // Init
     createDots();
     updateSliderPosition();
-    startAutoSlide();
+    startTestimonialAutoSlide();
 });
 </script>
 @endpush

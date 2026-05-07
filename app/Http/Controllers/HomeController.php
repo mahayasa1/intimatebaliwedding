@@ -22,15 +22,15 @@ class HomeController extends Controller
      */
     public function index()
     {
-        // Fetch featured packages (limit to 4 for homepage)
-        $packages = Package::orderBy('created_at', 'desc')
-                    ->latest()
+        // Fetch featured packages (randomized for homepage)
+        $packages = Package::inRandomOrder()
                     ->take(4)
                     ->get();
 
-        // Fetch latest gallery images (limit to 6)
-        $galleries = Gallery::orderBy('order')
-                    ->latest()
+        // Fetch gallery images (randomized, exclude hero & video)
+        $galleries = Gallery::where('category', '!=', 'Hero')
+                    ->where('type', '!=', 'video')
+                    ->inRandomOrder()
                     ->take(6)
                     ->get();
 
@@ -54,11 +54,11 @@ class HomeController extends Controller
         // If no hero slides, use default images
         if ($heroSlides->isEmpty()) {
             $heroSlides = collect([
-                (object)['image' => 'assets/background/home_1.jpg'],
-                (object)['image' => 'assets/background/home_2.jpg'],
-                (object)['image' => 'assets/background/home_3.jpg'],
-                (object)['image' => 'assets/background/home_4.jpg'],
-                (object)['image' => 'assets/background/home_5.jpg'],
+                (object)['image' => 'assets/background/home_1.jpg', 'is_public' => true],
+                (object)['image' => 'assets/background/home_2.jpg', 'is_public' => true],
+                (object)['image' => 'assets/background/home_3.jpg', 'is_public' => true],
+                (object)['image' => 'assets/background/home_4.jpg', 'is_public' => true],
+                (object)['image' => 'assets/background/home_5.jpg', 'is_public' => true],
             ]);
         }
 
