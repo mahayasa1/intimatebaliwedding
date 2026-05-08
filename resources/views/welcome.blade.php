@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @php use App\Helpers\ImageHelper; @endphp
 
-@section('title', 'Wedding Venue - Intimate Bali Wedding')
+@section('title', 'Intimate Wedding in Bali - Creating Unforgettable Moments')
 
 @push('styles')
 <style>
