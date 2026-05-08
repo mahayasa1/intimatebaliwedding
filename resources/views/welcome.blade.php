@@ -76,10 +76,10 @@
 /* ===== PACKAGE CARDS ===== */
 .package-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(clamp(140px, 35vw, 600px), 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(clamp(140px, 30vw, 260px), 1fr));
     gap: clamp(0.75rem, 2vw, 1.25rem);
-    max-width: 1400px;
-    margin: 0 auto;
+    max-width: 1200px;
+    margin: 2rem auto;
 }
 
 .package-card {
@@ -674,7 +674,7 @@
         <p class="section-subtitle">All packages can be customised to suit your needs</p>
 
         <div class="package-grid">
-            @foreach($packages->take(4) as $package)
+            @foreach($packages->take(8) as $package)
             <a href="{{ route('packages.public') }}" class="package-card">
                 <x-image
                     :src="$package->image ?? 'https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=800&q=80'"
@@ -705,7 +705,7 @@
 
         @if($galleries->count() > 0)
         <div class="gallery-preview-grid">
-            @foreach($galleries as $gallery)
+            @foreach($galleries->take(8) as $gallery)
             <div class="gallery-preview-item">
 
                 @if($gallery->type === 'video')

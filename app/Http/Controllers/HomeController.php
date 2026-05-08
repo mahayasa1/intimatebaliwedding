@@ -24,7 +24,7 @@ class HomeController extends Controller
     {
         // Fetch featured packages (randomized for homepage)
         $packages = Package::inRandomOrder()
-                    ->take(4)
+                    ->take(6)
                     ->get();
 
         // Fetch gallery images (randomized, exclude hero & video)

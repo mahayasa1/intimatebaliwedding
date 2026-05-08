@@ -1,11 +1,15 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <!-- Open Graph / Facebook -->
+<meta property="og:type" content="website" />
+<meta property="og:url" content="{{ url()->current() }}" />
+<meta property="og:title" content="Intimate Wedding in Bali" />
+<meta property="og:description" content="Creating unforgettable wedding moments in Bali. Contact us for your dream wedding!" />
+<meta property="og:image" content="{{ asset('assets/Logo_IBW_2B.png') }}" />
+<meta property="og:site_name" content="Intimate Bali Wedding" />
 
-    <title>@yield('title', 'Wedding Venue - Intimate Bali Wedding')</title>
+    <title>@yield('title', 'Intimate Wedding in Bali')</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
