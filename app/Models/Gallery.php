@@ -76,12 +76,24 @@ class Gallery extends Model
     /**
      * Thumbnail YouTube resolusi tinggi.
      */
+
+    public function getThumbnailAttribute(): ?string
+    {
+        // kalau video → ambil dari YouTube
+        if ($this->isVideo()) {
+            return $this->youtube_thumbnail;
+        }
+
+        // kalau foto → ambil dari storage
+        return $this->image ? asset('storage/' . $this->image) : null;
+    }
+
     public function getYoutubeThumbnailAttribute(): ?string
     {
         $id = $this->youtube_id;
         if (!$id) return null;
 
-        return "https://img.youtube.com/vi/{$id}/maxresdefault.jpg";
+        return "https://img.youtube.com/vi/{$id}/hqdefault.jpg";
     }
 
     /**

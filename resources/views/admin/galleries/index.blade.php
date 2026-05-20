@@ -331,8 +331,8 @@ body{
 
         @if($isVideo)
 
-            @if($gallery->youtube_thumbnail)
-                <img src="{{ $gallery->youtube_thumbnail }}">
+            @if($gallery->thumbnail)
+                <img src="{{ $gallery->thumbnail }}">
             @endif
 
             <div class="video-play">
