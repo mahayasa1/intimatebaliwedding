@@ -218,7 +218,6 @@
         pointer-events: none;
     }
 
-    /* Dark wash on hover */
     .card-overlay::before {
         content: '';
         position: absolute;
@@ -246,7 +245,6 @@
         transform: translateY(-28%);
     }
 
-    /* Category tag — same style as packages */
     .card-category-tag {
         display: inline-flex;
         align-items: center;
@@ -274,7 +272,6 @@
         color: white;
     }
 
-    /* Description — hidden until hover */
     .card-description {
         font-size: 0.88rem;
         line-height: 1.6;
@@ -294,7 +291,6 @@
         transform: translateY(0);
     }
 
-    /* CTA badge — same as package */
     .card-cta-badge {
         display: inline-flex;
         align-items: center;
@@ -321,13 +317,12 @@
         transform: translateY(0);
     }
 
-    /* Top-left category badge (always visible) */
     .top-badge {
         position: absolute;
         top: 0.75rem;
         left: 0.75rem;
         z-index: 5;
-        background: var(--gold);          /* ← ganti jadi gold */
+        background: var(--gold);
         color: white;
         padding: 0.3rem 0.75rem;
         border-radius: 20px;
@@ -341,7 +336,6 @@
         gap: 0.3rem;
     }
 
-    /* Play button for video */
     .video-play-btn {
         position: absolute;
         top: 50%; left: 50%;
@@ -409,6 +403,35 @@
     /* ── TAB PANELS ── */
     .tab-panel { display: none; }
     .tab-panel.active { display: block; }
+
+    /* ── PAGINATION ── */
+    .simple-pagination {
+        margin-top: 24px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .btn-page {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 14px;
+        border-radius: 8px;
+        background: #fff;
+        border: 1px solid #ddd;
+        text-decoration: none;
+        color: #6B5644;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .btn-page:hover {
+        background: #f4f4f4;
+        color: #6B5644;
+    }
 
     /* ── TESTIMONIALS ── */
     .testimonials-section {
@@ -639,7 +662,6 @@
                class="gallery-item"
                data-category="{{ $gallery->category ?? 'Other' }}">
 
-                {{-- Top badge: category --}}
                 @if($gallery->category)
                 <span class="top-badge"><i class="fas fa-tag"></i> {{ $gallery->category }}</span>
                 @endif
@@ -651,7 +673,6 @@
 
                 <div class="card-overlay">
                     <div class="card-content">
-
                         <div class="card-title">{{ $gallery->title }}</div>
 
                         @if(!empty($gallery->description))
@@ -674,8 +695,38 @@
         </div>
 
         @if($photos->hasPages())
-        <div style="margin-top:3rem;text-align:center;">
-            {{ $photos->links() }}
+        <div class="simple-pagination">
+
+            @if($photos->onFirstPage())
+                <span class="btn-page" style="opacity:.5;">
+                    <i class="fas fa-angle-left"></i> Previous
+                </span>
+            @else
+                <a href="{{ $photos->previousPageUrl() }}" class="btn-page">
+                    <i class="fas fa-angle-left"></i> Previous
+                </a>
+            @endif
+
+            @foreach($photos->getUrlRange(1, $photos->lastPage()) as $page => $url)
+                @if($page == $photos->currentPage())
+                    <span class="btn-page" style="background:#8B7355;color:#fff;border-color:#8B7355;">
+                        {{ $page }}
+                    </span>
+                @else
+                    <a href="{{ $url }}" class="btn-page">{{ $page }}</a>
+                @endif
+            @endforeach
+
+            @if($photos->hasMorePages())
+                <a href="{{ $photos->nextPageUrl() }}" class="btn-page">
+                    Next <i class="fas fa-angle-right"></i>
+                </a>
+            @else
+                <span class="btn-page" style="opacity:.5;">
+                    Next <i class="fas fa-angle-right"></i>
+                </span>
+            @endif
+
         </div>
         @endif
     </div>
@@ -702,7 +753,6 @@
                  data-category="{{ $video->category ?? 'Other' }}"
                  onclick="openVideoModal('{{ $video->youtube_embed_url }}', '{{ addslashes($video->title) }}')">
 
-                {{-- Top badge --}}
                 <span class="top-badge"><i class="fab fa-youtube"></i> VIDEO</span>
 
                 @if($video->youtube_thumbnail)
@@ -716,14 +766,12 @@
                 </div>
                 @endif
 
-                {{-- Play button --}}
                 <div class="video-play-btn">
                     <i class="fas fa-play"></i>
                 </div>
 
                 <div class="card-overlay">
                     <div class="card-content">
-                    
                         <div class="card-title">{{ $video->title }}</div>
 
                         @if($video->description)

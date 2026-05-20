@@ -29,8 +29,9 @@ class HomeController extends Controller
 
         // Fetch gallery images (randomized, exclude hero & video)
         $galleries = Gallery::where('category', '!=', 'Hero')
+                    ->where('type', '!=', 'Video')
                     ->inRandomOrder()
-                    ->take(6)
+                    ->take(8)
                     ->get();
 
         // Fetch latest published blogs (limit to 3)
