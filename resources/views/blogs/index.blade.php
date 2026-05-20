@@ -28,7 +28,7 @@
     .blog-container {
         max-width: 1200px;
         margin: 0 auto;
-        padding: 4rem 2rem;
+        padding: 3rem 1rem;
     }
 
     .blog-grid {
@@ -144,9 +144,9 @@
 @section('content')
 <!-- Hero Section -->
 <section class="blog-hero">
-    <div>
-        <h1>BLOG</h1>
-        <p style="font-size: 1.1rem; font-weight: 300;">Wedding Tips, Stories & Inspiration</p>
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 0.75rem;">
+        <h1 style="margin: 0;">BLOG</h1>
+        <p style="font-size: 1.1rem; font-weight: 300; margin: 0;">Wedding Tips, Stories & Inspiration.</p>
     </div>
 </section>
 
@@ -190,7 +190,7 @@
         Ready to Plan Your Wedding?
     </h2>
     <p style="color: #666; margin-bottom: 2rem; max-width: 600px; margin-left: auto; margin-right: auto;">
-        Let our experienced team help you create the wedding of your dreams
+        Let our experienced team help you create the wedding of your dreams.
     </p>
     <a href="#contact" class="btn-primary">Contact Us</a>
 </section>

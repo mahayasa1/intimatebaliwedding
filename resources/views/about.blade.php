@@ -128,7 +128,7 @@
 <section class="about-hero">
     <div>
         <h1>About Us</h1>
-        <p>Creating Unforgettable Experiences And Moments In Bali</p>
+        <p>Creating Unforgettable Experiences And Moments In Bali.</p>
     </div>
 </section>
 

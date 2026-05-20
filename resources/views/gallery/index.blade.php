@@ -617,7 +617,7 @@
 <section class="gallery-hero">
     <div>
         <h1>GALLERY & TESTIMONIALS</h1>
-        <p>Relive The Previous Beautiful Moments And Kind Words</p>
+        <p>Relive The Previous Beautiful Moments And Kind Words.</p>
     </div>
 </section>
 
@@ -625,7 +625,7 @@
     <!-- Intro -->
     <div class="gallery-intro">
         <h2>Our Beautiful Moments</h2>
-        <p>Browse through our collection of beautiful wedding moments captured in paradise</p>
+        <p>Browse through our collection of beautiful wedding moments captured in paradise.</p>
     </div>
 
     <!-- Tab Switcher -->
@@ -811,7 +811,7 @@
 <section class="testimonials-section">
     <div class="testimonials-header">
         <h2>What Our Couples Say</h2>
-        <p>Real reviews from Google Maps</p>
+        <p>Real reviews from Google Maps.</p>
         @if(!empty($businessStats))
         <div class="google-verified">
             <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/39/Google_Maps_icon_%282015-2020%29.svg/512px-Google_Maps_icon_%282015-2020%29.svg.png"

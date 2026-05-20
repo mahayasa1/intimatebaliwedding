@@ -648,7 +648,7 @@
 
     <div class="hero-overlay">
         <h1 class="hero-title">INTIMATE WEDDING IN BALI</h1>
-        <p class="hero-subtitle">Creating Timeless Memories Amidst Nature's Splendor</p>
+        <p class="hero-subtitle">Creating Timeless Memories Amidst Nature's Splendor.</p>
     </div>
 </section>
 
@@ -659,7 +659,7 @@
         <p class="section-subtitle">
             Intimate Bali Wedding is a specialized wedding service company dedicated to wedding affairs, meticulously, and resourcefully wedding. We
             GUARANTEE THAT YOU ARE IN GOOD HANDS FROM BEGINNING TO END. PROFESSIONAL AND FLEXIBLE. We have worked on various
-            projects around the world. Let us handle it!
+            projects around the world. Let us handle it!.
         </p>
         <div style="text-align: center;">
             <a href="{{ route('about') }}" class="btn-primary">Learn More</a>
@@ -671,7 +671,7 @@
 <section id="packages" class="section" style="background: #f8f8f8;">
     <div class="container">
         <h2 class="section-title">WEDDING PACKAGE</h2>
-        <p class="section-subtitle">All packages can be customised to suit your needs</p>
+        <p class="section-subtitle">All packages can be customised to suit your needs.</p>
 
         <div class="package-grid">
             @foreach($packages->take(8) as $package)
@@ -701,7 +701,7 @@
 <section id="gallery" class="section">
     <div class="container">
         <h2 class="section-title">GALLERY</h2>
-        <p class="section-subtitle">Beautiful moments captured in paradise</p>
+        <p class="section-subtitle">Beautiful moments captured in paradise.</p>
 
         @if($galleries->count() > 0)
         <div class="gallery-preview-grid">
@@ -761,7 +761,7 @@
 <section id="instagram" class="section" style="background: #f8f8f8;">
     <div class="container">
         <h2 class="section-title">FOLLOW US ON INSTAGRAM</h2>
-        <p class="section-subtitle">Stay connected and see our latest moments</p>
+        <p class="section-subtitle">Stay connected and see our latest moments.</p>
 
         <div class="instagram-feed-wrapper" style="position: relative; max-width: 1200px; margin: 2rem auto;">
             <div class="instagram-feed-container" style="background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
@@ -798,7 +798,7 @@
 <section class="section" style="background: #f8f8f8;">
     <div class="container">
         <h2 class="section-title">LATEST FROM OUR BLOG</h2>
-        <p class="section-subtitle">Wedding tips, inspiration, and stories</p>
+        <p class="section-subtitle">Wedding tips, inspiration, and stories.</p>
 
         <div class="blog-preview-grid">
             @foreach($blogs as $blog)
@@ -898,7 +898,7 @@
     <div class="container" style="text-align: center;">
         <h2 class="section-title">Ready to Start Planning?</h2>
         <p class="section-subtitle">
-            Contact us today for a free consultation and let's create your dream wedding together
+            Contact us today for a free consultation and let's create your dream wedding together.
         </p>
         <a href="{{ route('contact') }}" class="btn-primary">Contact Us Now</a>
     </div>
