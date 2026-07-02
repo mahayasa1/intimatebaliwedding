@@ -17,54 +17,95 @@ class GalleryController extends Controller
         $this->googleMapsService = $googleMapsService;
     }
 
-    public function index()
-    {
-        $allGalleries = Gallery::orderBy('title', 'asc')->orderBy('order')->get();
+    public function index(Request $request)
+{
+    // Ambil semua video (tidak dipaginasi)
+    $videoGalleries = Gallery::where(function ($q) {
+            $q->where('type', 'video')
+              ->orWhereNotNull('video_url');
+        })
+        ->orderBy('title')
+        ->orderBy('order')
+        ->get();
 
-        $photoGalleries = $allGalleries->filter(fn($g) => !$g->isVideo());
-        $videoGalleries = $allGalleries->filter(fn($g) => $g->isVideo());
-
-        $sortedPhotos = $photoGalleries->sortByDesc(function ($gallery) {
-            if (!$gallery->image) return 0;
-            $imagePath = storage_path('app/public/' . $gallery->image);
-            if (file_exists($imagePath)) {
-                [$width, $height] = getimagesize($imagePath);
-                return $height > 0 ? $width / $height : 0;
-            }
-            return 0;
+    // Query foto
+    $photoQuery = Gallery::where(function ($q) {
+            $q->whereNull('video_url')
+              ->orWhere('video_url', '');
+        })
+        ->where(function ($q) {
+            $q->whereNull('type')
+              ->orWhere('type', 'photo');
         });
 
-        $page    = request()->get('page', 1);
-        $perPage = 12;
+    // Filter kategori
+    if ($request->filled('category') && $request->category !== 'all') {
+        $photoQuery->where('category', $request->category);
+    }
 
-        $photos = new \Illuminate\Pagination\LengthAwarePaginator(
-            $sortedPhotos->forPage($page, $perPage),
-            $sortedPhotos->count(),
-            $perPage,
-            $page,
-            ['path' => request()->url(), 'query' => request()->query()]
-        );
+    $photoGalleries = $photoQuery
+        ->orderBy('title', 'asc')
+        ->orderBy('order')
+        ->get();
 
-        $categories = Gallery::where(function ($q) {
-            $q->whereNull('video_url')->orWhere('video_url', '');
+    // Tetap gunakan sorting berdasarkan rasio gambar
+    $sortedPhotos = $photoGalleries->sortByDesc(function ($gallery) {
+        if (!$gallery->image) {
+            return 0;
+        }
+
+        $imagePath = storage_path('app/public/' . $gallery->image);
+
+        if (file_exists($imagePath)) {
+            [$width, $height] = getimagesize($imagePath);
+
+            return $height > 0 ? ($width / $height) : 0;
+        }
+
+        return 0;
+    });
+
+    // Pagination
+    $page = $request->get('page', 1);
+    $perPage = 12;
+
+    $photos = new \Illuminate\Pagination\LengthAwarePaginator(
+        $sortedPhotos->forPage($page, $perPage)->values(),
+        $sortedPhotos->count(),
+        $perPage,
+        $page,
+        [
+            'path' => $request->url(),
+            'query' => $request->query(),
+        ]
+    );
+
+    // Semua kategori
+    $categories = Gallery::where(function ($q) {
+            $q->whereNull('video_url')
+              ->orWhere('video_url', '');
         })
-        ->where('type', '!=', 'video')
+        ->where(function ($q) {
+            $q->whereNull('type')
+              ->orWhere('type', 'photo');
+        })
+        ->whereNotNull('category')
+        ->where('category', '!=', '')
         ->distinct()
         ->orderBy('category')
-        ->pluck('category')
-        ->filter();
+        ->pluck('category');
 
-        $googleReviews = $this->googleMapsService->getReviews(6);
-        $businessStats = $this->googleMapsService->getBusinessStats();
+    $googleReviews = $this->googleMapsService->getReviews(6);
+    $businessStats = $this->googleMapsService->getBusinessStats();
 
-        return view('gallery.index', compact(
-            'photos',
-            'videoGalleries',
-            'categories',
-            'googleReviews',
-            'businessStats'
-        ));
-    }
+    return view('gallery.index', compact(
+        'photos',
+        'videoGalleries',
+        'categories',
+        'googleReviews',
+        'businessStats'
+    ));
+}
 
     public function show($id)
     {

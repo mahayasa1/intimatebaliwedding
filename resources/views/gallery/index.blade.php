@@ -645,11 +645,19 @@
 
         @if($categories->count() > 0)
         <div class="gallery-filters">
-            <button class="filter-btn active" data-category="all">All</button>
+            <a style="text-decoration: none" href="{{ route('gallery.public') }}"
+               class="filter-btn {{ !request('category') || request('category') == 'all' ? 'active' : '' }}">
+                All
+            </a>
             @foreach($categories as $category)
-            <button class="filter-btn" data-category="{{ $category }}">{{ $category }}</button>
-            @endforeach
+                <a href="{{ route('gallery.public', ['category' => $category]) }}"
+                   style="text-decoration: none"
+                   class="filter-btn {{ request('category') == $category ? 'active' : '' }}">
+                    {{ $category }}
+                </a>
+            @endforeach    
         </div>
+
         @endif
 
         <div class="gallery-grid" id="galleryGrid">
@@ -902,16 +910,16 @@ if (hash === 'videos') {
 }
 
 // ── FILTER FOTO ──
-document.querySelectorAll('#tab-photos .filter-btn').forEach(btn => {
-    btn.addEventListener('click', function() {
-        document.querySelectorAll('#tab-photos .filter-btn').forEach(b => b.classList.remove('active'));
-        this.classList.add('active');
-        const cat = this.dataset.category;
-        document.querySelectorAll('#galleryGrid .gallery-item').forEach(item => {
-            item.style.display = (cat === 'all' || item.dataset.category === cat) ? '' : 'none';
-        });
-    });
-});
+// document.querySelectorAll('#tab-photos .filter-btn').forEach(btn => {
+//     btn.addEventListener('click', function() {
+//         document.querySelectorAll('#tab-photos .filter-btn').forEach(b => b.classList.remove('active'));
+//         this.classList.add('active');
+//         const cat = this.dataset.category;
+//         document.querySelectorAll('#galleryGrid .gallery-item').forEach(item => {
+//             item.style.display = (cat === 'all' || item.dataset.category === cat) ? '' : 'none';
+//         });
+//     });
+// });
 
 // ── FILTER VIDEO ──
 document.querySelectorAll('#tab-videos .filter-btn').forEach(btn => {
