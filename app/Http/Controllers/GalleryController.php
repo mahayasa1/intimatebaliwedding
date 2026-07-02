@@ -7,6 +7,8 @@ use App\Models\Gallery;
 use App\Services\GoogleMapsService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Blade;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class GalleryController extends Controller
 {
@@ -69,7 +71,7 @@ class GalleryController extends Controller
     $page = $request->get('page', 1);
     $perPage = 12;
 
-    $photos = new \Illuminate\Pagination\LengthAwarePaginator(
+    $photos = new LengthAwarePaginator(
         $sortedPhotos->forPage($page, $perPage)->values(),
         $sortedPhotos->count(),
         $perPage,
@@ -106,6 +108,166 @@ class GalleryController extends Controller
         'businessStats'
     ));
 }
+
+ public function filterAjax(Request $request)
+    {
+        $category = $request->get('category', 'all');
+        $page     = max((int) $request->get('page', 1), 1);
+        $perPage  = 12;
+
+        $photoQuery = Gallery::where(function ($q) {
+                $q->whereNull('video_url')
+                  ->orWhere('video_url', '');
+            })
+            ->where(function ($q) {
+                $q->whereNull('type')
+                  ->orWhere('type', 'photo');
+            });
+
+        if ($category && $category !== 'all') {
+            $photoQuery->where('category', $category);
+        }
+
+        $photoGalleries = $photoQuery
+            ->orderBy('title', 'asc')
+            ->orderBy('order')
+            ->get();
+
+        // Sorting berdasarkan rasio gambar (sama seperti index())
+        $sortedPhotos = $photoGalleries->sortByDesc(function ($gallery) {
+            if (!$gallery->image) {
+                return 0;
+            }
+
+            $imagePath = storage_path('app/public/' . $gallery->image);
+
+            if (file_exists($imagePath)) {
+                [$width, $height] = getimagesize($imagePath);
+                return $height > 0 ? ($width / $height) : 0;
+            }
+
+            return 0;
+        });
+
+        $photos = new LengthAwarePaginator(
+            $sortedPhotos->forPage($page, $perPage)->values(),
+            $sortedPhotos->count(),
+            $perPage,
+            $page,
+            [
+                'path'  => route('gallery.filter'),
+                'query' => ['category' => $category],
+            ]
+        );
+
+        return response()->json([
+            'success'     => true,
+            'html'        => $this->renderGalleryGrid($photos),
+            'pagination'  => $this->renderGalleryPagination($photos),
+            'total'       => $photos->total(),
+            'currentPage' => $photos->currentPage(),
+            'category'    => $category,
+        ]);
+    }
+
+    /**
+     * Render markup grid foto (identik dengan markup di index.blade.php)
+     * tanpa membuat file blade baru — dikompilasi inline via Blade::render().
+     */
+    protected function renderGalleryGrid($photos): string
+    {
+        $template = <<<'BLADE'
+@php use App\Helpers\ImageHelper; @endphp
+@forelse($photos as $gallery)
+    @php
+        $additionalPhotos = is_array($gallery->photo) ? $gallery->photo : [];
+        $totalPhotos = ($gallery->image ? 1 : 0) + count($additionalPhotos);
+    @endphp
+    <a href="{{ route('gallery.show', $gallery->id) }}"
+       class="gallery-item"
+       data-category="{{ $gallery->category ?? 'Other' }}">
+
+        @if($gallery->category)
+        <span class="top-badge"><i class="fas fa-tag"></i> {{ $gallery->category }}</span>
+        @endif
+
+        <img src="{{ asset('storage/' . ImageHelper::thumb($gallery->image)) }}"
+             alt="{{ $gallery->title }}"
+             loading="lazy"
+             onerror="this.onerror=null; this.src='{{ asset('storage/' . $gallery->image) }}';">
+
+        <div class="card-overlay">
+            <div class="card-content">
+                <div class="card-title">{{ $gallery->title }}</div>
+
+                @if(!empty($gallery->description))
+                <div class="card-description">{{ Str::limit($gallery->description, 100) }}</div>
+                @endif
+
+                <div class="card-cta-badge">
+                    <i class="fas fa-images"></i>
+                    View {{ $totalPhotos }} {{ $totalPhotos == 1 ? 'Photo' : 'Photos' }}
+                </div>
+            </div>
+        </div>
+    </a>
+@empty
+    <div class="empty-state">
+        <div class="empty-icon"><i class="fas fa-images"></i></div>
+        <p>Belum ada foto di gallery.</p>
+    </div>
+@endforelse
+BLADE;
+
+        return Blade::render($template, ['photos' => $photos]);
+    }
+
+    /**
+     * Render markup pagination (identik dengan index.blade.php),
+     * link diganti jadi tombol AJAX (data-page) bukan <a href> reload.
+     */
+    protected function renderGalleryPagination($photos): string
+    {
+        if (!$photos->hasPages()) {
+            return '';
+        }
+
+        $template = <<<'BLADE'
+<div class="simple-pagination" id="galleryPagination">
+    @if($photos->onFirstPage())
+        <span class="btn-page" style="opacity:.5;">
+            <i class="fas fa-angle-left"></i> Previous
+        </span>
+    @else
+        <a href="#" class="btn-page ajax-page-link" data-page="{{ $photos->currentPage() - 1 }}">
+            <i class="fas fa-angle-left"></i> Previous
+        </a>
+    @endif
+
+    @foreach($photos->getUrlRange(1, $photos->lastPage()) as $page => $url)
+        @if($page == $photos->currentPage())
+            <span class="btn-page" style="background:#8B7355;color:#fff;border-color:#8B7355;">
+                {{ $page }}
+            </span>
+        @else
+            <a href="#" class="btn-page ajax-page-link" data-page="{{ $page }}">{{ $page }}</a>
+        @endif
+    @endforeach
+
+    @if($photos->hasMorePages())
+        <a href="#" class="btn-page ajax-page-link" data-page="{{ $photos->currentPage() + 1 }}">
+            Next <i class="fas fa-angle-right"></i>
+        </a>
+    @else
+        <span class="btn-page" style="opacity:.5;">
+            Next <i class="fas fa-angle-right"></i>
+        </span>
+    @endif
+</div>
+BLADE;
+
+        return Blade::render($template, ['photos' => $photos]);
+    }
 
     public function show($id)
     {

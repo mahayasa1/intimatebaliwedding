@@ -28,6 +28,7 @@ Route::get('/packages/{package}/subpackage/{subpackage}', [PackageController::cl
 
 // Gallery with Google Maps Reviews Integration
 Route::get('/gallery', [GalleryController::class, 'index'])->name('gallery.public');
+Route::get('/gallery/filter', [GalleryController::class, 'filterAjax'])->name('gallery.filter');
 Route::get('/gallery/{id}', [GalleryController::class, 'show'])->name('gallery.show');
 
 Route::get('/blog', [BlogController::class, 'index'])->name('blogs.public');

@@ -426,6 +426,7 @@
         color: #6B5644;
         font-size: 13px;
         font-weight: 600;
+        cursor: pointer;
     }
 
     .btn-page:hover {
@@ -593,6 +594,13 @@
 
     .no-reviews { text-align: center; padding: 3rem; color: var(--text-muted); }
 
+    /* ── LOADING STATE ── */
+    #galleryGrid.is-loading {
+        opacity: 0.4;
+        pointer-events: none;
+        transition: opacity 0.2s ease;
+    }
+
     /* ── RESPONSIVE ── */
     @media (max-width: 768px) {
         .gallery-hero h1 { font-size: 2.2rem; }
@@ -644,20 +652,20 @@
     <div class="tab-panel active" id="tab-photos">
 
         @if($categories->count() > 0)
-        <div class="gallery-filters">
-            <a style="text-decoration: none" href="{{ route('gallery.public') }}"
-               class="filter-btn {{ !request('category') || request('category') == 'all' ? 'active' : '' }}">
+        <div class="gallery-filters" id="photoFilters">
+            <button type="button"
+                    class="filter-btn {{ !request('category') || request('category') == 'all' ? 'active' : '' }}"
+                    data-category="all">
                 All
-            </a>
+            </button>
             @foreach($categories as $category)
-                <a href="{{ route('gallery.public', ['category' => $category]) }}"
-                   style="text-decoration: none"
-                   class="filter-btn {{ request('category') == $category ? 'active' : '' }}">
+                <button type="button"
+                        class="filter-btn {{ request('category') == $category ? 'active' : '' }}"
+                        data-category="{{ $category }}">
                     {{ $category }}
-                </a>
-            @endforeach    
+                </button>
+            @endforeach
         </div>
-
         @endif
 
         <div class="gallery-grid" id="galleryGrid">
@@ -702,41 +710,43 @@
             @endforelse
         </div>
 
-        @if($photos->hasPages())
-        <div class="simple-pagination">
+        <div id="galleryPaginationWrapper">
+            @if($photos->hasPages())
+            <div class="simple-pagination" id="galleryPagination">
 
-            @if($photos->onFirstPage())
-                <span class="btn-page" style="opacity:.5;">
-                    <i class="fas fa-angle-left"></i> Previous
-                </span>
-            @else
-                <a href="{{ $photos->previousPageUrl() }}" class="btn-page">
-                    <i class="fas fa-angle-left"></i> Previous
-                </a>
-            @endif
-
-            @foreach($photos->getUrlRange(1, $photos->lastPage()) as $page => $url)
-                @if($page == $photos->currentPage())
-                    <span class="btn-page" style="background:#8B7355;color:#fff;border-color:#8B7355;">
-                        {{ $page }}
+                @if($photos->onFirstPage())
+                    <span class="btn-page" style="opacity:.5;">
+                        <i class="fas fa-angle-left"></i> Previous
                     </span>
                 @else
-                    <a href="{{ $url }}" class="btn-page">{{ $page }}</a>
+                    <a href="#" class="btn-page ajax-page-link" data-page="{{ $photos->currentPage() - 1 }}">
+                        <i class="fas fa-angle-left"></i> Previous
+                    </a>
                 @endif
-            @endforeach
 
-            @if($photos->hasMorePages())
-                <a href="{{ $photos->nextPageUrl() }}" class="btn-page">
-                    Next <i class="fas fa-angle-right"></i>
-                </a>
-            @else
-                <span class="btn-page" style="opacity:.5;">
-                    Next <i class="fas fa-angle-right"></i>
-                </span>
+                @foreach($photos->getUrlRange(1, $photos->lastPage()) as $page => $url)
+                    @if($page == $photos->currentPage())
+                        <span class="btn-page" style="background:#8B7355;color:#fff;border-color:#8B7355;">
+                            {{ $page }}
+                        </span>
+                    @else
+                        <a href="#" class="btn-page ajax-page-link" data-page="{{ $page }}">{{ $page }}</a>
+                    @endif
+                @endforeach
+
+                @if($photos->hasMorePages())
+                    <a href="#" class="btn-page ajax-page-link" data-page="{{ $photos->currentPage() + 1 }}">
+                        Next <i class="fas fa-angle-right"></i>
+                    </a>
+                @else
+                    <span class="btn-page" style="opacity:.5;">
+                        Next <i class="fas fa-angle-right"></i>
+                    </span>
+                @endif
+
+            </div>
             @endif
-
         </div>
-        @endif
     </div>
 
     {{-- ===== TAB VIDEO ===== --}}
@@ -909,19 +919,7 @@ if (hash === 'videos') {
     if (videoBtn) switchTab('videos', videoBtn);
 }
 
-// ── FILTER FOTO ──
-// document.querySelectorAll('#tab-photos .filter-btn').forEach(btn => {
-//     btn.addEventListener('click', function() {
-//         document.querySelectorAll('#tab-photos .filter-btn').forEach(b => b.classList.remove('active'));
-//         this.classList.add('active');
-//         const cat = this.dataset.category;
-//         document.querySelectorAll('#galleryGrid .gallery-item').forEach(item => {
-//             item.style.display = (cat === 'all' || item.dataset.category === cat) ? '' : 'none';
-//         });
-//     });
-// });
-
-// ── FILTER VIDEO ──
+// ── FILTER VIDEO (client-side, tidak diubah) ──
 document.querySelectorAll('#tab-videos .filter-btn').forEach(btn => {
     btn.addEventListener('click', function() {
         document.querySelectorAll('#tab-videos .filter-btn').forEach(b => b.classList.remove('active'));
@@ -951,5 +949,84 @@ function closeVideoModal(e) {
 document.addEventListener('keydown', e => {
     if (e.key === 'Escape') closeVideoModal({ target: document.getElementById('videoModal') });
 });
+
+// ── AJAX GALLERY FILTER & PAGINATION (FOTO) ──
+(function () {
+    const filterUrl = "{{ route('gallery.filter') }}";
+    let currentCategory = "{{ request('category', 'all') }}";
+    let isLoading = false;
+
+    function loadGallery(category, page) {
+        if (isLoading) return;
+        isLoading = true;
+
+        const grid = document.getElementById('galleryGrid');
+        grid.classList.add('is-loading');
+
+        const params = new URLSearchParams({ category: category, page: page });
+
+        fetch(filterUrl + '?' + params.toString(), {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json'
+            }
+        })
+        .then(function (res) {
+            if (!res.ok) throw new Error('Request failed');
+            return res.json();
+        })
+        .then(function (data) {
+            grid.innerHTML = data.html;
+            document.getElementById('galleryPaginationWrapper').innerHTML = data.pagination || '';
+
+            currentCategory = category;
+
+            bindPaginationEvents();
+
+            const targetUrl = new URL(window.location.href);
+            if (category && category !== 'all') {
+                targetUrl.searchParams.set('category', category);
+            } else {
+                targetUrl.searchParams.delete('category');
+            }
+            history.replaceState(null, '', targetUrl.pathname + targetUrl.search + '#photos');
+
+            const gridTop = grid.getBoundingClientRect().top + window.scrollY - 100;
+            window.scrollTo({ top: gridTop, behavior: 'smooth' });
+        })
+        .catch(function (err) {
+            console.error('Gallery filter error:', err);
+        })
+        .finally(function () {
+            grid.classList.remove('is-loading');
+            isLoading = false;
+        });
+    }
+
+    function bindFilterEvents() {
+        document.querySelectorAll('#photoFilters .filter-btn').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                document.querySelectorAll('#photoFilters .filter-btn').forEach(function (b) {
+                    b.classList.remove('active');
+                });
+                this.classList.add('active');
+                loadGallery(this.dataset.category, 1);
+            });
+        });
+    }
+
+    function bindPaginationEvents() {
+        document.querySelectorAll('#galleryPaginationWrapper .ajax-page-link').forEach(function (link) {
+            link.addEventListener('click', function (e) {
+                e.preventDefault();
+                const page = parseInt(this.dataset.page, 10) || 1;
+                loadGallery(currentCategory, page);
+            });
+        });
+    }
+
+    bindFilterEvents();
+    bindPaginationEvents();
+})();
 </script>
 @endpush
