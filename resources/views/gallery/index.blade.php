@@ -673,19 +673,27 @@
             @php
                 $additionalPhotos = is_array($gallery->photo) ? $gallery->photo : [];
                 $totalPhotos = ($gallery->image ? 1 : 0) + count($additionalPhotos);
+                $previewImage = $gallery->image ?: ($additionalPhotos[0] ?? null);
             @endphp
             <a href="{{ route('gallery.show', $gallery->id) }}"
                class="gallery-item"
                data-category="{{ $gallery->category ?? 'Other' }}">
-
+            
                 @if($gallery->category)
                 <span class="top-badge"><i class="fas fa-tag"></i> {{ $gallery->category }}</span>
                 @endif
-
-                <img src="{{ asset('storage/' . ImageHelper::thumb($gallery->image)) }}"
+            
+                @if($previewImage)
+                <img src="{{ asset('storage/' . ImageHelper::thumb($previewImage)) }}"
                      alt="{{ $gallery->title }}"
                      loading="lazy"
-                     onerror="this.onerror=null; this.src='{{ asset('storage/' . $gallery->image) }}';">
+                     class="gallery-img"
+                     data-fallback="{{ asset('storage/' . $previewImage) }}">
+                @else
+                <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#f0f0f0;">
+                    <i class="fas fa-image" style="font-size:3rem;color:#ccc;"></i>
+                </div>
+                @endif
 
                 <div class="card-overlay">
                     <div class="card-content">
@@ -697,7 +705,7 @@
 
                         <div class="card-cta-badge">
                             <i class="fas fa-images"></i>
-                            View {{ $totalPhotos }} {{ $totalPhotos == 1 ? 'Photo' : 'Photos' }}
+                            View {{ $totalPhotos }} {{ $totalPhotos == 1 ? 'Image' : 'Images' }}
                         </div>
                     </div>
                 </div>
@@ -904,6 +912,16 @@
 
 @push('scripts')
 <script>
+
+document.addEventListener('error', function (e) {
+    const img = e.target;
+    if (img.tagName === 'IMG' && img.classList.contains('gallery-img') && img.dataset.fallback) {
+        const fb = img.dataset.fallback;
+        img.dataset.fallback = '';
+        img.src = fb;
+    }
+}, true); // capture:true wajib karena event 'error' pada <img> tidak bubble
+
 // ── TAB SWITCHER ──
 function switchTab(tab, btn) {
     document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
@@ -990,9 +1008,6 @@ document.addEventListener('keydown', e => {
                 targetUrl.searchParams.delete('category');
             }
             history.replaceState(null, '', targetUrl.pathname + targetUrl.search + '#photos');
-
-            const gridTop = grid.getBoundingClientRect().top + window.scrollY - 100;
-            window.scrollTo({ top: gridTop, behavior: 'smooth' });
         })
         .catch(function (err) {
             console.error('Gallery filter error:', err);

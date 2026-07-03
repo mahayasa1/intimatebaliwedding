@@ -7,8 +7,7 @@ use App\Models\Gallery;
 use App\Services\GoogleMapsService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Blade;
-use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Str;
 
 class GalleryController extends Controller
 {
@@ -20,102 +19,73 @@ class GalleryController extends Controller
     }
 
     public function index(Request $request)
-{
-    // Ambil semua video (tidak dipaginasi)
-    $videoGalleries = Gallery::where(function ($q) {
-            $q->where('type', 'video')
-              ->orWhereNotNull('video_url');
-        })
-        ->orderBy('title')
-        ->orderBy('order')
-        ->get();
+    {
+        // Ambil semua video (tidak dipaginasi)
+        $videoGalleries = Gallery::where(function ($q) {
+                $q->where('type', 'video')
+                  ->orWhereNotNull('video_url');
+            })
+            ->orderBy('title')
+            ->orderBy('order')
+            ->get();
 
-    // Query foto
-    $photoQuery = Gallery::where(function ($q) {
-            $q->whereNull('video_url')
-              ->orWhere('video_url', '');
-        })
-        ->where(function ($q) {
-            $q->whereNull('type')
-              ->orWhere('type', 'photo');
-        });
+        // Pagination langsung dari database (tidak lagi ->get() + sortBy manual)
+        $photos = $this->buildPhotoQuery($request->get('category'))
+            ->paginate(12)
+            ->withQueryString();
 
-    // Filter kategori
-    if ($request->filled('category') && $request->category !== 'all') {
-        $photoQuery->where('category', $request->category);
+        // Semua kategori
+        $categories = Gallery::where(function ($q) {
+                $q->whereNull('video_url')
+                  ->orWhere('video_url', '');
+            })
+            ->where(function ($q) {
+                $q->whereNull('type')
+                  ->orWhere('type', 'photo');
+            })
+            ->whereNotNull('category')
+            ->where('category', '!=', '')
+            ->distinct()
+            ->orderBy('category')
+            ->pluck('category');
+
+        $googleReviews = $this->googleMapsService->getReviews(6);
+        $businessStats = $this->googleMapsService->getBusinessStats();
+
+        return view('gallery.index', compact(
+            'photos',
+            'videoGalleries',
+            'categories',
+            'googleReviews',
+            'businessStats'
+        ));
     }
 
-    $photoGalleries = $photoQuery
-        ->orderBy('title', 'asc')
-        ->orderBy('order')
-        ->get();
-
-    // Tetap gunakan sorting berdasarkan rasio gambar
-    $sortedPhotos = $photoGalleries->sortByDesc(function ($gallery) {
-        if (!$gallery->image) {
-            return 0;
-        }
-
-        $imagePath = storage_path('app/public/' . $gallery->image);
-
-        if (file_exists($imagePath)) {
-            [$width, $height] = getimagesize($imagePath);
-
-            return $height > 0 ? ($width / $height) : 0;
-        }
-
-        return 0;
-    });
-
-    // Pagination
-    $page = $request->get('page', 1);
-    $perPage = 12;
-
-    $photos = new LengthAwarePaginator(
-        $sortedPhotos->forPage($page, $perPage)->values(),
-        $sortedPhotos->count(),
-        $perPage,
-        $page,
-        [
-            'path' => $request->url(),
-            'query' => $request->query(),
-        ]
-    );
-
-    // Semua kategori
-    $categories = Gallery::where(function ($q) {
-            $q->whereNull('video_url')
-              ->orWhere('video_url', '');
-        })
-        ->where(function ($q) {
-            $q->whereNull('type')
-              ->orWhere('type', 'photo');
-        })
-        ->whereNotNull('category')
-        ->where('category', '!=', '')
-        ->distinct()
-        ->orderBy('category')
-        ->pluck('category');
-
-    $googleReviews = $this->googleMapsService->getReviews(6);
-    $businessStats = $this->googleMapsService->getBusinessStats();
-
-    return view('gallery.index', compact(
-        'photos',
-        'videoGalleries',
-        'categories',
-        'googleReviews',
-        'businessStats'
-    ));
-}
-
- public function filterAjax(Request $request)
+    public function filterAjax(Request $request)
     {
         $category = $request->get('category', 'all');
-        $page     = max((int) $request->get('page', 1), 1);
-        $perPage  = 12;
 
-        $photoQuery = Gallery::where(function ($q) {
+        $photos = $this->buildPhotoQuery($category)
+            ->paginate(12)
+            ->withQueryString();
+
+        return response()->json([
+            'success'     => true,
+            'html'        => $this->renderPhotoGridHtml($photos),
+            'pagination'  => $this->renderPaginationHtml($photos),
+            'total'       => $photos->total(),
+            'currentPage' => $photos->currentPage(),
+            'category'    => $category,
+        ])->setEncodingOptions(JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT);
+    }
+
+    /**
+     * Query dasar untuk gallery bertipe foto, dipakai bersama
+     * oleh index() dan filterAjax() agar tidak duplikat.
+     */
+    private function buildPhotoQuery(?string $category = null)
+    {
+        $query = Gallery::where(function ($q) {
                 $q->whereNull('video_url')
                   ->orWhere('video_url', '');
             })
@@ -125,148 +95,104 @@ class GalleryController extends Controller
             });
 
         if ($category && $category !== 'all') {
-            $photoQuery->where('category', $category);
+            $query->where('category', $category);
         }
 
-        $photoGalleries = $photoQuery
-            ->orderBy('title', 'asc')
-            ->orderBy('order')
-            ->get();
-
-        // Sorting berdasarkan rasio gambar (sama seperti index())
-        $sortedPhotos = $photoGalleries->sortByDesc(function ($gallery) {
-            if (!$gallery->image) {
-                return 0;
-            }
-
-            $imagePath = storage_path('app/public/' . $gallery->image);
-
-            if (file_exists($imagePath)) {
-                [$width, $height] = getimagesize($imagePath);
-                return $height > 0 ? ($width / $height) : 0;
-            }
-
-            return 0;
-        });
-
-        $photos = new LengthAwarePaginator(
-            $sortedPhotos->forPage($page, $perPage)->values(),
-            $sortedPhotos->count(),
-            $perPage,
-            $page,
-            [
-                'path'  => route('gallery.filter'),
-                'query' => ['category' => $category],
-            ]
-        );
-
-        return response()->json([
-            'success'     => true,
-            'html'        => $this->renderGalleryGrid($photos),
-            'pagination'  => $this->renderGalleryPagination($photos),
-            'total'       => $photos->total(),
-            'currentPage' => $photos->currentPage(),
-            'category'    => $category,
-        ]);
+        return $query->orderBy('title')->orderBy('order');
     }
 
     /**
-     * Render markup grid foto (identik dengan markup di index.blade.php)
-     * tanpa membuat file blade baru — dikompilasi inline via Blade::render().
+     * Render markup grid foto (identik dengan markup di gallery/index.blade.php)
+     * murni menggunakan PHP string building, tanpa Blade::render().
      */
-    protected function renderGalleryGrid($photos): string
+    private function renderPhotoGridHtml($photos): string
     {
-        $template = <<<'BLADE'
-@php use App\Helpers\ImageHelper; @endphp
-@forelse($photos as $gallery)
-    @php
-        $additionalPhotos = is_array($gallery->photo) ? $gallery->photo : [];
-        $totalPhotos = ($gallery->image ? 1 : 0) + count($additionalPhotos);
-    @endphp
-    <a href="{{ route('gallery.show', $gallery->id) }}"
-       class="gallery-item"
-       data-category="{{ $gallery->category ?? 'Other' }}">
-
-        @if($gallery->category)
-        <span class="top-badge"><i class="fas fa-tag"></i> {{ $gallery->category }}</span>
-        @endif
-
-        <img src="{{ asset('storage/' . ImageHelper::thumb($gallery->image)) }}"
-             alt="{{ $gallery->title }}"
-             loading="lazy"
-             onerror="this.onerror=null; this.src='{{ asset('storage/' . $gallery->image) }}';">
-
-        <div class="card-overlay">
-            <div class="card-content">
-                <div class="card-title">{{ $gallery->title }}</div>
-
-                @if(!empty($gallery->description))
-                <div class="card-description">{{ Str::limit($gallery->description, 100) }}</div>
-                @endif
-
-                <div class="card-cta-badge">
-                    <i class="fas fa-images"></i>
-                    View {{ $totalPhotos }} {{ $totalPhotos == 1 ? 'Photo' : 'Photos' }}
-                </div>
-            </div>
-        </div>
-    </a>
-@empty
-    <div class="empty-state">
-        <div class="empty-icon"><i class="fas fa-images"></i></div>
-        <p>Belum ada foto di gallery.</p>
-    </div>
-@endforelse
-BLADE;
-
-        return Blade::render($template, ['photos' => $photos]);
+        if ($photos->isEmpty()) {
+            return '<div class="empty-state">'
+                . '<div class="empty-icon"><i class="fas fa-images"></i></div>'
+                . '<p>Belum ada foto di gallery.</p>'
+                . '</div>';
+        }
+    
+        $html = '';
+    
+        foreach ($photos as $gallery) {
+            $additionalPhotos = is_array($gallery->photo) ? $gallery->photo : [];
+            $totalPhotos      = ($gallery->image ? 1 : 0) + count($additionalPhotos);
+            $category         = $gallery->category ?? 'Other';
+            $previewImage     = $gallery->image ?: ($additionalPhotos[0] ?? null);
+            $photoLabel       = $totalPhotos == 1 ? 'Image' : 'Images';
+    
+            $html .= '<a href="' . e(route('gallery.show', $gallery->id)) . '" class="gallery-item" data-category="' . e($category) . '">';
+    
+            if ($gallery->category) {
+                $html .= '<span class="top-badge"><i class="fas fa-tag"></i> ' . e($gallery->category) . '</span>';
+            }
+    
+            if ($previewImage) {
+                $thumbUrl = asset('storage/' . ImageHelper::thumb($previewImage));
+                $fullUrl  = asset('storage/' . $previewImage);
+                $html .= '<img src="' . e($thumbUrl) . '" alt="' . e($gallery->title) . '" '
+                    . 'class="gallery-img" data-fallback="' . e($fullUrl) . '">';
+            } else {
+                $html .= '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#f0f0f0;">'
+                    . '<i class="fas fa-image" style="font-size:3rem;color:#ccc;"></i></div>';
+            }
+    
+            $html .= '<div class="card-overlay"><div class="card-content">';
+            $html .= '<div class="card-title">' . e($gallery->title) . '</div>';
+    
+            if (!empty($gallery->description)) {
+                $html .= '<div class="card-description">' . e(Str::limit($gallery->description, 100)) . '</div>';
+            }
+    
+            $html .= '<div class="card-cta-badge"><i class="fas fa-images"></i> View ' . $totalPhotos . ' ' . $photoLabel . '</div>';
+            $html .= '</div></div></a>';
+        }
+    
+        return $html;
     }
 
     /**
-     * Render markup pagination (identik dengan index.blade.php),
-     * link diganti jadi tombol AJAX (data-page) bukan <a href> reload.
+     * Render markup pagination (identik dengan gallery/index.blade.php),
+     * link berupa tombol AJAX (data-page), murni PHP string building.
      */
-    protected function renderGalleryPagination($photos): string
+    private function renderPaginationHtml($photos): string
     {
         if (!$photos->hasPages()) {
             return '';
         }
 
-        $template = <<<'BLADE'
-<div class="simple-pagination" id="galleryPagination">
-    @if($photos->onFirstPage())
-        <span class="btn-page" style="opacity:.5;">
-            <i class="fas fa-angle-left"></i> Previous
-        </span>
-    @else
-        <a href="#" class="btn-page ajax-page-link" data-page="{{ $photos->currentPage() - 1 }}">
-            <i class="fas fa-angle-left"></i> Previous
-        </a>
-    @endif
+        $currentPage = $photos->currentPage();
+        $lastPage    = $photos->lastPage();
 
-    @foreach($photos->getUrlRange(1, $photos->lastPage()) as $page => $url)
-        @if($page == $photos->currentPage())
-            <span class="btn-page" style="background:#8B7355;color:#fff;border-color:#8B7355;">
-                {{ $page }}
-            </span>
-        @else
-            <a href="#" class="btn-page ajax-page-link" data-page="{{ $page }}">{{ $page }}</a>
-        @endif
-    @endforeach
+        $html = '<div class="simple-pagination" id="galleryPagination">';
 
-    @if($photos->hasMorePages())
-        <a href="#" class="btn-page ajax-page-link" data-page="{{ $photos->currentPage() + 1 }}">
-            Next <i class="fas fa-angle-right"></i>
-        </a>
-    @else
-        <span class="btn-page" style="opacity:.5;">
-            Next <i class="fas fa-angle-right"></i>
-        </span>
-    @endif
-</div>
-BLADE;
+        if ($photos->onFirstPage()) {
+            $html .= '<span class="btn-page" style="opacity:.5;"><i class="fas fa-angle-left"></i> Previous</span>';
+        } else {
+            $html .= '<a href="#" class="btn-page ajax-page-link" data-page="' . ($currentPage - 1) . '">'
+                . '<i class="fas fa-angle-left"></i> Previous</a>';
+        }
 
-        return Blade::render($template, ['photos' => $photos]);
+        for ($page = 1; $page <= $lastPage; $page++) {
+            if ($page == $currentPage) {
+                $html .= '<span class="btn-page" style="background:#8B7355;color:#fff;border-color:#8B7355;">' . $page . '</span>';
+            } else {
+                $html .= '<a href="#" class="btn-page ajax-page-link" data-page="' . $page . '">' . $page . '</a>';
+            }
+        }
+
+        if ($photos->hasMorePages()) {
+            $html .= '<a href="#" class="btn-page ajax-page-link" data-page="' . ($currentPage + 1) . '">'
+                . 'Next <i class="fas fa-angle-right"></i></a>';
+        } else {
+            $html .= '<span class="btn-page" style="opacity:.5;">Next <i class="fas fa-angle-right"></i></span>';
+        }
+
+        $html .= '</div>';
+
+        return $html;
     }
 
     public function show($id)

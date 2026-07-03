@@ -250,24 +250,45 @@ class ImageHelper
     }
 
     /**
-     * Ambil path thumbnail (fallback ke original jika belum ada).
+     * Ambil path thumbnail (fallback ke original jika belum ada,
+     * dan auto-generate thumbnail on-the-fly kalau belum pernah dibuat).
      *
      * @param  string $storagePath
      * @return string
      */
     public static function thumb(?string $storagePath): string
     {
+        $default = 'defaults/no-image.webp';
+    
         if (empty($storagePath)) {
-            return 'defaults/no-image.webp';
+            return Storage::disk('public')->exists($default) ? $default : '';
         }
     
         $thumbPath = self::buildThumbPath($storagePath);
     
-        return Storage::disk('public')->exists($thumbPath)
-            ? $thumbPath
-            : $storagePath;
+        // Thumbnail sudah ada → langsung pakai
+        if (Storage::disk('public')->exists($thumbPath)) {
+            return $thumbPath;
+        }
+    
+        // Thumbnail belum ada, tapi original ada → generate on-the-fly
+        // (self-healing, supaya foto lama yang belum sempat di-thumbnail
+        // tetap tampil, bukan icon rusak)
+        if (Storage::disk('public')->exists($storagePath)) {
+            $generated = self::createThumbnail($storagePath);
+            if ($generated && Storage::disk('public')->exists($generated)) {
+                return $generated;
+            }
+            // Gagal generate (misal GD tidak aktif) → pakai gambar asli saja
+            return $storagePath;
+        }
+    
+        // Original pun tidak ada di disk → fallback ke default, TAPI
+        // dicek dulu apakah default-nya memang ada (ini bug lama: dulu
+        // langsung return $default tanpa cek, jadi bisa 404 → broken icon)
+        return Storage::disk('public')->exists($default) ? $default : '';
     }
-
+    
     /**
      * Ambil URL thumbnail (absolute URL).
      *
