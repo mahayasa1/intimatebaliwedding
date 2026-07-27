@@ -2,6 +2,12 @@
 
 @section('title', $blog->title)
 
+@php use App\Helpers\ImageHelper; @endphp
+@section('og_title', $blog->title)
+@section('og_description', Str::limit(strip_tags($blog->excerpt ?? ''), 160) ?: 'Baca artikel terbaru dari Intimate Bali Wedding.')
+@section('og_image', $blog->image ? asset('storage/' . ImageHelper::thumb($blog->image)) : asset('assets/Logo_IBW_2B.png'))
+@section('og_type', 'article')
+
 @push('styles')
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Lora:wght@400;500;600&display=swap');

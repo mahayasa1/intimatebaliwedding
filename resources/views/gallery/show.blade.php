@@ -3,6 +3,11 @@
 
 @section('title', $gallery->title . ' - Intimate Bali Wedding')
 
+@section('og_title', $gallery->title . ' - Intimate Bali Wedding')
+@section('og_description', Str::limit(strip_tags($gallery->description ?? ''), 160) ?: 'Lihat momen indah pernikahan di Bali bersama Intimate Bali Wedding.')
+@section('og_image', $gallery->thumbnail ?: asset('assets/Logo_IBW_2B.png'))
+@section('og_type', 'article')
+
 @push('styles')
 <style>
     .show-hero {

@@ -2,12 +2,19 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <!-- Open Graph / Facebook -->
-<meta property="og:type" content="website" />
+<meta property="og:type" content="@yield('og_type', 'website')" />
 <meta property="og:url" content="{{ url()->current() }}" />
-<meta property="og:title" content="Intimate Wedding in Bali" />
-<meta property="og:description" content="Creating unforgettable wedding moments in Bali. Contact us for your dream wedding!" />
-<meta property="og:image" content="{{ asset('assets/Logo_IBW_2B.png') }}" />
+<meta property="og:title" content="@yield('og_title', 'Intimate Wedding in Bali')" />
+<meta property="og:description" content="@yield('og_description', 'Creating unforgettable wedding moments in Bali. Contact us for your dream wedding!')" />
+<meta property="og:image" content="@yield('og_image', asset('assets/Logo_IBW_2B.png'))" />
+<meta property="og:image:secure_url" content="@yield('og_image', asset('assets/Logo_IBW_2B.png'))" />
 <meta property="og:site_name" content="Intimate Bali Wedding" />
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="@yield('og_title', 'Intimate Wedding in Bali')" />
+<meta name="twitter:description" content="@yield('og_description', 'Creating unforgettable wedding moments in Bali. Contact us for your dream wedding!')" />
+<meta name="twitter:image" content="@yield('og_image', asset('assets/Logo_IBW_2B.png'))" />
 
     <title>@yield('title', 'Intimate Wedding in Bali')</title>
 
