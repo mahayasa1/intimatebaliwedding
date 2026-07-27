@@ -3,6 +3,11 @@
 
 @section('title', $subpackage->name . ' — ' . $package->name . ' - Intimate Bali Wedding')
 
+@section('og_title', $subpackage->name . ' — ' . $package->name . ' - Intimate Bali Wedding')
+@section('og_description', Str::limit(strip_tags($subpackage->description ?? ''), 160) ?: 'Paket pernikahan intimate di Bali, sesuaikan dengan impian Anda.')
+@section('og_image', $subpackage->image ? asset('storage/' . ImageHelper::thumb($subpackage->image)) : asset('assets/Logo_IBW_2B.png'))
+@section('og_type', 'article')
+
 @push('styles')
 <style>
     /* ===== HERO ===== */
