@@ -36,19 +36,18 @@
     }
 
     .gallery-hero h1 {
-        font-family: var(--font-serif);
-        font-size: clamp(2rem, 5vw, 3.5rem);
+        font-family: 'Playfair Display', serif;
+        font-size: 3.5rem;
         font-weight: 700;
+        margin-bottom: 1rem;
         text-transform: uppercase;
-        letter-spacing: 3px;
-        margin-bottom: 0.5rem;
+        letter-spacing: 2px;
     }
 
     .gallery-hero p {
-        font-size: clamp(0.85rem, 2vw, 1.1rem);
+        font-size: 1.1rem;
         font-weight: 300;
-        letter-spacing: 2px;
-        opacity: 0.9;
+        letter-spacing: 1px;
     }
 
     /* ── SECTION WRAPPER ── */
@@ -625,7 +624,7 @@
 <section class="gallery-hero">
     <div>
         <h1>GALLERY & TESTIMONIALS</h1>
-        <p>Relive The Previous Beautiful Moments And Kind Words.</p>
+        <p>Relive The Previous Beautiful Moments And Kind Words</p>
     </div>
 </section>
 

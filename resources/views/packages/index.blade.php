@@ -392,7 +392,7 @@
         <div class="empty-packages">
             <div class="empty-packages-icon"><i class="fas fa-box-open"></i></div>
             <h3>No Packages Found</h3>
-            <p>Please check back later for our available packages.</p>
+            <p>Please check back later for our available packages</p>
         </div>
         @endif
     </div>

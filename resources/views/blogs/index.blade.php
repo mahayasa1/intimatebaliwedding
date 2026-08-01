@@ -5,7 +5,7 @@
 @push('styles')
 <style>
     .blog-hero {
-        background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), 
+        background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)),
                     url('/assets/background/bg_template.jpg');
         background-size: cover;
         background-position: center;
@@ -23,6 +23,15 @@
         font-family: 'Playfair Display', serif;
         font-size: 3.5rem;
         font-weight: 700;
+        margin-bottom: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+    }
+
+    .blog-hero p {
+        font-size: 1.1rem;
+        font-weight: 300;
+        letter-spacing: 1px;
     }
 
     .blog-container {
@@ -127,7 +136,7 @@
 
     @media (max-width: 768px) {
         .blog-hero h1 {
-            font-size: 2.5rem;
+            font-size: 2.2rem;
         }
 
         .blog-container {
@@ -144,9 +153,9 @@
 @section('content')
 <!-- Hero Section -->
 <section class="blog-hero">
-    <div style="display: flex; flex-direction: column; align-items: center; gap: 0.75rem;">
-        <h1 style="margin: 0;">BLOG</h1>
-        <p style="font-size: 1.1rem; font-weight: 300; margin: 0;">Wedding Tips, Stories & Inspiration.</p>
+    <div>
+        <h1>BLOG</h1>
+        <p>Wedding Tips, Stories & Inspiration.</p>
     </div>
 </section>
 
