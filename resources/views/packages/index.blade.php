@@ -334,14 +334,14 @@
 <section class="packages-hero">
     <div>
         <h1>Packages</h1>
-        <p>Choose Your Way To Happiness.</p>
+        <p>Choose Your Way To Happiness</p>
     </div>
 </section>
 
 <!-- Intro Section -->
 <section class="packages-intro">
     <h2>Wedding Packages</h2>
-    <p>All packages can be customised to suit your needs</p>
+    <p>All packages can be customised to suit your needs.</p>
 </section>
 
 <!-- Category Filter -->
