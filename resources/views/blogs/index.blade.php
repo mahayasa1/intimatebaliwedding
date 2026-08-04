@@ -155,7 +155,7 @@
 <section class="blog-hero">
     <div>
         <h1>BLOG</h1>
-        <p>Wedding Tips, Stories & Inspiration.</p>
+        <p>Wedding Tips, Stories & Inspiration</p>
     </div>
 </section>
 

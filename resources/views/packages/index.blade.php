@@ -341,7 +341,7 @@
 <!-- Intro Section -->
 <section class="packages-intro">
     <h2>Wedding Packages</h2>
-    <p>All packages can be customised to suit your needs.</p>
+    <p>All packages can be customised to suit your needs</p>
 </section>
 
 <!-- Category Filter -->
