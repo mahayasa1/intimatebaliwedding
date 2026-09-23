@@ -280,7 +280,7 @@
                     </li>
                     <li class="ibw-contact-item">
                         <div class="ibw-contact-text">
-                            <a href="tel:+6287861775445">+62 878-6177-5445</a>
+                            <a href="tel:+6287846793326">+62-878-4679-3326</a>
                         </div>
                     </li>
                     <li class="ibw-contact-item">
