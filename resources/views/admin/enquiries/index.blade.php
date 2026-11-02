@@ -453,6 +453,37 @@
             justify-content: center;
         }
     }
+
+    .country-filter {
+    margin-top: 1rem;
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.country-filter select {
+    font-family: 'Work Sans', sans-serif;
+    padding: 0.65rem 1rem;
+    border: 1px solid #e8e8e8;
+    border-radius: 8px;
+    background: white;
+    font-size: 0.9rem;
+    color: #333;
+    min-width: 220px;
+}
+
+.country-filter select:focus {
+    outline: none;
+    border-color: #8B7355;
+}
+
+.country-filter a {
+    font-family: 'Work Sans', sans-serif;
+    font-size: 0.85rem;
+    color: #8B7355;
+    text-decoration: none;
+}
 </style>
 @endpush
 
@@ -489,25 +520,50 @@
 <!-- Filter Tabs -->
 <div class="filter-section">
     <div class="filter-tabs">
-        <a href="{{ route('admin.enquiries.index') }}" class="filter-tab {{ !request('status') ? 'active' : '' }}">
+        <a href="{{ route('admin.enquiries.index', array_filter(['country' => request('country')])) }}"
+           class="filter-tab {{ !request('status') ? 'active' : '' }}">
             All ({{ $enquiries->total() }})
         </a>
-        <a href="{{ route('admin.enquiries.index', ['status' => 'new']) }}" class="filter-tab {{ request('status') == 'new' ? 'active' : '' }}">
+        <a href="{{ route('admin.enquiries.index', array_filter(['status' => 'new', 'country' => request('country')])) }}"
+           class="filter-tab {{ request('status') == 'new' ? 'active' : '' }}">
             New
         </a>
-        <a href="{{ route('admin.enquiries.index', ['status' => 'contacted']) }}" class="filter-tab {{ request('status') == 'contacted' ? 'active' : '' }}">
+        <a href="{{ route('admin.enquiries.index', array_filter(['status' => 'contacted', 'country' => request('country')])) }}"
+           class="filter-tab {{ request('status') == 'contacted' ? 'active' : '' }}">
             Contacted
         </a>
-        <a href="{{ route('admin.enquiries.index', ['status' => 'in_progress']) }}" class="filter-tab {{ request('status') == 'in_progress' ? 'active' : '' }}">
+        <a href="{{ route('admin.enquiries.index', array_filter(['status' => 'in_progress', 'country' => request('country')])) }}"
+           class="filter-tab {{ request('status') == 'in_progress' ? 'active' : '' }}">
             In Progress
         </a>
-        <a href="{{ route('admin.enquiries.index', ['status' => 'completed']) }}" class="filter-tab {{ request('status') == 'completed' ? 'active' : '' }}">
+        <a href="{{ route('admin.enquiries.index', array_filter(['status' => 'completed', 'country' => request('country')])) }}"
+           class="filter-tab {{ request('status') == 'completed' ? 'active' : '' }}">
             Completed
         </a>
-        <a href="{{ route('admin.enquiries.index', ['status' => 'cancelled']) }}" class="filter-tab {{ request('status') == 'cancelled' ? 'active' : '' }}">
+        <a href="{{ route('admin.enquiries.index', array_filter(['status' => 'cancelled', 'country' => request('country')])) }}"
+           class="filter-tab {{ request('status') == 'cancelled' ? 'active' : '' }}">
             Cancelled
         </a>
     </div>
+
+    <form method="GET" action="{{ route('admin.enquiries.index') }}" class="country-filter">
+        @if(request('status'))
+        <input type="hidden" name="status" value="{{ request('status') }}">
+        @endif
+
+        <select name="country" onchange="this.form.submit()">
+            <option value="">All Countries</option>
+            @foreach(config('countries') as $country)
+            <option value="{{ $country }}" {{ request('country') == $country ? 'selected' : '' }}>
+                {{ $country }}
+            </option>
+            @endforeach
+        </select>
+
+        @if(request('country'))
+        <a href="{{ route('admin.enquiries.index', request()->except('country')) }}">✕ Clear country</a>
+        @endif
+    </form>
 </div>
 
 <!-- Enquiries Table -->
@@ -538,6 +594,9 @@
                             <div class="contact-detail">{{ $enquiry->email }}</div>
                             @if($enquiry->phone)
                             <div class="contact-detail">{{ $enquiry->phone }}</div>
+                            @endif
+                            @if($enquiry->country)
+                            <div class="contact-detail">🌍 {{ $enquiry->country }}</div>
                             @endif
                         </div>
                     </td>

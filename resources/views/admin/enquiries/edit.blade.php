@@ -352,15 +352,15 @@
     </div>
 
     <!-- Customer Info -->
-    <div class="info-box">
-        <div class="info-box-title">📋 Enquiry from {{ $enquiry->name }}</div>
-        <div class="info-box-text">
-            <strong>Email:</strong> {{ $enquiry->email }}<br>
-            @if($enquiry->phone)
-            <strong>Phone:</strong> {{ $enquiry->phone }}<br>
-            @endif
-            <strong>Received:</strong> {{ $enquiry->created_at->format('F d, Y \a\t h:i A') }}
-        </div>
+    <div class="info-box-text">
+        <strong>Email:</strong> {{ $enquiry->email }}<br>
+        @if($enquiry->phone)
+        <strong>Phone:</strong> {{ $enquiry->phone }}<br>
+        @endif
+        @if($enquiry->country)
+        <strong>Country:</strong> {{ $enquiry->country }}<br>
+        @endif
+        <strong>Received:</strong> {{ $enquiry->created_at->format('F d, Y \a\t h:i A') }}
     </div>
 
     <form action="{{ route('admin.enquiries.update', $enquiry) }}" method="POST">
@@ -388,6 +388,11 @@
                     <label class="form-label">Phone Number</label>
                     <input type="text" class="form-control" value="{{ $enquiry->phone ?: 'Not provided' }}" disabled>
                 </div>
+
+                <div class="form-group">
+                    <label class="form-label">Country</label>
+                    <input type="text" class="form-control" value="{{ $enquiry->country ?: 'Not provided' }}" disabled>
+                </div>
             </div>
         </div>
 
@@ -398,6 +403,20 @@
                 Wedding Details
             </h3>
             <div class="form-grid">
+                <div class="form-group">
+                    <label for="country" class="form-label">Country</label>
+                    <select id="country" name="country" class="form-control @error('country') error @enderror">
+                        <option value="">Select Country</option>
+                        @foreach(config('countries') as $country)
+                            <option value="{{ $country }}" {{ old('country', $enquiry->country) == $country ? 'selected' : '' }}>
+                                {{ $country }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('country')
+                    <div class="error-message">{{ $message }}</div>
+                    @enderror
+                </div>
                 <div class="form-group">
                     <label for="wedding_date" class="form-label">Wedding Date</label>
                     <input 

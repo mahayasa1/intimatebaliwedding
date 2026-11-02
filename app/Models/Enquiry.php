@@ -15,6 +15,7 @@ class Enquiry extends Model
         'name',
         'email',
         'phone',
+        'country',
         'wedding_date',
         'wedding_type',
         'guest_count',

@@ -8,6 +8,7 @@ use App\Models\Enquiry;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Validation\Rule;
 
 class EnquiryController extends Controller
 {
@@ -44,6 +45,7 @@ class EnquiryController extends Controller
             'name'         => 'required|string|max:255',
             'email'        => 'required|email|max:255',
             'phone'        => 'nullable|string|max:255',
+            'country' => ['required', 'string', 'max:255', Rule::in(config('countries'))],
             'wedding_date' => 'nullable|string|max:255',
             'wedding_type' => 'nullable|string|max:255',
             'guest_count'  => 'nullable|integer',
@@ -118,6 +120,7 @@ class EnquiryController extends Controller
             'name'         => 'required|string|max:255',
             'email'        => 'required|email|max:255',
             'phone'        => 'nullable|string|max:255',
+            'country' => ['nullable', 'string', 'max:255', Rule::in(config('countries'))],
             'wedding_date' => 'nullable|string|max:255',
             'wedding_type' => 'nullable|string|max:255',
             'guest_count'  => 'nullable|integer',
@@ -160,6 +163,10 @@ class EnquiryController extends Controller
             $query->where('status', $request->status);
         }
 
+        if ($request->filled('country')) {
+            $query->where('country', $request->country);
+        }
+
         $enquiries = $query->paginate(20)->withQueryString();
 
         return view('admin.enquiries.index', compact('enquiries'));
@@ -190,6 +197,7 @@ class EnquiryController extends Controller
             'name'         => 'required|string|max:255',
             'email'        => 'required|email|max:255',
             'phone'        => 'nullable|string|max:255',
+            'country'      => 'nullable|string|max:255',
             'wedding_date' => 'nullable|string|max:255',
             'wedding_type' => 'nullable|string|max:255',
             'guest_count'  => 'nullable|integer',

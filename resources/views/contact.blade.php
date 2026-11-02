@@ -326,16 +326,27 @@
 
                 <div class="form-row">
                     <div class="form-group">
+                        <label for="country">Country *</label>
+                        <select id="country" name="country" required>
+                            <option value="">Select Country</option>
+                            @foreach(config('countries') as $country)
+                                <option value="{{ $country }}" {{ old('country') == $country ? 'selected' : '' }}>
+                                    {{ $country }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="form-group">
                         <label for="phone">Phone Number</label>
                         <input type="tel" id="phone" name="phone" value="{{ old('phone') }}" placeholder="+62 812 3456 7890">
                     </div>
+                </div>
+                
+                <div class="form-row">
                     <div class="form-group">
                         <label for="wedding_date">Wedding Date</label>
                         <input type="date" id="wedding_date" name="wedding_date" value="{{ old('wedding_date') }}">
                     </div>
-                </div>
-
-                <div class="form-row">
                     <div class="form-group">
                         <label for="wedding_type">Wedding Type</label>
                         <select id="wedding_type" name="wedding_type">
@@ -347,10 +358,11 @@
                             <option value="Other"          {{ old('wedding_type') == 'Other'          ? 'selected' : '' }}>Other</option>
                         </select>
                     </div>
-                    <div class="form-group">
-                        <label for="guest_count">Guest Count (Approx.)</label>
-                        <input type="number" id="guest_count" name="guest_count" value="{{ old('guest_count') }}" placeholder="e.g. 2" min="1">
-                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="guest_count">Guest Count (Approx.)</label>
+                    <input type="number" id="guest_count" name="guest_count" value="{{ old('guest_count') }}" placeholder="e.g. 2" min="1">
                 </div>
 
                 <div class="form-group">

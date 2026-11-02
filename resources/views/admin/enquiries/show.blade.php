@@ -454,6 +454,12 @@
                 </a>
                 @endif
             </div>
+            <div class="detail-meta">
+                📅 Received on {{ $enquiry->created_at->format('F d, Y \a\t h:i A') }}
+                @if($enquiry->country)
+                <br>🌍 {{ $enquiry->country }}
+                @endif
+            </div>
         </div>
     </div>
 
@@ -481,6 +487,17 @@
                     <div class="info-value">
                         @if($enquiry->phone)
                         <a href="tel:{{ $enquiry->phone }}">{{ $enquiry->phone }}</a>
+                        @else
+                        <span style="color: #999;">Not provided</span>
+                        @endif
+                    </div>
+                </div>
+                
+                <div class="info-item">
+                    <div class="info-label">Country</div>
+                    <div class="info-value">
+                        @if($enquiry->country)
+                        {{ $enquiry->country }}
                         @else
                         <span style="color: #999;">Not provided</span>
                         @endif
