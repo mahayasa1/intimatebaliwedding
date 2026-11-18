@@ -408,29 +408,76 @@
 
 @push('scripts')
 <script>
-document.querySelectorAll('.filter-btn').forEach(btn => {
-    btn.addEventListener('click', function() {
-        // Update active button
-        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-        this.classList.add('active');
+(function () {
+    const STORAGE_KEY = 'packagesCategoryFilter';
+    const buttons = document.querySelectorAll('.filter-btn');
 
-        const cat = this.dataset.category;
-        const cards = document.querySelectorAll('.package-card');
+    function applyFilter(cat) {
+        // Update tombol aktif
+        let found = false;
+        buttons.forEach(b => {
+            const active = b.dataset.category === cat;
+            b.classList.toggle('active', active);
+            if (active) found = true;
+        });
+        if (!found) {           // kategori tidak ada lagi → kembali ke All
+            cat = 'all';
+            buttons.forEach(b => b.classList.toggle('active', b.dataset.category === 'all'));
+        }
+
+        // Tampilkan / sembunyikan kartu
         let visibleCount = 0;
-
-        cards.forEach(card => {
-            const cardCat = card.dataset.category;
-            const show = cat === 'all' || cardCat === cat;
+        document.querySelectorAll('.package-card').forEach(card => {
+            const show = cat === 'all' || card.dataset.category === cat;
             card.style.display = show ? '' : 'none';
             if (show) visibleCount++;
         });
 
-        // Show empty state if no results
         const emptyState = document.getElementById('emptyState');
         if (emptyState) {
             emptyState.style.display = visibleCount === 0 ? 'block' : 'none';
         }
+    }
+
+    buttons.forEach(btn => {
+        btn.addEventListener('click', function () {
+            const cat = this.dataset.category;
+            try { sessionStorage.setItem(STORAGE_KEY, cat); } catch (e) {}
+            applyFilter(cat);
+        });
     });
-});
+
+    // Pulihkan filter HANYA saat pengunjung kembali dari halaman detail package/subpackage
+    // (tombol Back browser atau link "Back to ..."). Dari halaman lain, tetap mulai dari All.
+    function cameFromPackageDetail() {
+        try {
+            const nav = performance.getEntriesByType('navigation')[0];
+            if (nav && nav.type === 'back_forward') return true;
+
+            if (document.referrer) {
+                const ref = new URL(document.referrer);
+                return ref.origin === location.origin && ref.pathname.indexOf('/packages/') === 0;
+            }
+        } catch (e) {}
+        return false;
+    }
+
+    let saved = null;
+    try { saved = sessionStorage.getItem(STORAGE_KEY); } catch (e) {}
+
+    if (saved && saved !== 'all' && cameFromPackageDetail()) {
+        applyFilter(saved);
+    } else {
+        try { sessionStorage.removeItem(STORAGE_KEY); } catch (e) {}
+    }
+
+    // Halaman dipulihkan dari cache browser (tombol Back) → samakan lagi tampilannya
+    window.addEventListener('pageshow', function (e) {
+        if (!e.persisted) return;
+        let cat = 'all';
+        try { cat = sessionStorage.getItem(STORAGE_KEY) || 'all'; } catch (err) {}
+        applyFilter(cat);
+    });
+})();
 </script>
 @endpush
