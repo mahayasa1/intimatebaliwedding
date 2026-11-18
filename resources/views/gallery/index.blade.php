@@ -600,6 +600,23 @@
         transition: opacity 0.2s ease;
     }
 
+    .new-badge {
+        position: absolute;
+        top: 0.75rem;
+        right: 0.75rem;
+        z-index: 6;
+        background: #e74c3c;
+        color: #fff;
+        padding: 0.3rem 0.7rem;
+        border-radius: 20px;
+        font-size: 0.68rem;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        font-family: var(--font-sans);
+        box-shadow: 0 2px 8px rgba(231,76,60,0.4);
+    }
+
     /* ── RESPONSIVE ── */
     @media (max-width: 768px) {
         .gallery-hero h1 { font-size: 2.2rem; }
@@ -675,19 +692,23 @@
                 $previewImage = $gallery->image ?: ($additionalPhotos[0] ?? null);
             @endphp
             <a href="{{ route('gallery.show', $gallery->id) }}"
-               class="gallery-item"
-               data-category="{{ $gallery->category ?? 'Other' }}">
+                class="gallery-item"
+                data-category="{{ $gallery->category ?? 'Other' }}">
             
                 @if($gallery->category)
                 <span class="top-badge"><i class="fas fa-tag"></i> {{ $gallery->category }}</span>
                 @endif
+
+                @if($gallery->is_new)
+                <span class="new-badge">NEW</span>
+                @endif
             
                 @if($previewImage)
                 <img src="{{ asset('storage/' . ImageHelper::thumb($previewImage)) }}"
-                     alt="{{ $gallery->title }}"
-                     loading="lazy"
-                     class="gallery-img"
-                     data-fallback="{{ asset('storage/' . $previewImage) }}">
+                    alt="{{ $gallery->title }}"
+                    loading="lazy"
+                    class="gallery-img"
+                    data-fallback="{{ asset('storage/' . $previewImage) }}">
                 @else
                 <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#f0f0f0;">
                     <i class="fas fa-image" style="font-size:3rem;color:#ccc;"></i>

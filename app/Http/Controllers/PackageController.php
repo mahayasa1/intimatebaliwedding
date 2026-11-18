@@ -5,9 +5,9 @@ namespace App\Http\Controllers;
 use App\Helpers\ImageHelper;
 use App\Models\Package;
 use App\Models\Subpackage;
+use App\Services\MediaSync;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 
 class PackageController extends Controller
 {
@@ -63,7 +63,7 @@ class PackageController extends Controller
             'subpackages.*.photos.*'      => 'nullable|image|mimes:jpeg,png,jpg,webp|max:20480',
         ]);
 
-        DB::transaction(function () use ($request, $validated) {
+        $package = DB::transaction(function () use ($request, $validated) {
 
             if ($request->hasFile('image')) {
                 $result = ImageHelper::storeAndCompress($request->file('image'), 'packages');
@@ -83,36 +83,13 @@ class PackageController extends Controller
 
             $package = Package::create($validated);
 
-            if ($request->has('subpackages')) {
-                foreach ($request->subpackages as $index => $sub) {
-                    if (empty($sub['name'])) continue;
+            $this->saveSubpackages($request, $package);
 
-                    $subImage = null;
-                    if (!empty($sub['image']) && $sub['image'] instanceof \Illuminate\Http\UploadedFile) {
-                        $result   = ImageHelper::storeAndCompress($sub['image'], 'packages/subpackages');
-                        $subImage = $result['path'];
-                    }
-
-                    $subPhotos = [];
-                    if (!empty($sub['photos']) && is_array($sub['photos'])) {
-                        foreach ($sub['photos'] as $subPhoto) {
-                            if ($subPhoto instanceof \Illuminate\Http\UploadedFile) {
-                                $result      = ImageHelper::storeAndCompress($subPhoto, 'packages/subpackages/photos');
-                                $subPhotos[] = $result['path'];
-                            }
-                        }
-                    }
-
-                    Subpackage::create([
-                        'package_id'  => $package->id,
-                        'name'        => $sub['name'],
-                        'description' => $sub['description'] ?? null,
-                        'image'       => $subImage,
-                        'photo'       => $subPhotos,
-                    ]);
-                }
-            }
+            return $package;
         });
+
+        // Foto otomatis masuk ke Gallery dengan label NEW
+        MediaSync::syncAll($package);
 
         return redirect()->route('admin.packages.index')
             ->with('success', 'Package created successfully.');
@@ -145,13 +122,12 @@ class PackageController extends Controller
             'subpackages.*.photos.*'      => 'nullable|image|mimes:jpeg,png,jpg,webp|max:20480',
         ]);
 
+        // Catat semua file SEBELUM perubahan, untuk dibersihkan setelahnya
+        $oldPaths = MediaSync::packagePaths($package);
+
         DB::transaction(function () use ($request, $validated, $package) {
 
             if ($request->hasFile('image')) {
-                if ($package->image) {
-                    Storage::disk('public')->delete($package->image);
-                    ImageHelper::deleteThumb($package->image);
-                }
                 $result = ImageHelper::storeAndCompress($request->file('image'), 'packages');
                 $validated['image'] = $result['path'];
             } else {
@@ -163,11 +139,10 @@ class PackageController extends Controller
             if ($request->has('removed_photos')) {
                 $removedPhotos = json_decode($request->removed_photos, true);
                 if (is_array($removedPhotos)) {
-                    foreach ($removedPhotos as $photoPath) {
-                        Storage::disk('public')->delete($photoPath);
-                        ImageHelper::deleteThumb($photoPath);
-                        $existingPhotos = array_filter($existingPhotos, fn($p) => $p !== $photoPath);
-                    }
+                    $existingPhotos = array_filter(
+                        $existingPhotos,
+                        fn($p) => !in_array($p, $removedPhotos, true)
+                    );
                 }
             }
 
@@ -183,50 +158,18 @@ class PackageController extends Controller
 
             $package->update($validated);
 
-            foreach ($package->subpackages as $oldSub) {
-                if ($oldSub->image) {
-                    Storage::disk('public')->delete($oldSub->image);
-                    ImageHelper::deleteThumb($oldSub->image);
-                }
-                if ($oldSub->photo && is_array($oldSub->photo)) {
-                    foreach ($oldSub->photo as $p) {
-                        Storage::disk('public')->delete($p);
-                        ImageHelper::deleteThumb($p);
-                    }
-                }
-            }
-            $package->subpackages()->delete();
-
-            if ($request->has('subpackages')) {
-                foreach ($request->subpackages as $index => $sub) {
-                    if (empty($sub['name'])) continue;
-
-                    $subImage = $sub['existing_image'] ?? null;
-                    if (!empty($sub['image']) && $sub['image'] instanceof \Illuminate\Http\UploadedFile) {
-                        $result   = ImageHelper::storeAndCompress($sub['image'], 'packages/subpackages');
-                        $subImage = $result['path'];
-                    }
-
-                    $subPhotos = !empty($sub['existing_photos']) ? (array) $sub['existing_photos'] : [];
-                    if (!empty($sub['photos']) && is_array($sub['photos'])) {
-                        foreach ($sub['photos'] as $subPhoto) {
-                            if ($subPhoto instanceof \Illuminate\Http\UploadedFile) {
-                                $result      = ImageHelper::storeAndCompress($subPhoto, 'packages/subpackages/photos');
-                                $subPhotos[] = $result['path'];
-                            }
-                        }
-                    }
-
-                    Subpackage::create([
-                        'package_id'  => $package->id,
-                        'name'        => $sub['name'],
-                        'description' => $sub['description'] ?? null,
-                        'image'       => $subImage,
-                        'photo'       => $subPhotos,
-                    ]);
-                }
-            }
+            $this->saveSubpackages($request, $package);
         });
+
+        $package->refresh()->load('subpackages');
+        $removed = array_values(array_diff($oldPaths, MediaSync::packagePaths($package)));
+
+        // 1) Foto yang dihapus di sini ikut dihapus dari item gallery manual yang tertaut
+        MediaSync::pruneLinkedGalleries($removed);
+        // 2) Sinkron mirror gallery (subpackage)
+        MediaSync::syncAll($package);
+        // 3) Baru hapus file yang benar-benar tidak dipakai lagi
+        MediaSync::release($removed);
 
         return redirect()->route('admin.packages.index')
             ->with('success', 'Package updated successfully.');
@@ -234,22 +177,84 @@ class PackageController extends Controller
 
     public function destroy(Package $package)
     {
-        if ($package->image) {
-            Storage::disk('public')->delete($package->image);
-            ImageHelper::deleteThumb($package->image);
-        }
+        $paths = MediaSync::packagePaths($package);
 
-        if ($package->photo && is_array($package->photo)) {
-            foreach ($package->photo as $photo) {
-                Storage::disk('public')->delete($photo);
-                ImageHelper::deleteThumb($photo);
-            }
-        }
-
+        MediaSync::deleteMirrorsOfPackage($package->id);
         $package->subpackages()->delete();
         $package->delete();
 
+        // File yang masih dipakai item gallery manual tidak ikut terhapus
+        MediaSync::release($paths);
+
         return redirect()->route('admin.packages.index')
             ->with('success', 'Package deleted successfully.');
+    }
+
+    /**
+     * Simpan subpackage dari form (create & update).
+     *
+     * Subpackage yang sudah ada di-UPDATE di tempat (ID tetap, sehingga
+     * tautan ke gallery tidak putus). Yang tidak ada lagi di form dihapus.
+     * File TIDAK dihapus di sini; pembersihan dilakukan oleh MediaSync::release().
+     */
+    private function saveSubpackages(Request $request, Package $package): void
+    {
+        $existing = $package->subpackages()->get()->keyBy('id');
+        $keptIds  = [];
+
+        foreach ((array) ($request->subpackages ?? []) as $sub) {
+            if (empty($sub['name'])) {
+                continue;
+            }
+
+            $model = !empty($sub['id']) ? $existing->get($sub['id']) : null;
+
+            // Gambar: pakai yang lama hanya jika memang milik subpackage ini
+            $subImage = null;
+            if ($model && !empty($sub['existing_image']) && $sub['existing_image'] === $model->image) {
+                $subImage = $model->image;
+            }
+            if (!empty($sub['image']) && $sub['image'] instanceof \Illuminate\Http\UploadedFile) {
+                $result   = ImageHelper::storeAndCompress($sub['image'], 'packages/subpackages');
+                $subImage = $result['path'];
+            }
+
+            $subPhotos = [];
+            if ($model && !empty($sub['existing_photos'])) {
+                $subPhotos = array_values(array_intersect(
+                    (array) $sub['existing_photos'],
+                    $model->photo ?? []
+                ));
+            }
+            if (!empty($sub['photos']) && is_array($sub['photos'])) {
+                foreach ($sub['photos'] as $subPhoto) {
+                    if ($subPhoto instanceof \Illuminate\Http\UploadedFile) {
+                        $result      = ImageHelper::storeAndCompress($subPhoto, 'packages/subpackages/photos');
+                        $subPhotos[] = $result['path'];
+                    }
+                }
+            }
+
+            $data = [
+                'name'        => $sub['name'],
+                'description' => $sub['description'] ?? null,
+                'image'       => $subImage,
+                'photo'       => $subPhotos,
+            ];
+
+            if ($model) {
+                $model->update($data);
+                $keptIds[] = $model->id;
+            } else {
+                $created   = Subpackage::create($data + ['package_id' => $package->id]);
+                $keptIds[] = $created->id;
+            }
+        }
+
+        foreach ($existing as $id => $old) {
+            if (!in_array($id, $keptIds, true)) {
+                $old->delete();
+            }
+        }
     }
 }

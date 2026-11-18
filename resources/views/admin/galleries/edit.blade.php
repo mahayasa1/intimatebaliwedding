@@ -130,7 +130,7 @@
     .progress-label { font-family: 'Work Sans', sans-serif; font-size: 0.82rem; color: #1565c0; }
 
     /* New image preview */
-    .image-new-preview { display: none; margin-top: 1rem; }
+    .image-new-preview { display: none; margin-top: 1rem; position: relative; width: fit-content; max-width: 100%; }
     .image-new-preview img { max-width: 100%; max-height: 300px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); display: block; }
     .image-new-preview.show { display: block; }
 
@@ -151,6 +151,16 @@
         font-size: 0.8rem; transition: all 0.3s ease; z-index: 5;
     }
     .remove-photo:hover { background: #e74c3c; transform: scale(1.1); }
+
+    /* Tombol silang pada foto utama */
+    .remove-image {
+        position: absolute; top: 8px; right: 8px; z-index: 5;
+        width: 30px; height: 30px; padding: 0; border: none; border-radius: 50%;
+        background: rgba(231,76,60,0.95); color: #fff; font-size: 20px; line-height: 1; cursor: pointer;
+        display: flex; align-items: center; justify-content: center;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.3); transition: all 0.2s ease;
+    }
+    .remove-image:hover { background: #c0392b; transform: scale(1.1); }
 
     /* Server badge */
     .server-badge {
@@ -189,10 +199,25 @@
 
 @section('content')
 <div class="form-container">
+    @if($gallery->isMirror())
+        <div style="background:#fff8e1;border:1px solid #ffd54f;color:#7a5c00;padding:1rem 1.25rem;border-radius:12px;margin-bottom:1.25rem;font-family:'Work Sans',sans-serif;font-size:.9rem;">
+            <i class="fa-solid fa-link"></i>
+            Item ini otomatis dari <strong>{{ $gallery->source === 'package' ? 'Package' : 'Subpackage' }}</strong>.
+            Judul & kategori mengikuti Package/Subpackage, dan foto baru ditambahkan lewat menu Packages.
+            Di sini kamu bisa <strong>menghapus foto</strong> (klik ×, foto juga terhapus dari Subpackage-nya)
+            serta mengubah <strong>deskripsi</strong> dan <strong>urutan</strong>.
+        </div>
+    @elseif(!empty($gallery->linked_targets))
+        <div style="background:#e8f5e9;border:1px solid #a5d6a7;color:#2e7d32;padding:1rem 1.25rem;border-radius:12px;margin-bottom:1.25rem;font-family:'Work Sans',sans-serif;font-size:.9rem;">
+            <i class="fa-solid fa-link"></i>
+            Item ini terhubung ke Package/Subpackage. Foto baru yang kamu tambahkan di sini ikut masuk ke sana.
+        </div>
+    @endif
     <form action="{{ route('admin.galleries.update', $gallery) }}" method="POST" enctype="multipart/form-data" id="editForm">
         @csrf
         @method('PUT')
         <input type="hidden" name="removed_photos" id="removed_photos" value="">
+        <input type="hidden" name="remove_main_image" id="remove_main_image" value="0">
 
         {{-- TYPE SELECTOR --}}
         <div class="form-card">
@@ -292,13 +317,16 @@
             </h3>
 
             @if($gallery->image)
-            <div class="current-image-box">
+            <div class="current-image-box" id="currentMainBox">
                 <span>Foto saat ini:</span>
-                <img src="{{ asset('storage/' . $gallery->image) }}" alt="{{ $gallery->title }}">
+                <div style="position:relative;display:inline-block;">
+                    <img src="{{ asset('storage/' . $gallery->image) }}" alt="{{ $gallery->title }}">
+                    <button type="button" class="remove-image" onclick="removeMainImage()" title="Hapus foto utama">&times;</button>
+                </div>
             </div>
             @endif
 
-            <div class="form-group">
+            <div class="form-group" style="{{ $gallery->isMirror() ? 'display:none;' : '' }}">
                 <label class="form-label">{{ $gallery->image ? 'Ganti Foto Utama (Opsional)' : 'Upload Foto Utama' }}</label>
                 <div class="upload-area" id="mainImageArea">
                     <input type="file" id="mainImageInput" name="foto"
@@ -317,6 +345,7 @@
                 </div>
                 <div class="image-new-preview" id="mainImgPreview">
                     <img src="" alt="Preview" id="mainImgPreviewImg">
+                    <button type="button" class="remove-image" id="mainImgRemove" title="Hapus gambar">&times;</button>
                 </div>
                 @error('foto')<div class="error-message">{{ $message }}</div>@enderror
                 <div class="server-badge" style="margin-top:0.75rem;">
@@ -351,7 +380,7 @@
             </div>
             @endif
 
-            <div class="form-group">
+            <div class="form-group" style="{{ $gallery->isMirror() ? 'display:none;' : '' }}">
                 <label class="form-label">Tambah Foto Baru</label>
                 <div class="upload-area" id="photosArea">
                     <input type="file" id="photosInput" name="photos[]"
@@ -494,6 +523,22 @@ document.addEventListener('DOMContentLoaded', function () {
         reader.readAsDataURL(result);
     });
 
+    // Tombol silang pada preview foto utama baru
+    document.getElementById('mainImgRemove').addEventListener('click', function () {
+        ImageCompressor.replaceFiles(mainInput, []);
+        mainInput.value = '';
+        mainPrevImg.src = '';
+        mainPreview.classList.remove('show');
+        document.getElementById('mainImgProgress').classList.remove('show');
+    });
+
+    // Hapus foto utama yang sudah tersimpan
+    window.removeMainImage = function () {
+        if (!confirm('Hapus foto utama? Foto pertama dari Foto Tambahan akan menjadi foto utama.')) return;
+        document.getElementById('remove_main_image').value = '1';
+        document.getElementById('currentMainBox')?.remove();
+    };
+
     // Drag & drop main
     mainArea.addEventListener('dragover',  e => { e.preventDefault(); mainArea.classList.add('drag-over'); });
     mainArea.addEventListener('dragleave', () => mainArea.classList.remove('drag-over'));
@@ -539,14 +584,26 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!photoFiles.length) { newPhotosGrid.style.display = 'none'; return; }
         newPhotosGrid.style.display = 'grid';
         photoFiles.forEach((file, i) => {
-            const reader = new FileReader();
-            reader.onload = e => {
-                const div = document.createElement('div');
-                div.className = 'photo-item';
-                div.innerHTML = `<img src="${e.target.result}" alt="Photo ${i + 1}">`;
-                newPhotosGrid.appendChild(div);
-            };
-            reader.readAsDataURL(file);
+            const div = document.createElement('div');
+            div.className = 'photo-item';
+
+            const img = document.createElement('img');
+            img.src = URL.createObjectURL(file);
+            img.alt = 'Photo ' + (i + 1);
+
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'remove-photo';
+            btn.title = 'Hapus foto';
+            btn.innerHTML = '&times;';
+            btn.addEventListener('click', () => {
+                photoFiles.splice(i, 1);
+                ImageCompressor.replaceFiles(photosInput, photoFiles);
+                renderNewPhotos();
+            });
+
+            div.append(img, btn);
+            newPhotosGrid.appendChild(div);
         });
     }
 

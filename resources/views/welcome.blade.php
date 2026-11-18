@@ -236,6 +236,25 @@
 
 .gallery-preview-item:hover img { transform: scale(1.08); }
 
+/* ===== BADGE NEW (Recently & Gallery) ===== */
+    .recent-new-badge {
+        position: absolute;
+        top: 0.6rem;
+        right: 0.6rem;
+        z-index: 10;
+        background: #e74c3c;
+        color: #fff;
+        padding: 0.25rem 0.65rem;
+        border-radius: 20px;
+        font-size: 0.68rem;
+        font-weight: 700;
+        line-height: 1.4;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        pointer-events: none;
+        box-shadow: 0 2px 8px rgba(231,76,60,0.4);
+    }
+
 /* ===== BLOG PREVIEW ===== */
 .blog-preview-grid {
     display: grid;
@@ -584,6 +603,64 @@
     padding: clamp(1.5rem, 4vw, 3rem);
     color: #999;
 }
+
+/* ===== RECENTLY UPLOADED (jalan ke kiri) ===== */
+.recent-marquee {
+    overflow: hidden;
+    position: relative;
+    padding: 0.5rem 0;
+    -webkit-mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
+            mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
+}
+.recent-track {
+    display: flex;
+    width: max-content;
+    animation: recentScroll var(--recent-duration, 40s) linear infinite;
+}
+.recent-card {
+    position: relative;
+    flex: 0 0 auto;
+    display: block;
+    width: clamp(200px, 24vw, 300px);
+    aspect-ratio: 4 / 3;
+    margin-right: 1rem;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+}
+.recent-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.5s ease;
+}
+.recent-card:hover img { transform: scale(1.06); }
+.recent-new-badge {
+    position: absolute;
+    top: 0.6rem;
+    right: 0.6rem;
+    z-index: 10;
+    background: #e74c3c;
+    color: #fff;
+    padding: 0.25rem 0.65rem;
+    border-radius: 20px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    line-height: 1.4;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    pointer-events: none;
+    box-shadow: 0 2px 8px rgba(231,76,60,0.4);
+}
+@keyframes recentScroll {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+}
+@media (prefers-reduced-motion: reduce) {
+    .recent-marquee { overflow-x: auto; -webkit-mask-image: none; mask-image: none; }
+    .recent-track { animation: none; }
+}
 </style>
 @endpush
 
@@ -667,6 +744,42 @@
     </div>
 </section>
 
+<!-- Recently Uploaded (jalan ke kiri) -->
+@if($recentPhotos->isNotEmpty())
+@php
+    // Ulang daftar sampai cukup panjang, lalu gandakan 2x agar loop mulus
+    $half = collect();
+    while ($half->count() < 10) { $half = $half->concat($recentPhotos); }
+    $track = $half->concat($half);
+@endphp
+<section id="recently" class="section" style="padding-top: 0;">
+    <div class="container">
+        <h2 class="section-title">RECENTLY</h2>
+        <p class="section-subtitle">Our newest wedding moments, freshly uploaded.</p>
+    </div>
+
+    <div class="recent-marquee">
+        <div class="recent-track" style="--recent-duration: {{ max(30, $half->count() * 4) }}s;">
+            @foreach($track as $item)
+            <a href="{{ route('gallery.show', $item['id']) }}" class="recent-card" title="{{ $item['title'] }}">
+                @if($item['is_new'])
+                    <span class="recent-new-badge">NEW</span>
+                @endif
+                <img src="{{ asset('storage/' . ImageHelper::thumb($item['path'])) }}"
+                     alt="{{ $item['title'] ?? 'Recent wedding' }}"
+                     loading="lazy"
+                     onerror="this.onerror=null; this.src='{{ asset('storage/' . $item['path']) }}';">
+            </a>
+            @endforeach
+        </div>
+    </div>
+
+    {{-- <div class="container" style="text-align: center; margin-top: 2rem;">
+        <a href="{{ route('gallery.public') }}" class="btn-primary">View Full Gallery</a>
+    </div> --}}
+</section>
+@endif
+
 <!-- Wedding Package Section -->
 <section id="packages" class="section" style="background: #f8f8f8;">
     <div class="container">
@@ -707,7 +820,9 @@
         <div class="gallery-preview-grid">
             @foreach($galleries->take(8) as $gallery)
             <div class="gallery-preview-item">
-
+                @if($gallery->is_new && $gallery->type !== 'video')
+                    <span class="recent-new-badge">NEW</span>
+                @endif
                 @if($gallery->type === 'video')
 
                     {{-- YOUTUBE --}}
@@ -740,7 +855,7 @@
                 @else
 
                     <x-image
-                        :src="$gallery->image"
+                        :src="$gallery->image ?: (($gallery->photo ?? [])[0] ?? null)"
                         :alt="$gallery->title ?? 'Gallery'"
                     />
 

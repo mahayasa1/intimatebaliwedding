@@ -21,10 +21,17 @@ class Gallery extends Model
         'description',
         'category',
         'order',
+        'source',
+        'package_id',
+        'subpackage_id',
+        'linked_targets',
+        'new_until',
     ];
 
     protected $casts = [
-        'order' => 'integer',
+        'order'          => 'integer',
+        'linked_targets' => 'array',
+        'new_until'      => 'datetime',
         // 'photo' TIDAK didaftarkan di sini lagi.
         // Jangan gabungkan $casts dan getXAttribute/setXAttribute
         // untuk kolom yang sama — accessor lama akan MENIMPA cast
@@ -129,6 +136,24 @@ class Gallery extends Model
                 return $id ? "https://img.youtube.com/vi/{$id}/hqdefault.jpg" : null;
             },
         );
+    }
+
+    /**
+     * Label NEW: tampil selama new_until masih di masa depan.
+     */
+    protected function isNew(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->new_until !== null && $this->new_until->isFuture(),
+        );
+    }
+
+    /**
+     * Item gallery hasil mirror otomatis dari Package / Subpackage?
+     */
+    public function isMirror(): bool
+    {
+        return in_array($this->source, ['package', 'subpackage'], true);
     }
 
     /**

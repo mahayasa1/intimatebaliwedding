@@ -137,11 +137,26 @@
 
     if (!inputEl) return;
 
-    /* ── Render previews dari FileList ── */
-    function renderPreviews(files) {
+    var multiple = {{ $isMultiple ? 'true' : 'false' }};
+    var selected = [];      // daftar file terpilih (sumber kebenaran)
+    var objectUrls = [];
+
+    function fileKey(f) { return f.name + '|' + f.size + '|' + f.lastModified; }
+
+    /* Samakan <input>.files dengan daftar "selected" */
+    function syncInput() {
+        var dt = new DataTransfer();
+        selected.forEach(function (f) { dt.items.add(f); });
+        inputEl.files = dt.files;
+    }
+
+    /* ── Render preview + tombol silang di pojok kanan atas ── */
+    function renderPreviews() {
+        objectUrls.forEach(function (u) { URL.revokeObjectURL(u); });
+        objectUrls = [];
         previewEl.innerHTML = '';
 
-        if (!files.length) {
+        if (!selected.length) {
             previewEl.style.display = 'none';
             areaEl.style.display = '';
             return;
@@ -152,61 +167,108 @@
         var grid = document.createElement('div');
         grid.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;';
 
-        Array.from(files).forEach(function (file) {
-            if (!file.type.startsWith('image/')) return;
+        selected.forEach(function (file, index) {
+            var url = URL.createObjectURL(file);
+            objectUrls.push(url);
 
-            var reader = new FileReader();
-            reader.onload = function (e) {
-                var wrap = document.createElement('div');
-                wrap.style.cssText = [
-                    'position:relative',
-                    'border-radius:8px',
-                    'overflow:hidden',
-                    'aspect-ratio:1',
-                    'background:#f0f0f0',
-                    'border:2px solid #e8e8e8',
-                ].join(';');
+            var wrap = document.createElement('div');
+            wrap.style.cssText = [
+                'position:relative',
+                'border-radius:8px',
+                'overflow:hidden',
+                'aspect-ratio:1',
+                'background:#f0f0f0',
+                'border:2px solid #e8e8e8',
+            ].join(';');
 
-                var img = document.createElement('img');
-                img.src = e.target.result;
-                img.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;';
+            var img = document.createElement('img');
+            img.src = url;
+            img.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;';
 
-                /* filename badge */
-                var badge = document.createElement('div');
-                badge.style.cssText = [
-                    'position:absolute',
-                    'bottom:0',
-                    'left:0',
-                    'right:0',
-                    'background:rgba(0,0,0,.55)',
-                    'color:white',
-                    'font-size:9px',
-                    'padding:3px 5px',
-                    'font-family:sans-serif',
-                    'white-space:nowrap',
-                    'overflow:hidden',
-                    'text-overflow:ellipsis',
-                ].join(';');
-                badge.textContent = file.name;
+            /* filename badge */
+            var badge = document.createElement('div');
+            badge.style.cssText = [
+                'position:absolute',
+                'bottom:0',
+                'left:0',
+                'right:0',
+                'background:rgba(0,0,0,.55)',
+                'color:white',
+                'font-size:9px',
+                'padding:3px 5px',
+                'font-family:sans-serif',
+                'white-space:nowrap',
+                'overflow:hidden',
+                'text-overflow:ellipsis',
+            ].join(';');
+            badge.textContent = file.name;
 
-                wrap.appendChild(img);
-                wrap.appendChild(badge);
-                grid.appendChild(wrap);
-            };
-            reader.readAsDataURL(file);
+            /* tombol silang */
+            var btn = document.createElement('button');
+            btn.type = 'button';
+            btn.title = 'Hapus gambar';
+            btn.innerHTML = '&times;';
+            btn.style.cssText = [
+                'position:absolute',
+                'top:6px',
+                'right:6px',
+                'z-index:5',
+                'width:26px',
+                'height:26px',
+                'padding:0',
+                'border:none',
+                'border-radius:50%',
+                'background:#e74c3c',
+                'color:#fff',
+                'font-size:18px',
+                'line-height:1',
+                'cursor:pointer',
+                'display:flex',
+                'align-items:center',
+                'justify-content:center',
+                'box-shadow:0 2px 6px rgba(0,0,0,.3)',
+            ].join(';');
+            btn.addEventListener('click', function (ev) {
+                ev.preventDefault();
+                ev.stopPropagation();
+                selected.splice(index, 1);
+                syncInput();
+                renderPreviews();
+            });
+
+            wrap.appendChild(img);
+            wrap.appendChild(badge);
+            wrap.appendChild(btn);
+            grid.appendChild(wrap);
         });
 
         previewEl.appendChild(grid);
 
         /* Sembunyikan upload area untuk single upload */
-        if (!{{ $isMultiple ? 'true' : 'false' }}) {
+        if (!multiple) {
             areaEl.style.display = 'none';
         }
     }
 
     /* ── change event ── */
     inputEl.addEventListener('change', function () {
-        renderPreviews(Array.from(this.files));
+        var incoming = Array.from(this.files).filter(function (f) {
+            return f.type.startsWith('image/');
+        });
+
+        if (multiple) {
+            /* Tambahkan ke daftar yang sudah ada (tanpa duplikat) */
+            var keys = {};
+            selected.forEach(function (f) { keys[fileKey(f)] = true; });
+            incoming.forEach(function (f) {
+                if (!keys[fileKey(f)]) { selected.push(f); }
+            });
+        } else {
+            selected = incoming.slice(0, 1);
+        }
+
+        syncInput();
+        renderPreviews();
     });
 
     /* ── Drag & drop ── */

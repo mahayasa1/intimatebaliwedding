@@ -158,6 +158,13 @@
         font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px;
     }
 
+    .remove-image {
+        position: absolute; top: 10px; right: 10px; z-index: 5; background: #e74c3c; color: white;
+        border: none; border-radius: 50%; width: 32px; height: 32px; padding: 0; cursor: pointer;
+        display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;
+    }
+    .remove-image:hover { background: #c0392b; transform: scale(1.1); }
+
     .btn-remove-sub {
         background: #e74c3c; color: white; border: none; border-radius: 8px;
         padding: 0.4rem 0.8rem; cursor: pointer; font-size: 0.8rem;
@@ -442,10 +449,15 @@ function addSubpackage(data = null) {
     const existingPhotos = data ? (data.photo || []) : [];
 
     const existingImgHtml = existingImage
-        ? `<div style="margin-bottom:0.75rem;">
+        ? `<div class="sub-existing-img" style="margin-bottom:0.75rem;">
                <span style="font-size:0.8rem;color:#666;">Current image:</span><br>
-               <img src="/storage/${existingImage}" style="max-width:180px;max-height:130px;border-radius:8px;margin-top:4px;">
-               <input type="hidden" name="subpackages[${idx}][existing_image]" value="${existingImage}">
+               <div style="position:relative;display:inline-block;margin-top:4px;">
+                   <img src="/storage/${existingImage}" style="max-width:180px;max-height:130px;border-radius:8px;display:block;">
+                   <button type="button" class="remove-image" title="Hapus gambar"
+                       style="top:6px;right:6px;width:26px;height:26px;font-size:18px;"
+                       onclick="removeSubExisting(this)">&times;</button>
+                   <input type="hidden" name="subpackages[${idx}][existing_image]" value="${existingImage}">
+               </div>
            </div>` : '';
 
     const existingPhotosHtml = existingPhotos.length
@@ -453,8 +465,12 @@ function addSubpackage(data = null) {
                <span style="font-size:0.8rem;color:#666;">Current photos:</span>
                <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;">
                    ${existingPhotos.map(p => `
-                       <img src="/storage/${p}" style="width:80px;height:80px;object-fit:cover;border-radius:6px;">
-                       <input type="hidden" name="subpackages[${idx}][existing_photos][]" value="${p}">
+                       <div class="sub-existing-photo" style="position:relative;width:90px;height:90px;">
+                           <img src="/storage/${p}" style="width:90px;height:90px;object-fit:cover;border-radius:6px;display:block;">
+                           <button type="button" class="remove-photo" title="Hapus foto"
+                               onclick="removeSubExisting(this)">&times;</button>
+                           <input type="hidden" name="subpackages[${idx}][existing_photos][]" value="${p}">
+                       </div>
                    `).join('')}
                </div>
            </div>` : '';
@@ -463,6 +479,7 @@ function addSubpackage(data = null) {
     div.className = 'subpackage-item';
     div.id = `sub_${idx}`;
     div.innerHTML = `
+        ${data && data.id ? `<input type="hidden" name="subpackages[${idx}][id]" value="${data.id}">` : ''}
         <div class="subpackage-header">
             <span class="subpackage-number">Sub-package #${list.children.length + 1}</span>
             <button type="button" class="btn-remove-sub" onclick="removeSubpackage('sub_${idx}')">
@@ -493,8 +510,10 @@ function addSubpackage(data = null) {
                     <div class="progress-label" id="sub_img_label_${idx}">Mengompres…</div>
                     <div class="progress-bar-wrap"><div class="progress-bar" id="sub_img_bar_${idx}"></div></div>
                 </div>
-                <div id="sub_img_preview_${idx}" style="display:none;margin-top:0.75rem;">
-                    <img style="max-width:200px;max-height:150px;border-radius:8px;" src="" alt="preview">
+                <div id="sub_img_preview_${idx}" style="display:none;margin-top:0.75rem;position:relative;width:fit-content;max-width:100%;">
+                    <img style="max-width:200px;max-height:150px;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.1);display:block;" src="" alt="preview">
+                    <button type="button" class="remove-image" id="sub_img_remove_${idx}" title="Hapus gambar"
+                        style="top:6px;right:6px;width:26px;height:26px;font-size:18px;">&times;</button>
                 </div>
             </div>
             <div class="form-group full-width">
@@ -536,6 +555,14 @@ function addSubpackage(data = null) {
     });
 
     /* Sub additional photos */
+    /* Tombol silang pada preview gambar utama subpackage */
+    document.getElementById(`sub_img_remove_${idx}`).addEventListener('click', function () {
+        ImageCompressor.replaceFiles(subImgInput, []);
+        const box = document.getElementById(`sub_img_preview_${idx}`);
+        box.style.display = 'none';
+        box.querySelector('img').src = '';
+    });
+
     let subPhotoFiles = [];
     const subPhotosInput = document.getElementById(`sub_photos_${idx}`);
     subPhotosInput.addEventListener('change', async function () {
@@ -552,20 +579,38 @@ function addSubpackage(data = null) {
         ImageCompressor.replaceFiles(subPhotosInput, subPhotoFiles);
         showSubProgress(idx, 'photos', 100, `✓ ${subPhotoFiles.length} foto siap`, true);
 
+        renderSubPhotos();
+    });
+
+    function renderSubPhotos() {
         const grid = document.getElementById(`sub_photos_grid_${idx}`);
         grid.innerHTML = '';
-        grid.style.display = subPhotoFiles.length ? 'grid' : 'none';
+        if (!subPhotoFiles.length) { grid.style.display = 'none'; return; }
+        grid.style.display = 'grid';
         subPhotoFiles.forEach((file, i) => {
-            const reader = new FileReader();
-            reader.onload = e => {
-                const d = document.createElement('div');
-                d.className = 'photo-preview-item';
-                d.innerHTML = `<img src="${e.target.result}" alt="Photo ${i + 1}" style="width:100%;height:100%;object-fit:cover;">`;
-                grid.appendChild(d);
-            };
-            reader.readAsDataURL(file);
+            const d = document.createElement('div');
+            d.className = 'photo-preview-item';
+
+            const img = document.createElement('img');
+            img.src = URL.createObjectURL(file);
+            img.alt = 'Photo ' + (i + 1);
+            img.style.cssText = 'width:100%;height:100%;object-fit:cover;';
+
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'remove-photo';
+            btn.title = 'Hapus foto';
+            btn.innerHTML = '&times;';
+            btn.addEventListener('click', () => {
+                subPhotoFiles.splice(i, 1);
+                ImageCompressor.replaceFiles(subPhotosInput, subPhotoFiles);
+                renderSubPhotos();
+            });
+
+            d.append(img, btn);
+            grid.appendChild(d);
         });
-    });
+    }
 }
 
 function showSubProgress(idx, type, pct, text, done) {
@@ -581,6 +626,12 @@ function showSubProgress(idx, type, pct, text, done) {
         label.style.color    = '#155724';
         setTimeout(() => { prog.classList.remove('show'); bar.style.background = ''; label.style.color = ''; }, 2500);
     }
+}
+
+/* Hapus gambar subpackage yang sudah tersimpan (hidden input ikut hilang → server menghapusnya) */
+function removeSubExisting(btn) {
+    if (!confirm('Hapus gambar ini?')) return;
+    (btn.closest('.sub-existing-img') || btn.closest('.sub-existing-photo')).remove();
 }
 
 function removeSubpackage(id) {

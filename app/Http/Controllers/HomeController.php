@@ -34,6 +34,33 @@ class HomeController extends Controller
                     ->take(8)
                     ->get();
 
+        // Foto wedding yang baru diupload (dari Subpackage maupun Gallery)
+        $recentPhotos = collect();
+        Gallery::where(function ($q) {
+                    $q->whereNull('type')->orWhereRaw('LOWER(type) != ?', ['video']);
+                })
+                ->where(function ($q) {
+                    $q->whereNull('category')->orWhere('category', '!=', 'Hero');
+                })
+                ->orderByDesc('new_until')
+                ->orderByDesc('created_at')
+                ->take(12)
+                ->get()
+                ->each(function ($g) use (&$recentPhotos) {
+                    $paths = array_values(array_unique(array_filter(
+                        array_merge([$g->image], $g->photo ?? [])
+                    )));
+                    foreach (array_slice($paths, 0, 4) as $path) {
+                        $recentPhotos->push([
+                            'path'   => $path,
+                            'title'  => $g->title,
+                            'id'     => $g->id,
+                            'is_new' => $g->is_new,
+                        ]);
+                    }
+                });
+        $recentPhotos = $recentPhotos->take(16)->values();
+
         // Fetch latest published blogs (limit to 3)
         $blogs = Blog::where('is_published', true)
                     ->whereNotNull('published_at')
@@ -69,6 +96,7 @@ class HomeController extends Controller
             'googleReviews',
             'businessStats',
             'heroSlides',
+            'recentPhotos'
         ));
     }
 }

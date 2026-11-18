@@ -329,6 +329,12 @@ body{
             {{ $isVideo ? 'VIDEO' : 'PHOTO' }}
         </span>
 
+        <span style="position:absolute;top:12px;right:12px;z-index:5;display:flex;gap:6px;">
+            @if($gallery->is_new)
+                <span style="background:#e74c3c;color:#fff;padding:.35rem .6rem;font-size:.68rem;border-radius:8px;font-weight:700;">NEW</span>
+            @endif
+        </span>
+
         @if($isVideo)
 
             @if($gallery->thumbnail)

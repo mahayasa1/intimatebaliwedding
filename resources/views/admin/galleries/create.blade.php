@@ -128,6 +128,18 @@
     .image-preview { display: none; margin-top: 1rem; position: relative; }
     .image-preview img { max-width: 100%; max-height: 300px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); display: block; }
     .image-preview.show { display: block; }
+    .image-preview { width: fit-content; max-width: 100%; }
+
+    /* Tombol silang (hapus gambar) */
+    .remove-image, .remove-photo {
+        position: absolute; top: 8px; right: 8px; z-index: 5;
+        width: 30px; height: 30px; padding: 0; border: none; border-radius: 50%;
+        background: #e74c3c; color: #fff; font-size: 20px; line-height: 1; cursor: pointer;
+        display: flex; align-items: center; justify-content: center;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.3); transition: all 0.2s ease;
+    }
+    .remove-photo { top: 5px; right: 5px; width: 26px; height: 26px; font-size: 18px; }
+    .remove-image:hover, .remove-photo:hover { background: #c0392b; transform: scale(1.1); }
 
     /* Photos grid */
     .photos-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 1rem; margin-top: 1rem; }
@@ -287,6 +299,7 @@
                 </div>
                 <div class="image-preview" id="mainImgPreview">
                     <img src="" alt="Preview" id="mainImgPreviewImg">
+                    <button type="button" class="remove-image" id="mainImgRemove" title="Hapus gambar">&times;</button>
                 </div>
                 @error('foto')<div class="error-message">{{ $message }}</div>@enderror
                 <div class="server-badge" style="margin-top:0.75rem;">
@@ -322,6 +335,38 @@
                 <div class="server-badge" style="margin-top:0.75rem;">
                     <i class="fas fa-server"></i>
                     Semua foto dikompres 2× — client + server (WebP)
+                </div>
+            </div>
+        </div>
+
+        {{-- INCLUDE KE PACKAGE / SUBPACKAGE --}}
+        <div class="form-card" id="includeSection">
+            <h3 class="section-title">
+                <span class="section-icon"><i class="fa-solid fa-link"></i></span>
+                Include ke Package <span style="font-size:0.8rem;color:#999;font-weight:400;">(Opsional)</span>
+            </h3>
+
+            <div class="form-group">
+                <label for="includePackage" class="form-label">Package</label>
+                <select id="includePackage" name="package_id" class="form-control @error('package_id') error @enderror">
+                    <option value="">— Hanya masuk Gallery —</option>
+                    @foreach($packages as $pkg)
+                        <option value="{{ $pkg->id }}" {{ old('package_id') === $pkg->id ? 'selected' : '' }}>{{ $pkg->name }}</option>
+                    @endforeach
+                </select>
+                <div class="form-help">Foto yang diupload di sini akan ikut ditambahkan ke package / subpackage yang dipilih.</div>
+                @error('package_id')<div class="error-message">{{ $message }}</div>@enderror
+            </div>
+
+            <div id="includeOptions" style="display:none;">
+                <label class="form-label">Masukkan foto ke:</label>
+                <div style="display:flex;flex-direction:column;gap:.6rem;font-family:'Work Sans',sans-serif;font-size:.92rem;">
+                    <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;">
+                        <input type="checkbox" name="include_package" value="1" id="includePackageChk"
+                               {{ old('include_package', '1') ? 'checked' : '' }}>
+                        <span>Package utama</span>
+                    </label>
+                    <div id="includeSubList" style="display:flex;flex-direction:column;gap:.6rem;"></div>
                 </div>
             </div>
         </div>
@@ -443,6 +488,16 @@ document.addEventListener('DOMContentLoaded', function () {
         reader.readAsDataURL(result);
     });
 
+    // Tombol silang foto utama
+    document.getElementById('mainImgRemove').addEventListener('click', function () {
+        ImageCompressor.replaceFiles(mainInput, []);
+        mainInput.value = '';
+        mainPrevImg.src = '';
+        mainPreview.classList.remove('show');
+        mainArea.style.display = '';
+        document.getElementById('mainImgProgress').classList.remove('show');
+    });
+
     // Drag & drop main
     mainArea.addEventListener('dragover',  e => { e.preventDefault(); mainArea.classList.add('drag-over'); });
     mainArea.addEventListener('dragleave', () => mainArea.classList.remove('drag-over'));
@@ -488,14 +543,26 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!photoFiles.length) { photosGrid.style.display = 'none'; return; }
         photosGrid.style.display = 'grid';
         photoFiles.forEach((file, i) => {
-            const reader = new FileReader();
-            reader.onload = e => {
-                const div = document.createElement('div');
-                div.className = 'photo-preview-item';
-                div.innerHTML = `<img src="${e.target.result}" alt="Photo ${i + 1}">`;
-                photosGrid.appendChild(div);
-            };
-            reader.readAsDataURL(file);
+            const div = document.createElement('div');
+            div.className = 'photo-preview-item';
+
+            const img = document.createElement('img');
+            img.src = URL.createObjectURL(file);
+            img.alt = 'Photo ' + (i + 1);
+
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'remove-photo';
+            btn.title = 'Hapus foto';
+            btn.innerHTML = '&times;';
+            btn.addEventListener('click', () => {
+                photoFiles.splice(i, 1);
+                ImageCompressor.replaceFiles(photosInput, photoFiles);
+                renderPhotoPreviews();
+            });
+
+            div.append(img, btn);
+            photosGrid.appendChild(div);
         });
     }
 
@@ -536,5 +603,57 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
 });
+</script>
+@endpush
+
+@php
+    $packagesJs = [];
+    foreach ($packages as $p) {
+        $subs = [];
+        foreach ($p->subpackages as $sp) {
+            $subs[] = ['id' => $sp->id, 'name' => $sp->name];
+        }
+        $packagesJs[] = ['id' => $p->id, 'name' => $p->name, 'subs' => $subs];
+    }
+    $oldSubIds = old('subpackage_ids', []);
+@endphp
+@push('scripts')
+<script>
+(function () {
+    const packages   = @json($packagesJs);
+    const oldSubs    = @json($oldSubIds);
+
+    const select     = document.getElementById('includePackage');
+    const options    = document.getElementById('includeOptions');
+    const subList    = document.getElementById('includeSubList');
+    const section    = document.getElementById('includeSection');
+
+    function renderSubs() {
+        const pkg = packages.find(p => p.id === select.value);
+        subList.innerHTML = '';
+        options.style.display = pkg ? 'block' : 'none';
+        if (!pkg) return;
+
+        pkg.subs.forEach(sub => {
+            const label = document.createElement('label');
+            label.style.cssText = 'display:flex;align-items:center;gap:.5rem;cursor:pointer;';
+            label.innerHTML = '<input type="checkbox" name="subpackage_ids[]" value="' + sub.id + '"' +
+                (oldSubs.includes(sub.id) ? ' checked' : '') + '><span></span>';
+            label.querySelector('span').textContent = 'Subpackage: ' + sub.name;
+            subList.appendChild(label);
+        });
+    }
+
+    // Include hanya berlaku untuk tipe Photo
+    function toggleSection() {
+        const checked = document.querySelector('input[name="type"]:checked');
+        section.style.display = (checked && checked.value === 'video') ? 'none' : '';
+    }
+
+    select.addEventListener('change', renderSubs);
+    document.querySelectorAll('input[name="type"]').forEach(r => r.addEventListener('change', toggleSection));
+    renderSubs();
+    toggleSection();
+})();
 </script>
 @endpush

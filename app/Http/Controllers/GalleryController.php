@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Helpers\ImageHelper;
 use App\Models\Gallery;
+use App\Models\Package;
+use App\Models\Subpackage;
+use App\Services\MediaSync;
 use App\Services\GoogleMapsService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -128,6 +131,10 @@ class GalleryController extends Controller
             if ($gallery->category) {
                 $html .= '<span class="top-badge"><i class="fas fa-tag"></i> ' . e($gallery->category) . '</span>';
             }
+
+            if ($gallery->is_new) {
+                $html .= '<span class="new-badge">NEW</span>';
+            }
     
             if ($previewImage) {
                 $thumbUrl = asset('storage/' . ImageHelper::thumb($previewImage));
@@ -247,7 +254,10 @@ class GalleryController extends Controller
             }
         }
 
+        // Urutan: item NEW paling atas (yang terbaru dulu), sisanya sesuai abjad
         $galleries = $query
+            ->orderByRaw('CASE WHEN new_until IS NOT NULL AND new_until > ? THEN 0 ELSE 1 END', [now()])
+            ->orderByRaw('CASE WHEN new_until IS NOT NULL AND new_until > ? THEN new_until END DESC', [now()])
             ->orderBy('title', 'asc')
             ->orderBy('order')
             ->orderByDesc('created_at')
@@ -259,7 +269,12 @@ class GalleryController extends Controller
 
     public function create()
     {
-        return view('admin.galleries.create');
+        // Untuk pilihan "Include ke Package / Subpackage"
+        $packages = Package::with(['subpackages' => fn($q) => $q->select('id', 'package_id', 'name')->orderBy('name')])
+            ->orderBy('name')
+            ->get(['id', 'name']);
+
+        return view('admin.galleries.create', compact('packages'));
     }
 
     public function store(Request $request)
@@ -267,14 +282,18 @@ class GalleryController extends Controller
         $type = $request->input('type', 'photo');
 
         $validated = $request->validate([
-            'type'        => 'required|in:photo,video',
-            'title'       => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'category'    => 'nullable|string|max:255',
-            'order'       => 'nullable|integer',
-            'foto'        => 'required_if:type,photo|nullable|image|mimes:jpeg,png,jpg,webp|max:20480',
-            'photos.*'    => 'nullable|image|mimes:jpeg,png,jpg,webp|max:20480',
-            'video_url'   => 'required_if:type,video|nullable|url',
+            'type'            => 'required|in:photo,video',
+            'title'           => 'required|string|max:255',
+            'description'     => 'nullable|string',
+            'category'        => 'nullable|string|max:255',
+            'order'           => 'nullable|integer',
+            'foto'            => 'required_if:type,photo|nullable|image|mimes:jpeg,png,jpg,webp|max:20480',
+            'photos.*'        => 'nullable|image|mimes:jpeg,png,jpg,webp|max:20480',
+            'video_url'       => 'required_if:type,video|nullable|url',
+            'package_id'      => 'nullable|exists:packages,id',
+            'include_package' => 'nullable|boolean',
+            'subpackage_ids'  => 'nullable|array',
+            'subpackage_ids.*'=> 'exists:subpackages,id',
         ]);
 
         if ($type === 'video') {
@@ -287,6 +306,7 @@ class GalleryController extends Controller
                 'video_url'   => $validated['video_url'],
                 'image'       => null,
                 'photo'       => [],
+                'source'      => 'manual',
             ]);
         } else {
             $image = null;
@@ -303,7 +323,7 @@ class GalleryController extends Controller
                 }
             }
 
-            Gallery::create([
+            $gallery = Gallery::create([
                 'type'        => 'photo',
                 'title'       => $validated['title'],
                 'description' => $validated['description'] ?? null,
@@ -312,7 +332,19 @@ class GalleryController extends Controller
                 'video_url'   => null,
                 'image'       => $image,
                 'photo'       => $photos,
+                'source'      => 'manual',
+                'new_until'   => now()->addDays(MediaSync::NEW_DAYS),
             ]);
+
+            // Include foto ke Package / Subpackage yang dipilih
+            if (!empty($validated['package_id'])) {
+                MediaSync::includeInto(
+                    $gallery,
+                    $validated['package_id'],
+                    $request->boolean('include_package'),
+                    $validated['subpackage_ids'] ?? []
+                );
+            }
         }
 
         return redirect()->route('admin.galleries.index')->with('success', 'Gallery item created successfully.');
@@ -330,6 +362,11 @@ class GalleryController extends Controller
 
     public function update(Request $request, Gallery $gallery)
     {
+        // Item otomatis dari Subpackage: hanya deskripsi, urutan, dan HAPUS foto
+        if ($gallery->isMirror()) {
+            return $this->updateMirror($request, $gallery);
+        }
+
         $type = $request->input('type', $gallery->type ?? 'photo');
 
         if ($type === 'video') {
@@ -344,67 +381,167 @@ class GalleryController extends Controller
             $gallery->update($validated);
         } else {
             $validated = $request->validate([
-                'title'       => 'required|string|max:255',
-                'foto'        => 'nullable|image|mimes:jpeg,png,jpg,webp|max:20480',
-                'photos.*'    => 'nullable|image|mimes:jpeg,png,jpg,webp|max:20480',
-                'description' => 'nullable|string',
-                'category'    => 'nullable|string|max:255',
-                'order'       => 'nullable|integer',
+                'title'             => 'required|string|max:255',
+                'foto'              => 'nullable|image|mimes:jpeg,png,jpg,webp|max:20480',
+                'photos.*'          => 'nullable|image|mimes:jpeg,png,jpg,webp|max:20480',
+                'description'       => 'nullable|string',
+                'category'          => 'nullable|string|max:255',
+                'order'             => 'nullable|integer',
+                'remove_main_image' => 'nullable|boolean',
             ]);
             $validated['type'] = 'photo';
 
+            // Foto yang diminta dihapus
+            $removedList = [];
+            if ($request->filled('removed_photos')) {
+                $decoded = json_decode($request->removed_photos, true);
+                if (is_array($decoded)) {
+                    $removedList = $decoded;
+                }
+            }
+
+            // Item harus tetap punya minimal 1 foto
+            $coverCount = $request->hasFile('foto')
+                ? 1
+                : (($request->boolean('remove_main_image') || !$gallery->image) ? 0 : 1);
+            $remaining = $coverCount
+                + count(array_diff($gallery->photo ?? [], $removedList))
+                + count((array) $request->file('photos', []));
+
+            if ($remaining < 1) {
+                return redirect()->back()->withInput()
+                    ->with('error', 'Item gallery harus punya minimal 1 foto. Untuk menghapus seluruh item, gunakan tombol Delete.');
+            }
+
+            $oldPaths   = MediaSync::galleryPaths($gallery);
+            $newlyAdded = [];
+
+            // Cover
+            $image = $gallery->image;
             if ($request->hasFile('foto')) {
-                if ($gallery->image) {
-                    Storage::disk('public')->delete($gallery->image);
-                    ImageHelper::deleteThumb($gallery->image);
-                }
-                $result              = ImageHelper::storeAndCompress($request->file('foto'), 'gallery');
-                $validated['image']  = $result['path'];
+                $result       = ImageHelper::storeAndCompress($request->file('foto'), 'gallery');
+                $image        = $result['path'];
+                $newlyAdded[] = $result['path'];
+            } elseif ($request->boolean('remove_main_image')) {
+                $image = null;
+            }
+            if ($image && in_array($image, $removedList, true)) {
+                $image = null;
             }
 
-            $existingPhotos = $gallery->photo ?? [];
-
-            if ($request->has('removed_photos')) {
-                $removedPhotos = json_decode($request->removed_photos, true);
-                if (is_array($removedPhotos)) {
-                    foreach ($removedPhotos as $photoPath) {
-                        Storage::disk('public')->delete($photoPath);
-                        ImageHelper::deleteThumb($photoPath);
-                        $existingPhotos = array_filter($existingPhotos, fn($p) => $p !== $photoPath);
-                    }
-                }
-            }
+            // Foto tambahan
+            $existingPhotos = array_values(array_diff($gallery->photo ?? [], $removedList));
 
             if ($request->hasFile('photos')) {
                 foreach ($request->file('photos') as $photo) {
                     $result           = ImageHelper::storeAndCompress($photo, 'gallery/photos');
                     $existingPhotos[] = $result['path'];
+                    $newlyAdded[]     = $result['path'];
                 }
             }
 
+            // Cover kosong → foto pertama naik jadi cover
+            if (!$image && $existingPhotos) {
+                $image = array_shift($existingPhotos);
+            }
+
+            $validated['image'] = $image;
             $validated['photo'] = array_values($existingPhotos);
-            unset($validated['foto'], $validated['photos']);
+            unset($validated['foto'], $validated['photos'], $validated['remove_main_image']);
+
+            if ($newlyAdded) {
+                $validated['new_until'] = now()->addDays(MediaSync::NEW_DAYS);
+            }
+
             $gallery->update($validated);
+            $gallery->refresh();
+
+            $removedPaths = array_values(array_diff($oldPaths, MediaSync::galleryPaths($gallery)));
+
+            // Foto baru ikut ke package/subpackage tertaut; foto dihapus ikut dihapus di sana
+            if ($newlyAdded) {
+                MediaSync::pushToLinkedTargets($gallery, $newlyAdded);
+            }
+            MediaSync::removeFromTargets($gallery->linked_targets, $removedPaths);
+
+            // File dihapus hanya jika tidak dipakai Package/Subpackage/Gallery lain
+            MediaSync::release($removedPaths);
+            MediaSync::resyncTargets($gallery->linked_targets);
         }
 
         return redirect()->route('admin.galleries.index')->with('success', 'Gallery item updated successfully.');
     }
 
-    public function destroy(Gallery $gallery)
+    /**
+     * Item gallery otomatis dari Subpackage.
+     * Menghapus foto di sini = menghapus foto itu dari Subpackage-nya juga.
+     */
+    private function updateMirror(Request $request, Gallery $gallery)
     {
-        if ($gallery->image) {
-            Storage::disk('public')->delete($gallery->image);
-            ImageHelper::deleteThumb($gallery->image);
+        $validated = $request->validate([
+            'description' => 'nullable|string',
+            'order'       => 'nullable|integer',
+        ]);
+
+        $gallery->update([
+            'description' => $validated['description'] ?? null,
+            'order'       => $validated['order'] ?? 0,
+        ]);
+
+        $removed = [];
+        if ($request->filled('removed_photos')) {
+            $decoded = json_decode($request->removed_photos, true);
+            if (is_array($decoded)) {
+                $removed = $decoded;
+            }
+        }
+        if ($request->boolean('remove_main_image') && $gallery->image) {
+            $removed[] = $gallery->image;
         }
 
-        if ($gallery->photo && is_array($gallery->photo)) {
-            foreach ($gallery->photo as $photo) {
-                Storage::disk('public')->delete($photo);
-                ImageHelper::deleteThumb($photo);
+        // Hanya foto milik item ini yang boleh dihapus
+        $removed = array_values(array_intersect($removed, MediaSync::galleryPaths($gallery)));
+
+        if ($removed && $gallery->source === 'subpackage' && $gallery->subpackage_id) {
+            $sub = Subpackage::find($gallery->subpackage_id);
+
+            if ($sub) {
+                $photos = array_values(array_diff($sub->photo ?? [], $removed));
+                $image  = ($sub->image && in_array($sub->image, $removed, true)) ? null : $sub->image;
+
+                // Cover terhapus → foto pertama naik jadi cover
+                if (!$image && $photos) {
+                    $image = array_shift($photos);
+                }
+
+                $sub->update(['image' => $image, 'photo' => $photos]);
+
+                MediaSync::pruneLinkedGalleries($removed);
+                MediaSync::syncSubpackage($sub->fresh());   // memperbarui / menghapus item ini
+                MediaSync::release($removed);
             }
         }
 
+        return redirect()->route('admin.galleries.index')
+            ->with('success', 'Gallery item updated. Foto yang dihapus juga terhapus dari Subpackage.');
+    }
+
+    public function destroy(Gallery $gallery)
+    {
+        if ($gallery->isMirror()) {
+            return redirect()->route('admin.galleries.index')
+                ->with('error', 'Item ini otomatis dari Package/Subpackage. Hapus fotonya lewat Package/Subpackage terkait.');
+        }
+
+        $paths   = MediaSync::galleryPaths($gallery);
+        $targets = $gallery->linked_targets;
+
         $gallery->delete();
+
+        // Package/Subpackage TIDAK berubah; file tetap ada selama masih dipakai di sana
+        MediaSync::release($paths);
+        MediaSync::resyncTargets($targets);
+
         return redirect()->route('admin.galleries.index')->with('success', 'Gallery item deleted successfully.');
     }
 }

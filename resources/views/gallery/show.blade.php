@@ -296,6 +296,14 @@
     .lb-thumb.active { opacity: 1; border-color: #D4AF37; }
     .lb-thumb:hover { opacity: 0.9; }
 
+    .photo-new-badge {
+        position: absolute; top: 0.6rem; right: 0.6rem; z-index: 5;
+        background: #e74c3c; color: #fff; padding: 0.25rem 0.65rem;
+        border-radius: 20px; font-size: 0.68rem; font-weight: 700;
+        letter-spacing: 1px; text-transform: uppercase;
+        box-shadow: 0 2px 8px rgba(231,76,60,0.4);
+    }
+
     @media (max-width: 768px) {
         .show-hero h1 { font-size: 2rem; }
         .photos-grid { grid-template-columns: repeat(2, 1fr); }
@@ -343,6 +351,9 @@
     <div class="photos-grid">
         @foreach($allPhotos as $index => $photo)
         <div class="photo-item" onclick="openLb({{ $index }})">
+            @if($gallery->is_new)
+                <span class="photo-new-badge">NEW</span>
+            @endif
             <img src="{{ asset('storage/' . ImageHelper::thumb($photo)) }}"
                  alt="{{ $gallery->title }} - Photo {{ $index + 1 }}"
                  loading="{{ $index === 0 ? 'eager' : 'lazy' }}"
