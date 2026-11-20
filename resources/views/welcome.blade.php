@@ -236,24 +236,183 @@
 
 .gallery-preview-item:hover img { transform: scale(1.08); }
 
-/* ===== BADGE NEW (Recently & Gallery) ===== */
-    .recent-new-badge {
-        position: absolute;
-        top: 0.6rem;
-        right: 0.6rem;
-        z-index: 10;
-        background: #e74c3c;
-        color: #fff;
-        padding: 0.25rem 0.65rem;
-        border-radius: 20px;
-        font-size: 0.68rem;
-        font-weight: 700;
-        line-height: 1.4;
-        letter-spacing: 1px;
-        text-transform: uppercase;
-        pointer-events: none;
-        box-shadow: 0 2px 8px rgba(231,76,60,0.4);
-    }
+/* ===== RECENTLY UPLOADED (berganti di tempat) ===== */
+.recent-swap-grid {
+    display: grid;
+    grid-template-columns: repeat(var(--tiles, 4), 1fr);
+    gap: clamp(0.75rem, 2vw, 1.25rem);
+    max-width: 1200px;
+    margin: 2rem auto 0;
+}
+
+@media (max-width: 640px) {
+    .recent-swap-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+.recent-tile {
+    position: relative;
+    overflow: hidden;
+    border-radius: clamp(6px, 1vw, 10px);
+    aspect-ratio: 4 / 3;
+    background: #f0f0f0;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+}
+
+.recent-slide {
+    position: absolute;
+    inset: 0;
+    display: block;
+    opacity: 0;
+    z-index: 1;
+    transition: opacity 1.2s ease;
+}
+
+.recent-slide.is-active { opacity: 1; z-index: 2; }
+
+.recent-slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transform: scale(1.05);
+    transition: transform 6s ease-out;
+}
+
+.recent-slide.is-active img { transform: scale(1); }
+
+.recent-new-badge {
+    position: absolute;
+    top: 0.6rem;
+    right: 0.6rem;
+    z-index: 10;
+    background: #e74c3c;
+    color: #fff;
+    padding: 0.25rem 0.65rem;
+    border-radius: 20px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    line-height: 1.4;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    pointer-events: none;
+    box-shadow: 0 2px 8px rgba(231,76,60,0.4);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .recent-slide, .recent-slide img { transition: none; }
+}
+
+/* ===== ZOOM POP-UP ===== */
+.img-zoom {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.img-zoom.is-open { opacity: 1; visibility: visible; }
+
+.img-zoom-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.88);
+}
+
+.img-zoom-dialog {
+    position: relative;
+    max-width: min(92vw, 1000px);
+    max-height: 92vh;
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    transform: scale(0.8);
+    transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.img-zoom.is-open .img-zoom-dialog { transform: scale(1); }
+
+.img-zoom-dialog img {
+    display: block;
+    max-width: 100%;
+    max-height: calc(92vh - 76px);
+    object-fit: contain;
+    background: #111;
+}
+
+.img-zoom-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.9rem 1.25rem;
+    background: #fff;
+}
+
+.img-zoom-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.05rem;
+    color: #1a1a1a;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.img-zoom-more {
+    flex-shrink: 0;
+    background: linear-gradient(135deg, #D4AF37 0%, #AA8B2A 100%);
+    color: #fff;
+    padding: 0.65rem 1.6rem;
+    border-radius: 30px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.img-zoom-more:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(170,139,42,0.4);
+}
+
+.img-zoom-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 3;
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: rgba(0,0,0,0.55);
+    color: #fff;
+    font-size: 26px;
+    line-height: 1;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.img-zoom-close:hover { background: rgba(0,0,0,0.8); transform: rotate(90deg); }
+
+@media (max-width: 520px) {
+    .img-zoom-bar { flex-direction: column; align-items: stretch; text-align: center; }
+    .img-zoom-more { text-align: center; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .img-zoom, .img-zoom-dialog { transition: none; }
+}
 
 /* ===== BLOG PREVIEW ===== */
 .blog-preview-grid {
@@ -603,64 +762,6 @@
     padding: clamp(1.5rem, 4vw, 3rem);
     color: #999;
 }
-
-/* ===== RECENTLY UPLOADED (jalan ke kiri) ===== */
-.recent-marquee {
-    overflow: hidden;
-    position: relative;
-    padding: 0.5rem 0;
-    -webkit-mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
-            mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
-}
-.recent-track {
-    display: flex;
-    width: max-content;
-    animation: recentScroll var(--recent-duration, 40s) linear infinite;
-}
-.recent-card {
-    position: relative;
-    flex: 0 0 auto;
-    display: block;
-    width: clamp(200px, 24vw, 300px);
-    aspect-ratio: 4 / 3;
-    margin-right: 1rem;
-    border-radius: 10px;
-    overflow: hidden;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-}
-.recent-card img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-    transition: transform 0.5s ease;
-}
-.recent-card:hover img { transform: scale(1.06); }
-.recent-new-badge {
-    position: absolute;
-    top: 0.6rem;
-    right: 0.6rem;
-    z-index: 10;
-    background: #e74c3c;
-    color: #fff;
-    padding: 0.25rem 0.65rem;
-    border-radius: 20px;
-    font-size: 0.68rem;
-    font-weight: 700;
-    line-height: 1.4;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    pointer-events: none;
-    box-shadow: 0 2px 8px rgba(231,76,60,0.4);
-}
-@keyframes recentScroll {
-    from { transform: translateX(0); }
-    to   { transform: translateX(-50%); }
-}
-@media (prefers-reduced-motion: reduce) {
-    .recent-marquee { overflow-x: auto; -webkit-mask-image: none; mask-image: none; }
-    .recent-track { animation: none; }
-}
 </style>
 @endpush
 
@@ -744,39 +845,49 @@
     </div>
 </section>
 
-<!-- Recently Uploaded (jalan ke kiri) -->
+<!-- Recently Uploaded (berganti di tempat) -->
 @if($recentPhotos->isNotEmpty())
 @php
-    // Ulang daftar sampai cukup panjang, lalu gandakan 2x agar loop mulus
-    $half = collect();
-    while ($half->count() < 10) { $half = $half->concat($recentPhotos); }
-    $track = $half->concat($half);
+    // Bagi foto ke beberapa "kotak"; tiap kotak berganti foto di posisinya sendiri
+    $tileCount = min(4, $recentPhotos->count());
+    $tiles = [];
+    foreach ($recentPhotos->values() as $k => $photo) {
+        $tiles[$k % $tileCount][] = $photo;
+    }
 @endphp
 <section id="recently" class="section" style="padding-top: 0;">
     <div class="container">
         <h2 class="section-title">RECENTLY</h2>
         <p class="section-subtitle">Our newest wedding moments, freshly uploaded.</p>
-    </div>
 
-    <div class="recent-marquee">
-        <div class="recent-track" style="--recent-duration: {{ max(30, $half->count() * 4) }}s;">
-            @foreach($track as $item)
-            <a href="{{ route('gallery.show', $item['id']) }}" class="recent-card" title="{{ $item['title'] }}">
-                @if($item['is_new'])
-                    <span class="recent-new-badge">NEW</span>
-                @endif
-                <img src="{{ asset('storage/' . ImageHelper::thumb($item['path'])) }}"
-                     alt="{{ $item['title'] ?? 'Recent wedding' }}"
-                     loading="lazy"
-                     onerror="this.onerror=null; this.src='{{ asset('storage/' . $item['path']) }}';">
-            </a>
+        <div class="recent-swap-grid" style="--tiles: {{ $tileCount }};">
+            @foreach($tiles as $tilePhotos)
+            <div class="recent-tile">
+                @foreach($tilePhotos as $i => $item)
+                <a href="{{ route('gallery.show', $item['id']) }}"
+                   class="recent-slide {{ $i === 0 ? 'is-active' : '' }}"
+                   title="{{ $item['title'] }}"
+                   data-zoom
+                   data-full="{{ asset('storage/' . $item['path']) }}"
+                   data-title="{{ $item['title'] }}"
+                   data-url="{{ route('gallery.show', $item['id']) }}">
+                    @if($item['is_new'])
+                        <span class="recent-new-badge">NEW</span>
+                    @endif
+                    <img src="{{ asset('storage/' . ImageHelper::thumb($item['path'])) }}"
+                         alt="{{ $item['title'] ?? 'Recent wedding' }}"
+                         @if($i > 0) loading="lazy" @endif
+                         onerror="this.onerror=null; this.src='{{ asset('storage/' . $item['path']) }}';">
+                </a>
+                @endforeach
+            </div>
             @endforeach
         </div>
-    </div>
 
-    {{-- <div class="container" style="text-align: center; margin-top: 2rem;">
-        <a href="{{ route('gallery.public') }}" class="btn-primary">View Full Gallery</a>
-    </div> --}}
+        {{-- <div style="text-align: center; margin-top: 2rem;">
+            <a href="{{ route('gallery.public') }}" class="btn-primary">View Full Gallery</a>
+        </div> --}}
+    </div>
 </section>
 @endif
 
@@ -788,7 +899,7 @@
 
         <div class="package-grid">
             @foreach($packages->take(8) as $package)
-            <a href="{{ route('packages.public') }}" class="package-card">
+            <a href="{{ route('packages.show', $package->id) }}" class="package-card">
                 <x-image
                     :src="$package->image ?? 'https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=800&q=80'"
                     :alt="$package->name"
@@ -819,10 +930,22 @@
         @if($galleries->count() > 0)
         <div class="gallery-preview-grid">
             @foreach($galleries->take(8) as $gallery)
-            <div class="gallery-preview-item">
+            @php $zoomCover = $gallery->image ?: (($gallery->photo ?? [])[0] ?? null); @endphp
+            <a href="{{ $gallery->type === 'video' ? route('gallery.public') : route('gallery.show', $gallery->id) }}"
+               class="gallery-preview-item"
+               style="display:block;"
+               title="{{ $gallery->title }}"
+               @if($gallery->type !== 'video' && $zoomCover)
+               data-zoom
+               data-full="{{ asset('storage/' . $zoomCover) }}"
+               data-title="{{ $gallery->title }}"
+               data-url="{{ route('gallery.show', $gallery->id) }}"
+               @endif>
+
                 @if($gallery->is_new && $gallery->type !== 'video')
                     <span class="recent-new-badge">NEW</span>
                 @endif
+
                 @if($gallery->type === 'video')
 
                     {{-- YOUTUBE --}}
@@ -861,7 +984,7 @@
 
                 @endif
 
-            </div>
+            </a>
             @endforeach
         </div>
         @endif
@@ -1019,6 +1142,18 @@
     </div>
 </section>
 
+{{-- Zoom pop-up untuk gambar gallery --}}
+<div id="imgZoom" class="img-zoom" aria-hidden="true">
+    <div class="img-zoom-backdrop" data-close></div>
+    <div class="img-zoom-dialog" role="dialog" aria-modal="true" aria-label="Image preview">
+        <button type="button" class="img-zoom-close" data-close aria-label="Close">&times;</button>
+        <img id="imgZoomImg" src="" alt="">
+        <div class="img-zoom-bar">
+            <span id="imgZoomTitle" class="img-zoom-title"></span>
+            <a id="imgZoomMore" href="#" class="img-zoom-more">View More</a>
+        </div>
+    </div>
+</div>
 @endsection
 
 @push('scripts')
@@ -1191,5 +1326,88 @@ document.addEventListener('DOMContentLoaded', function () {
     updateSliderPosition();
     startTestimonialAutoSlide();
 });
+</script>
+@endpush
+
+@push('scripts')
+<script>
+(function () {
+    const tiles = document.querySelectorAll('.recent-tile');
+    if (!tiles.length) return;
+    // Hormati pengaturan "kurangi animasi": foto tidak berganti otomatis
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    tiles.forEach(function (tile, tileIndex) {
+        const slides = tile.querySelectorAll('.recent-slide');
+        if (slides.length < 2) return;
+
+        let current = 0;
+        let paused = false;
+
+        tile.addEventListener('mouseenter', function () { paused = true; });
+        tile.addEventListener('mouseleave', function () { paused = false; });
+
+        function next() {
+            if (paused || document.hidden) return;
+            slides[current].classList.remove('is-active');
+            current = (current + 1) % slides.length;
+            slides[current].classList.add('is-active');
+        }
+
+        // Tiap kotak mulai bergantian (tidak serentak) supaya terasa hidup
+        setTimeout(function () { setInterval(next, 4500); }, tileIndex * 1100);
+    });
+})();
+</script>
+@endpush
+
+@push('scripts')
+<script>
+(function () {
+    const modal = document.getElementById('imgZoom');
+    if (!modal) return;
+
+    const img   = document.getElementById('imgZoomImg');
+    const title = document.getElementById('imgZoomTitle');
+    const more  = document.getElementById('imgZoomMore');
+    let lastFocus = null;
+
+    function open(link) {
+        lastFocus = link;
+        img.src = link.dataset.full;
+        img.alt = link.dataset.title || '';
+        title.textContent = link.dataset.title || '';
+        more.href = link.dataset.url || '#';
+
+        modal.classList.add('is-open');
+        modal.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+        more.focus({ preventScroll: true });
+    }
+
+    function close() {
+        modal.classList.remove('is-open');
+        modal.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+        if (lastFocus) lastFocus.focus({ preventScroll: true });
+    }
+
+    // Klik gambar bertanda data-zoom → tampilkan zoom (bukan pindah halaman)
+    document.addEventListener('click', function (e) {
+        const link = e.target.closest('a[data-zoom]');
+        if (link) {
+            e.preventDefault();
+            open(link);
+            return;
+        }
+        if (e.target.closest('[data-close]')) {
+            close();
+        }
+    });
+
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && modal.classList.contains('is-open')) close();
+    });
+})();
 </script>
 @endpush
